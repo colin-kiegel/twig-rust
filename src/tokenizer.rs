@@ -29,5 +29,5 @@ trait Tokenizer {
     ///
     /// * When the code is syntactically wrong
 
-    pub fn tokenize(code: String, filename: Option<String>);
+    pub fn tokenize(code: String, filename: Option<String>) -> Vec<Token>;
 }

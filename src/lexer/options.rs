@@ -12,11 +12,11 @@
  */
 
 pub struct Options {
-    tag_comment: (String, String),
-    tag_block: (String,String),
-    tag_variable: (String,String),
-    whitespace_trim: String,
-    interpolation: (String,String),
+    pub tag_comment: (String, String),
+    pub tag_block: (String,String),
+    pub tag_variable: (String,String),
+    pub whitespace_trim: String,
+    pub interpolation: (String,String),
 }
 
 impl Default for Options {

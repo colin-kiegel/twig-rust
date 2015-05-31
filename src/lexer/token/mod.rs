@@ -11,6 +11,10 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+pub mod stream;
+
+pub use self::stream::Stream;
+pub use template::raw::cursor::Position;
 use lexer;
 
 #[derive(Debug, PartialEq)]
@@ -30,13 +34,8 @@ pub enum Type {
     InterpolationEnd   = 11,
 }
 
-#[derive(Debug)]
-pub struct Position {
-    lineno: u32,
-}
-
 #[derive(Debug, PartialEq)]
-pub struct Value(String); // TODO evaluate switch to slice
+pub struct Value(pub String); // TODO evaluate switch to slice
 
 #[derive(Debug)]
 pub struct Token {
@@ -148,7 +147,7 @@ mod test {
         let token = Token::new(
             Type::Text,
             Value("Hello World!".to_string()),
-            Position{lineno: 0},
+            0,
         );
         assert_eq!(token.val, Value("Hello World!".to_string()));
         assert!(token.is_type(Type::Text));
