@@ -21,25 +21,25 @@ use lexer::options::Options;
 
 use std::rc::Rc;
 
-//const REGEX_NAME            : &'static str = r"/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A";
-//const REGEX_NUMBER          : &'static str = r"/[0-9]+(?:\.[0-9]+)?/A";
-//const REGEX_STRING          : &'static str = r"/\"([^#\"\\]*(?:\\.[^#\"\\]*)*)\"|\'([^\'\\]*(?:\\.[^\'\\]*)*)\'/As"; // TODO check if it should be ' instead of \'
-//const REGEX_DQ_STRING_DELIM : &'static str = r"/\"/A";
-//const REGEX_DQ_STRING_PART  : &'static str = r"/[^#\"\\]*(?:(?:\\.|#(?!\\{))[^#\"\\]*)*/As";
+//const REGEX_NAME            : &'static str = r"\A[a-zA-Z_\x7f-\xff][a-zA-Z\d_\x7f-\xff]*";
+//const REGEX_NUMBER          : &'static str = r"\A\d+(?:\.\d+)?";
+//const REGEX_STRING          : &'static str = r"\A\"([^#\"\\]*(?:\\[.\n][^#\"\\]*)*)\"|'([^'\\]*(?:\\[.\n][^'\\]*)*)'";
+//const REGEX_DQ_STRING_DELIM : &'static str = r"\A\"";
+//const REGEX_DQ_STRING_PART  : &'static str = r"\A[^#\"\\]*(?:(?:\\[.\n]|#(?!\\{))[^#\"\\]*)*";
 
 #[derive(Debug)]
 #[derive(PartialEq)]
 pub struct RegexPatterns {
-    var: Regex,
-    block: Regex,
-    raw_data: Regex,
-    operator: Regex,
-    comment: Regex,
-    block_raw: Regex,
-    block_line: Regex,
-    tokens_start: Regex,
-    interpolation_start: Regex,
-    interpolation_end: Regex,
+    pub var: Regex,
+    pub block: Regex,
+    pub raw_data: Regex,
+    pub operator: Regex,
+    pub comment: Regex,
+    pub block_raw: Regex,
+    pub block_line: Regex,
+    pub tokens_start: Regex,
+    pub interpolation_start: Regex,
+    pub interpolation_end: Regex,
 }
 
 macro_rules! quote {
@@ -77,53 +77,43 @@ impl RegexPatterns {
         let i1 = quote!(opt.interpolation.1);
                 
         Ok(RegexPatterns {
-            var: try_new_regex!(format!(r"/\s*{ws}{v1}\s*|\s*{v1}/A",
-                        ws = ws,
-                        v1 = v1)),
-                // PHP: '/\s*'.$whitespace_trim.$tag_variable[1].'\s*|\s*'.$tag_variable[1].'/A'
-          
-            block: try_new_regex!(format!(r"/\s*(?:{ws}{b1}\s*|\s*{b1})\n?/A",
-                        ws = ws,
-                        b1 = b1)),
-                // PHP: '/\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')\n?/A'
+            var: try_new_regex!(format!(
+                r"\A\s*{ws}{v1}\s*|\s*{v1}", ws = ws, v1 = v1)),
+                // orig: '/\s*'.$whitespace_trim.$tag_variable[1].'\s*|\s*'.$tag_variable[1].'/A'
             
-            raw_data: try_new_regex!(format!(r"/({b0}{ws}|{b0})\s*(?:end%s)\s*(?:{ws}{b1}\s*|\s*{b1})/s",
-                        ws = ws,
-                        b0 = b0,
-                        b1 = b1)),
-                // PHP: '/('.$tag_block[0].$whitespace_trim.'|'.$tag_block[0].')\s*(?:end%s)\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')/s'
+            block: try_new_regex!(format!(
+                r"\A\s*(?:{ws}{b1}\s*|\s*{b1})\n?", ws = ws, b1 = b1)),
+                // orig: '/\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')\n?/A'
+            
+            raw_data: try_new_regex!(format!(
+                r"({b0}{ws}|{b0})\s*(?:end%s)\s*(?:{ws}{b1}\s*|\s*{b1})", ws = ws, b0 = b0, b1 = b1)),
+                // orig: '/('.$tag_block[0].$whitespace_trim.'|'.$tag_block[0].')\s*(?:end%s)\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')/s'
             
             operator: try_new_regex!(&RegexPatterns::get_operator_regex(env)),
-                // PHP: $this.getOperatorRegex(),
             
-            comment: try_new_regex!(format!(r"/(?:{ws}{c1}\s*|{c1})\n?/s",
-                        ws = ws,
-                        c1 = c1)),
-                // PHP: '/(?:'.$whitespace_trim.$tag_comment[1].'\s*|'.$tag_comment[1].')\n?/s'
+            comment: try_new_regex!(format!(
+                r"(?:{ws}{c1}\s*|{c1})\n?", ws = ws, c1 = c1)),
+                // orig: '/(?:'.$whitespace_trim.$tag_comment[1].'\s*|'.$tag_comment[1].')\n?/s'
             
-            block_raw: try_new_regex!(format!(r"/\s*(raw|verbatim)\s*(?:{ws}{b1}\s*|\s*{b1})/As",
-                        ws = ws,
-                        b1 = b1)),
-                // PHP: '/\s*(raw|verbatim)\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')/As'
+            block_raw: try_new_regex!(format!(
+                r"\A\s*(raw|verbatim)\s*(?:{ws}{b1}\s*|\s*{b1})", ws = ws, b1 = b1)),
+                // orig: '/\s*(raw|verbatim)\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')/As'
             
-            block_line: try_new_regex!(format!(r"/\s*line\s+(\d+)\s*{b1}/As",
-                        b1 = b0)),
-                // PHP: '/\s*line\s+(\d+)\s*'.$tag_block[1].'/As'
+            block_line: try_new_regex!(format!(
+                r"\A\s*line\s+(\d+)\s*{b1}", b1 = b1)),
+                // orig: '/\s*line\s+(\d+)\s*'.$tag_block[1].'/As'
             
-            tokens_start: try_new_regex!(format!(r"/({v0}|{b0}|{c0})({ws})?/s",
-                        ws = ws,
-                        b0 = b0,
-                        v0 = v0,
-                        c0 = c0)),
-                // PHP: '/('.$tag_variable[0].'|'.$tag_block[0].'|'.$tag_comment[0].')('.$whitespace_trim.')?/s'
+            tokens_start: try_new_regex!(format!(
+                r"({v0}|{b0}|{c0})({ws})?", ws = ws, b0 = b0, v0 = v0, c0 = c0)),
+                // orig: '/('.$tag_variable[0].'|'.$tag_block[0].'|'.$tag_comment[0].')('.$whitespace_trim.')?/s'
             
-            interpolation_start: try_new_regex!(format!(r"/{i0}\s*/A",
-                        i0 = i0)),
-                // PHP: '/'.$interpolation[0].'\s*/A'
+            interpolation_start: try_new_regex!(format!(
+                r"\A{i0}\s*", i0 = i0)),
+                // orig: '/'.$interpolation[0].'\s*/A'
             
-            interpolation_end: try_new_regex!(format!(r"/\s*{i1}/A",
-                        i1 = i1)),
-                // PHP: '/\s*'.$interpolation[1].'/A'
+            interpolation_end: try_new_regex!(format!(
+                r"\A\s*{i1}", i1 = i1)),
+                // orig: '/\s*'.$interpolation[1].'/A'
         })
     }
     
@@ -174,16 +164,16 @@ mod test {
         let opt = Rc::new(Options{..Default::default()});
         let rp_o = RegexPatterns::new(env, opt).unwrap();
         let rp_x = RegexPatterns {
-            var: Regex::new(r"/\s*-\}\}\s*|\s*\}\}/A").unwrap(),
-            block: Regex::new(r"/\s*(?:-%\}\s*|\s*%\})\n?/A").unwrap(),
-            raw_data: Regex::new(r"/(\{%-|\{%)\s*(?:end%s)\s*(?:-%\}\s*|\s*%\})/s").unwrap(),
+            var: Regex::new(r"\A\s*-\}\}\s*|\s*\}\}").unwrap(),
+            block: Regex::new(r"\A\s*(?:-%\}\s*|\s*%\})\n?").unwrap(),
+            raw_data: Regex::new(r"(\{%-|\{%)\s*(?:end%s)\s*(?:-%\}\s*|\s*%\})").unwrap(),
             operator: Regex::new(r"").unwrap(),
-            comment: Regex::new(r"/(?:-\#\}\s*|\#\})\n?/s").unwrap(),
-            block_raw: Regex::new(r"/\s*(raw|verbatim)\s*(?:-%\}\s*|\s*%\})/As").unwrap(),
-            block_line: Regex::new(r"/\s*line\s+(\d+)\s*\{%/As").unwrap(),
-            tokens_start: Regex::new(r"/(\{\{|\{%|\{\#)(-)?/s").unwrap(),
-            interpolation_start: Regex::new(r"/\#\{\s*/A").unwrap(),
-            interpolation_end: Regex::new(r"/\s*\}/A").unwrap(),
+            comment: Regex::new(r"(?:-\#\}\s*|\#\})\n?").unwrap(),
+            block_raw: Regex::new(r"\A\s*(raw|verbatim)\s*(?:-%\}\s*|\s*%\})").unwrap(),
+            block_line: Regex::new(r"\A\s*line\s+(\d+)\s*%\}").unwrap(),
+            tokens_start: Regex::new(r"(\{\{|\{%|\{\#)(-)?").unwrap(),
+            interpolation_start: Regex::new(r"\A\#\{\s*").unwrap(),
+            interpolation_end: Regex::new(r"\A\s*\}").unwrap(),
         };
         
         println!(".var");
