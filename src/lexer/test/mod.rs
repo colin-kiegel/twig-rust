@@ -17,8 +17,8 @@ use environment::Environment;
 use template::raw::Raw;
 use std::rc::Rc;
 
-const TWIG_TEMPLATE_CODE : &'static str = include_str!("twig.template.html");
-const TWIG_TEMPLATE_NAME : &'static str = "twig.template.html";
+static TWIG_TEMPLATE_NAME : &'static str = "twig.template.html";
+static TWIG_TEMPLATE_CODE : &'static str = include_str!("twig.template.html");
 
 #[test]
 pub fn new() {
@@ -27,7 +27,7 @@ pub fn new() {
     let tpl = Rc::new(Raw::new(TWIG_TEMPLATE_CODE, TWIG_TEMPLATE_NAME));
     let mut lxr = Lexer::new(env, opt);
     
-    let tokenstream = lxr.tokenize(tpl).unwrap();
+    let tokenstream = lxr.tokenize(&tpl).unwrap();
     
     assert!(!tokenstream.is_eof());
 }

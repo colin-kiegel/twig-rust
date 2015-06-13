@@ -21,7 +21,7 @@ pub use self::cursor::Cursor as Cursor;
 #[derive(Debug)]
 pub struct Raw {
     filename: String,
-    code: String,
+    pub code: String,
 }
 
 #[allow(dead_code)]
