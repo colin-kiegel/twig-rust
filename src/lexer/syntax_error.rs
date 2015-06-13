@@ -6,16 +6,18 @@
  */
 
 /**
- * Stores the Twig configuration.
+ * Typisation of syntax errors.
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
-const VERSION : &'static str = "1.18.1";
-
-#[derive(Default)]
-pub struct Environment;
- 
-impl Environment {
-
+#[allow(dead_code)]
+#[derive(Debug)]
+pub enum Code {
+    Unknown,
+    UnexpectedCharacter,
+    UnexpectedBracket,
+    UnexpectedEof,
+    UnclosedBracket,
+    UnclosedComment,
 }

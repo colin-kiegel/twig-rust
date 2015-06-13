@@ -16,7 +16,7 @@ pub use super::*;
 #[macro_export]
 macro_rules! err {
     ( $message:expr, $code:expr ) => ({
-            use super::*;
+            //use super::*;
             
             Err(error::Error::new($code, err_details!($message)))
         });

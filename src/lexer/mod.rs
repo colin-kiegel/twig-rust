@@ -11,31 +11,39 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+// outer
+use std::rc::Rc;
+use template;
+use environment::Environment;
+use error;
+
+// exports
+pub mod syntax_error;
 pub mod options;
+pub use self::options::Options;
+pub use self::syntax_error::Code as SyntaxErrorCode;
+pub type SyntaxError = error::Error<SyntaxErrorCode>;
+
+// inner
+#[cfg(test)]
+mod test;
 mod state;
 mod regex_patterns;
 mod token;
-
-pub use self::options::Options;
-pub use environment::Environment;
-//use self::token as token;
 use self::token::Token;
 use self::state::State;
 use self::regex_patterns::RegexPatterns;
-use template;
-use error;
-
-use std::rc::Rc;
 
 // TODO: where does this belong?
-const PUNCTUATION           : &'static str = "()[]{}?:.,|";
+//const PUNCTUATION           : &'static str = "()[]{}?:.,|";
 
-#[derive(Default)]
+#[allow(dead_code)]
+//#[derive(Default)]
 struct Lexer {
-    env: Environment,
+    env: Rc<Environment>,
     options: Rc<Options>,
     patterns: RegexPatterns,
-    template: Option<Rc<template::Raw>>, // TODO reference with lifetime?
+    template: Option<Rc<template::Raw>>,
     stream: Option<Rc<token::Stream>>,
     cursor: Option<Rc<template::raw::Cursor>>,
     position: Option<usize>,
@@ -43,34 +51,53 @@ struct Lexer {
     state: State,
     states: Vec<State>,
     brackets: Vec<(&'static str/*TODO reduce lifetime*/, usize/*TODO LineNo*/)>,
-    currentVarBlockLine: usize,
+    current_var_block_line: usize,
 }
 
+#[allow(dead_code)]
+#[allow(unused_variables)]
 impl Lexer {
-    pub fn new(env: Environment, options: Options) -> Lexer {
-        let opt = Rc::new(options);
+    pub fn new(env: Environment, opt: Options) -> Lexer {
+        let env = Rc::new(env);
+        let opt = Rc::new(opt);
+        let patterns = RegexPatterns::new(env.clone(), opt.clone())
+        .unwrap(); // TODO Error-Handling
+        
         Lexer {
             env: env,
-            patterns: RegexPatterns::new(opt.clone()),
             options: opt,
-            .. Default::default()
+            patterns: patterns,
+            template: None,
+            stream: None,
+            cursor: None,
+            position: None,
+            positions: Vec::default(),
+            state: State::default(),
+            states: Vec::default(),
+            brackets: Vec::default(),
+            current_var_block_line: 0,
         }
     }
     
-    pub fn tokenize(&mut self, template: Rc<template::Raw>) -> Result<Rc<token::Stream>, error::aliases::SyntaxError> {
+    pub fn tokenize(&mut self, template: Rc<template::Raw>) -> Result<Rc<token::Stream>, SyntaxError> {
         // TODO set/handle encoding (note: Twig-PHP assumes ASCII)
         
-        unimplemented!();
+        let cursor = Rc::new(template::raw::Cursor::new(template.clone()));
+        let mut tokens = Vec::<Token>::new();
         
         self.reset();
         self.template = Some(template.clone());
-        let mut tokens = Vec::<Token>::new();
+        self.cursor = Some(cursor.clone());
+        
+        println!("Starting with {:?}", cursor);
         
         // find all token starts in one go
-        // TODO preg_match_all(self.patterns.tokens_start, self.code, matches, PREG_OFFSET_CAPTURE);
-        // self.positions = matches;
+        // let positions = self.patterns.tokens_start.find_iter(&template.code);
         
-        while !self.cursor.clone().expect("fatal").is_eof() {
+        // PHP: preg_match_all(self.patterns.tokens_start, self.code, matches, PREG_OFFSET_CAPTURE);
+        // TODO self.positions = positions;
+        
+        while !cursor.is_eof() {
             match self.state {
                 State::Data => self.lex_data(),
                 State::Block => self.lex_block(),
@@ -83,7 +110,7 @@ impl Lexer {
         tokens.push(Token::new(
             token::Type::Eof,
             token::Value("".to_string())/*TODO val*/,
-            self.cursor.clone().expect("fatal").get_position() 
+            cursor.get_position() 
         ));
         
         if !self.brackets.is_empty() {

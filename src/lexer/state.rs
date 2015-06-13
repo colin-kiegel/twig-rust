@@ -11,6 +11,7 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+#[allow(dead_code)]
 pub enum State {
     Data            = 0,
     Block           = 1,
@@ -19,6 +20,7 @@ pub enum State {
     Interpolation   = 4,
 }
 
+#[allow(dead_code)]
 impl Default for State {
     fn default() -> State {
         State::Data

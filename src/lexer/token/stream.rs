@@ -17,6 +17,7 @@ use template;
 
 use std::rc::Rc;
 
+#[allow(dead_code)]
 #[derive(Default)]
 pub struct Stream {
     tokens: Vec<Token>,
@@ -34,6 +35,8 @@ impl ToString for Stream {
     }
 }
 
+#[allow(dead_code)]
+#[allow(unused_variables)]
 impl Stream {
     /// Constructor
 

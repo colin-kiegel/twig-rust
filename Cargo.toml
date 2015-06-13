@@ -2,3 +2,6 @@
 name = "twig"
 version = "0.1.0"
 authors = ["Colin Kiegel <kiegel@gmx.de>"]
+
+[dependencies]
+regex = "0.1.33"

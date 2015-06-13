@@ -31,26 +31,17 @@
 #[macro_use]
 pub mod macros;
 
-pub mod syntax;
-
-pub use self::syntax::Code as SyntaxErrorCode;
-
-pub mod aliases {
-    pub use super::*;
-    
-//    pub type SyntaxErrorCode = super::SyntaxErrorCode;
-    pub type SyntaxError = Error<syntax::Code>;
-}
-
 // TODO Read more about error handling in rust
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Error<T>
-    /*where T: Syntax, ... - restrict to real codes */ {
+    /* TODO where T: Syntax, ... - restrict to real codes */ {
     code: T,
     details: Details,
 }
 
+#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Details {
     pub message : &'static str,
@@ -60,6 +51,7 @@ pub struct Details {
     pub column : u32,
 }
 
+#[allow(dead_code)]
 impl<T> Error<T> {
     pub fn new(code: T, details: Details) -> Error<T> {
         Error {

@@ -15,8 +15,9 @@ pub mod stream;
 
 pub use self::stream::Stream;
 pub use template::raw::cursor::Position;
-use lexer;
 
+
+#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Type {
     Eof                = -1,
@@ -44,6 +45,8 @@ pub struct Token {
     pos: Position, // orig called 'lineno'
 }
 
+#[allow(dead_code)]
+#[allow(unused_variables)]
 impl Type {
     /// Returns the name of the token type (internal representation).
     ///
@@ -103,6 +106,8 @@ impl ToString for Type {
     }
 }
 
+#[allow(dead_code)]
+#[allow(unused_variables)]
 impl Token {
     /// Constructor.
     /// 
@@ -140,7 +145,7 @@ impl ToString for Token {
 
 #[cfg(test)]
 mod test {
-    use super::{Token, Type, Value, Position};
+    use super::{Token, Type, Value};
 
     #[test]
     fn new_token() {

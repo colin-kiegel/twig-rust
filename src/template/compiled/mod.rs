@@ -11,4 +11,5 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+#[allow(dead_code)]
 pub struct Compiled;
