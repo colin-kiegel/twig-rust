@@ -53,7 +53,7 @@ pub struct Details {
 
 #[allow(dead_code)]
 impl<T> Error<T> {
-    pub fn new(code: T, details: Details) -> Error<T> {
+    pub fn new(details: Details, code: T) -> Error<T> {
         Error {
             code : code,
             details : details,

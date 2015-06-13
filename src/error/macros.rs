@@ -18,7 +18,7 @@ macro_rules! err {
     ( $message:expr, $code:expr ) => ({
             //use super::*;
             
-            Err(error::Error::new($code, err_details!($message)))
+            Err(error::Error::new(err_details!($message), $code))
         });
 }
 
