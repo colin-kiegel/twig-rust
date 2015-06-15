@@ -12,8 +12,8 @@
  */
 
 use error;
-use lexer::state::SyntaxError;
-use lexer::state::SyntaxErrorCode;
+use lexer::SyntaxError;
+use lexer::SyntaxErrorCode;
 use std::rc::Rc;
 
 pub type Position = usize;

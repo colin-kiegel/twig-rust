@@ -13,10 +13,11 @@
 use super::*;
 
 #[allow(dead_code)]
-struct Interpolation;
+struct Interpolation(State);
 
-impl State for Interpolation {
-    fn lex(&self) -> Result<Option<Box<State>>,SyntaxError> {
+impl Tokenize for Interpolation {
+    fn lex<T>(&mut self) -> &mut T 
+    where T: Tokenize {
     /*
         $bracket = end($this->brackets);
         if ($this->options['interpolation'][0] === $bracket[0] && preg_match($this->regexes['interpolation_end'], $this->code, $match, null, $this->cursor)) {

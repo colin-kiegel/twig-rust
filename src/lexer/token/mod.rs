@@ -16,7 +16,6 @@ pub mod stream;
 pub use self::stream::Stream;
 pub use template::raw::cursor::Position;
 
-
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Type {
@@ -138,7 +137,7 @@ impl ToString for Token {
     /// Returns a string representation of the token type.
     fn to_string(&self) -> String {
         let Value(ref val_string) = self.val;
-        format!("{}({})", self.typ.to_string(), val_string)
+        format!("{typ}({val})", typ = self.typ.to_string(), val = val_string)
         //return sprintf('%s(%s)', self::typeToString($this->type, true), $this->value);
     }
 }

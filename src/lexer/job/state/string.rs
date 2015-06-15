@@ -13,10 +13,11 @@
 use super::*;
 
 #[allow(dead_code)]
-struct String;
+struct String(State);
 
-impl State for String {
-    fn lex(&self) -> Result<Option<Box<State>>,SyntaxError> {
+impl Tokenize for String {
+    fn lex<T>(&mut self) -> &mut T 
+    where T: Tokenize {
     /*
         // whitespace
         if (preg_match('/\s+/A', $this->code, $match, null, $this->cursor)) {

@@ -13,10 +13,11 @@
 use super::*;
 
 #[allow(dead_code)]
-struct Block;
+struct Block(State);
 
-impl State for Block {
-    fn lex(&self) -> Result<Option<Box<State>>,SyntaxError> {
+impl Tokenize for Block {
+    fn lex<T>(&mut self) -> &mut T 
+    where T: Tokenize {
         /*
         if (empty($this->brackets) && preg_match($this->regexes['lex_block'], $this->code, $match, null, $this->cursor)) {
             $this->pushToken(Twig_Token::BLOCK_END_TYPE);

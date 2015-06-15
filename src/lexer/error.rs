@@ -11,9 +11,15 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+// exports //
+pub type SyntaxError = error::Error<SyntaxErrorCode>;
+
+// imports //
+use error;
+
 #[allow(dead_code)]
 #[derive(Debug)]
-pub enum Code {
+pub enum SyntaxErrorCode {
     Unknown,
     UnexpectedCharacter,
     UnexpectedBracket,

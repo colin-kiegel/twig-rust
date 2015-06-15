@@ -13,10 +13,11 @@
 use super::*;
 
 #[allow(dead_code)]
-struct Data;
+struct Data(State);
 
-impl State for Data {
-    fn lex(&self) -> Result<Option<Box<State>>,SyntaxError> {
+impl Tokenize for Data {
+    fn lex<T>(&mut self) -> &mut T 
+    where T: Tokenize {
     /*
             // if no matches are left we return the rest of the template as simple text token
         if (self.position == self.token_iter.count() - 1) {
