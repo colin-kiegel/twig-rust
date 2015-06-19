@@ -31,7 +31,7 @@ pub struct Job<'a> {
     current_var_block_line: usize,
     patterns: Rc<RegexPatterns>,
     template: Rc<template::Raw>,
-    tokens: Vec<Token>,
+    tokens: token::Stream,
     cursor: Rc<template::raw::Cursor>,
     position: usize,
     token_iter: regex::FindMatches<'a ,'a >, // orig: positions
@@ -45,12 +45,13 @@ impl<'a> Job<'a> {
             // find all token starts in one go:
             let token_iter = patterns.tokens_start.find_iter(&template.code);
             let cursor = Rc::new(template::raw::Cursor::new(template.clone()));
+            let tokens = token::Stream::new(template.clone());
             println!("Starting with {:?}", cursor);
 
         Box::new(Job {
             patterns: patterns.clone(),
             template: template.clone(),
-            tokens: Vec::<Token>::new(), // TODO guess count
+            tokens: tokens,
             cursor: cursor,
             token_iter: token_iter,
             position: Default::default(),
@@ -60,12 +61,11 @@ impl<'a> Job<'a> {
         })
     }
     
-    pub fn tokenize(self) -> Result<token::Stream, SyntaxError> {
-        let mut job = self;
+    pub fn tokenize(mut self) -> Result<token::Stream, SyntaxError> {
         let mut tokenizer : Box<Tokenize> = state::Initial::new();
 
         while !tokenizer.is_finished() {
-            match tokenizer.step(&mut job) {
+            match tokenizer.step(&mut self) {
                 Ok(new_state) => tokenizer = new_state,
                 Err(e) => {
                     return Err(e); // TODO wrap the error?
@@ -73,6 +73,15 @@ impl<'a> Job<'a> {
             }
         }
         
-        Ok(token::Stream::new(job.tokens, job.template))
+        Ok(self.tokens)
+    }
+    
+    pub fn push_token(&mut self, token: token::Token) {
+        // TODO sometime in the future:
+        // * check if the template can be disassembled into string-objects without
+        //   copying - i.e. without calling to_string(&str)
+
+        let position = self.cursor.get_position();
+        self.tokens.push(token, position);
     }
 }

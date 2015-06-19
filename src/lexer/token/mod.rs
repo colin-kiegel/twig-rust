@@ -11,10 +11,27 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+// exports //
 pub mod stream;
-
 pub use self::stream::Stream;
-pub use template::raw::cursor::Position;
+
+#[allow(dead_code)]
+#[derive(Debug, PartialEq)]
+pub enum Token {
+    Eof,
+    Text(String),
+    BlockStart,
+    VarStart,
+    BlockEnd,
+    VarEnd,
+    Name(String),
+    Number(String),
+    String(String),
+    Operator(String),
+    Punctuation(String),
+    InterpolationStart,
+    InterpolationEnd,
+}
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
@@ -34,14 +51,59 @@ pub enum Type {
     InterpolationEnd   = 11,
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Value(pub String); // TODO evaluate switch to slice
+#[allow(dead_code)]
+#[allow(unused_variables)]
+impl Token {
+    pub fn get_value<'a>(&'a self) -> Option<&'a str> {
+        match *self {
+            Token::Eof => None,
+            Token::Text(ref x) => Some(x),
+            Token::BlockStart => None,
+            Token::VarStart => None,
+            Token::BlockEnd => None,
+            Token::VarEnd => None,
+            Token::Name(ref x) => Some(x),
+            Token::Number(ref x) => Some(x),
+            Token::String(ref x) => Some(x),
+            Token::Operator(ref x) => Some(x),
+            Token::Punctuation(ref x) => Some(x),
+            Token::InterpolationStart => None,
+            Token::InterpolationEnd => None,
+        }
+    }
+    
+    pub fn get_type(&self) -> Type {
+        match *self {
+            Token::Eof => Type::Eof,
+            Token::Text(_) => Type::Text,
+            Token::BlockStart => Type::BlockStart,
+            Token::VarStart => Type::VarStart,
+            Token::BlockEnd => Type::BlockEnd,
+            Token::VarEnd => Type::VarEnd,
+            Token::Name(_) => Type::Name,
+            Token::Number(_) => Type::Number,
+            Token::String(_) => Type::String,
+            Token::Operator(_) => Type::Operator,
+            Token::Punctuation(_) => Type::Punctuation,
+            Token::InterpolationStart => Type::InterpolationStart,
+            Token::InterpolationEnd => Type::InterpolationEnd,
+        }
+    }
+    
+    pub fn is_type(&self, typ: Type) -> bool {
+        self.get_type() == typ
+    }
+}
 
-#[derive(Debug)]
-pub struct Token {
-    typ: Type, // orig called 'type' 
-    val: Value,
-    pos: Position, // orig called 'lineno'
+impl ToString for Token {
+    /// Returns a string representation of the token type.
+    fn to_string(&self) -> String {
+        let typ = self.get_type().get_name(false);
+        match self.get_value() {
+            Some(ref val) => format!("{typ}({val})", typ = typ, val = val),
+            None          => format!("{typ}", typ = typ),
+        }
+    }
 }
 
 #[allow(dead_code)]
@@ -99,61 +161,19 @@ impl Type {
 }
 
 impl ToString for Type {
-
     fn to_string(&self) -> String {
          self.get_name(true)
     }
 }
 
-#[allow(dead_code)]
-#[allow(unused_variables)]
-impl Token {
-    /// Constructor.
-    /// 
-    /// # Arguments
-    ///
-    /// * `typ` - The type of the token
-    /// * `val` - The token value
-    /// * `pos` - The line position in the source
-    
-    pub fn new(typ: Type, val: Value, pos: Position) -> Token {
-        Token {
-            typ: typ,
-            val: val,
-            pos: pos,
-        }
-    }
-    
-    pub fn is_type(&self, typ: Type) -> bool {
-        self.typ == typ
-    }
-    
-    pub fn is_value(&self, val: Value) -> bool {
-        self.val == val
-    }
-}
-
-impl ToString for Token {
-    /// Returns a string representation of the token type.
-    fn to_string(&self) -> String {
-        let Value(ref val_string) = self.val;
-        format!("{typ}({val})", typ = self.typ.to_string(), val = val_string)
-        //return sprintf('%s(%s)', self::typeToString($this->type, true), $this->value);
-    }
-}
-
 #[cfg(test)]
 mod test {
-    use super::{Token, Type, Value};
+    use super::{Token, Type};
 
     #[test]
     fn new_token() {
-        let token = Token::new(
-            Type::Text,
-            Value("Hello World!".to_string()),
-            0,
-        );
-        assert_eq!(token.val, Value("Hello World!".to_string()));
+        let token = Token::Text("Hello World!".to_string());
+        assert_eq!(token.get_value().unwrap(), "Hello World!".to_string());
         assert!(token.is_type(Type::Text));
     }
 }

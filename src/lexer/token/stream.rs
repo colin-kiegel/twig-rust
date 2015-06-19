@@ -18,40 +18,49 @@ use template;
 use std::rc::Rc;
 
 #[allow(dead_code)]
-#[derive(Default)]
-pub struct Stream {
-    tokens: Vec<Token>,
-    current: usize,
-    template: Option<Rc<template::Raw>>,
-//    filename: String,
+#[derive(Debug)]
+pub struct Item {
+    token:      Token,
+    position:   usize,
 }
 
-impl ToString for Stream {
-    /// Returns a string representation of the token stream.
-    
-    fn to_string(&self) -> String {
-        let v: Vec<String> = self.tokens.iter().map(|x| x.to_string()).collect();
-        v.connect("\n")
-    }
+#[allow(dead_code)]
+#[derive(Default)]
+pub struct Stream {
+    items: Vec<Item>,
+    template: Option<Rc<template::Raw>>,
 }
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
 impl Stream {
     /// Constructor
-
-    pub fn new(tokens: Vec<Token>, template: Rc<template::Raw>) -> Stream {
+    pub fn new(template: Rc<template::Raw>) -> Stream {
         Stream {
-            tokens: tokens,
-            current: 0,
+            items: Vec::new(),
             template: Some(template),
-//            filename: filename.to_string(),
         }
     }
     
-    pub fn is_eof(&self) -> bool {
-        // TODO - switch to self.tokens.last() if it is safe
-        self.tokens[self.current].is_type(Type::Eof)
+    pub fn push(&mut self, token: Token, position: usize) {
+        self.items.push(Item {
+            token: token,
+            position: position,
+        });
     }
     
+    pub fn is_eof(&self) -> bool {
+        match self.items.last()  {
+            Some(x) => x.token.is_type(Type::Eof),
+            None    => true,
+        }
+    }
+}
+
+impl ToString for Stream {
+    /// Returns a string representation of the token stream.
+    fn to_string(&self) -> String {
+        let v: Vec<String> = self.items.iter().map(|i| i.token.to_string()).collect();
+        v.connect("\n")
+    }
 }
