@@ -13,6 +13,8 @@
 
 // exports //
 pub type SyntaxError = error::Error<SyntaxErrorCode>;
+pub type TokenError = error::Error<TokenErrorCode>;
+pub type LexerError = error::Error<LexerErrorCode>;
 
 // imports //
 use error;
@@ -26,4 +28,16 @@ pub enum SyntaxErrorCode {
     UnexpectedEof,
     UnclosedBracket,
     UnclosedComment,
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+pub enum LexerErrorCode {
+    Logic,
+}
+
+#[allow(dead_code)]
+#[derive(Debug)]
+pub enum TokenErrorCode {
+    NoValue,
 }

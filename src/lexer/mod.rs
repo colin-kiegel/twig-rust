@@ -16,7 +16,7 @@ pub mod error;
 pub mod job;
 pub mod options;
 pub use self::options::Options;
-pub use self::error::{SyntaxErrorCode, SyntaxError};
+pub use self::error::*;//{SyntaxErrorCode, SyntaxError};
 
 
 // imports
