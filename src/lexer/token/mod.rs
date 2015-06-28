@@ -11,9 +11,13 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+/////////////
 // exports //
+/////////////
+
 pub mod stream;
 pub use self::stream::Stream;
+
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
@@ -71,7 +75,7 @@ impl Token {
             Token::InterpolationEnd => None,
         }
     }
-    
+
     pub fn get_type(&self) -> Type {
         match *self {
             Token::Eof => Type::Eof,
@@ -89,7 +93,7 @@ impl Token {
             Token::InterpolationEnd => Type::InterpolationEnd,
         }
     }
-    
+
     pub fn is_type(&self, typ: Type) -> bool {
         self.get_type() == typ
     }
@@ -114,24 +118,24 @@ impl Type {
     /// # Arguments
     ///
     /// * `short` - short or long representation
-    
+
     pub fn get_name(&self, short: bool) -> String {
          let name = match *self {
-            Type::Eof => "EOF_TYPE",
-            Type::Text => "TEXT_TYPE",
-            Type::BlockStart => "BLOCK_START_TYPE",
-            Type::VarStart => "VAR_START_TYPE",
-            Type::BlockEnd => "BLOCK_END_TYPE",
-            Type::VarEnd => "VAR_END_TYPE",
-            Type::Name => "NAME_TYPE",
-            Type::Number => "NUMBER_TYPE",
-            Type::String => "STRING_TYPE",
-            Type::Operator => "OPERATOR_TYPE",
-            Type::Punctuation => "PUNCTUATION_TYPE",
-            Type::InterpolationStart => "INTERPOLATION_START_TYPE",
-            Type::InterpolationEnd => "INTERPOLATION_END_TYPE",
+            Type::Eof => "EOF",
+            Type::Text => "TEXT",
+            Type::BlockStart => "BLOCK_START",
+            Type::VarStart => "VAR_START",
+            Type::BlockEnd => "BLOCK_END",
+            Type::VarEnd => "VAR_END",
+            Type::Name => "NAME",
+            Type::Number => "NUMBER",
+            Type::String => "STRING",
+            Type::Operator => "OPERATOR",
+            Type::Punctuation => "PUNCTUATION",
+            Type::InterpolationStart => "INTERPOLATION_START",
+            Type::InterpolationEnd => "INTERPOLATION_END",
         };
-        
+
         if short {
             name.to_string()
         } else {
@@ -139,7 +143,7 @@ impl Type {
         }
     }
 
-    // Returns the description of the token type in plain english.
+    /// Returns the description of the token type in plain english.
 
     pub fn get_description(&self) -> String {
          match *self {

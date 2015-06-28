@@ -11,8 +11,12 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+/////////////
+// exports //
+/////////////
+
 #[allow(dead_code)]
-const VERSION : &'static str = "1.18.1";
+pub const VERSION : &'static str = "1.18.1";
 
 #[derive(Default)]
 pub struct Environment;

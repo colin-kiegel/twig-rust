@@ -11,9 +11,13 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
-pub mod cursor;
+/////////////
+// exports //
+/////////////
 
+pub mod cursor;
 pub use self::cursor::Cursor as Cursor;
+
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
@@ -36,7 +40,7 @@ impl Raw {
 
         return x;
     }
-    
+
     fn fix_linebreaks(&mut self) {
         self.code = self.code.replace("\r\n","\n").replace("\r","\n");
     }
@@ -49,7 +53,7 @@ mod test {
     #[test]
     pub fn new() {
         let t = Raw::new("A", "B");
-        
+
         assert_eq!(t.code, "A");
         assert_eq!(t.filename, "B");
     }

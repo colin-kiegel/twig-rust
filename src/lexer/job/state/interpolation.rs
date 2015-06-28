@@ -10,13 +10,19 @@
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
+
+/////////////
+// imports //
+/////////////
+
 use super::*;
+
 
 #[allow(dead_code)]
 struct Interpolation(State);
 
 impl Tokenize for Interpolation {
-    fn lex<T>(&mut self) -> &mut T 
+    fn lex<T>(&mut self) -> &mut T
     where T: Tokenize {
     /*
         $bracket = end($this->brackets);

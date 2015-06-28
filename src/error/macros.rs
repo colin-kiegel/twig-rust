@@ -11,13 +11,17 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+/////////////
+// exports //
+/////////////
+
 pub use super::*;
 
 #[macro_export]
 macro_rules! err {
     ( $message:expr, $code:expr ) => ({
             //use super::*;
-            
+
             Err(error::Error::new(err_details!($message), $code))
         });
 }
