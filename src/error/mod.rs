@@ -28,23 +28,36 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+/////////////
+// imports //
+/////////////
+
+use std::fmt;
+use std::error::Error as ErrorTrait;
+
+/////////////
+// exports //
+/////////////
+
 #[macro_use]
 pub mod macros;
 
 // TODO Read more about error handling in rust
+//http://doc.rust-lang.org/std/error/index.html
 
 #[allow(dead_code)]
 #[derive(Debug)]
-pub struct Error<T>
-    /* TODO where T: Syntax, ... - restrict to real codes */ {
+pub struct Error<T> {
     code: T,
     details: Details,
+    description: String,
+    cause: Option<Box<ErrorTrait>>,
 }
 
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Details {
-    pub message : &'static str,
+    pub message : &'static str, // TODO make this Option<&str> - requires additional macro logic
     pub module_path : &'static str,
     pub filename : &'static str,
     pub line : u32,
@@ -52,21 +65,58 @@ pub struct Details {
 }
 
 #[allow(dead_code)]
-impl<T> Error<T> {
+impl<T> Error<T>
+    where T: fmt::Debug {
     pub fn new(details: Details, code: T) -> Error<T> {
+        let description = format!("[{code:?}]: {details}",
+            code = code,
+            details = details.to_string());
+
         Error {
             code : code,
             details : details,
+            description: description,
+            cause: None,
         }
+    }
+
+    pub fn chain(&mut self, cause: Box<ErrorTrait>) {
+        self.cause = Some(cause)
+    }
+}
+
+// error: use of unstable library feature 'core': requires RFC and more experience
+//     where T: ::std::marker::Reflect + fmt::Debug {
+//              ^~~~~~~~~~~~~~~~~~~~~~
+// impl<T> ErrorTrait for Error<T>
+//     where T: ::std::marker::Reflect + fmt::Debug {
+//     fn description(&self) -> &str {
+//         self.description.as_ref()
+//     }
+//
+//     fn cause<'a>(&'a self) -> Option<&'a ErrorTrait> {
+//         use std::borrow::Borrow;
+//         // TODO is there a simpler way to go from Option<Box<T>> to Option<&T>? Ask this on SO...
+//         match self.cause {
+//             Some(ref cause) => Some(cause.borrow()),
+//             None            => None
+//         }
+//     }
+// }
+
+impl<T> fmt::Display for Error<T> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "{}", self.description)
     }
 }
 
 impl ToString for Details {
     fn to_string(&self) -> String {
-        format!("{}::{}:{}:{}",
-            self.module_path,
-            self.filename,
-            self.line,
-            self.column)
+        format!("{message} in {path}/{filename}:{line}:{column}",
+            message  = self.message,
+            path     = self.module_path,
+            filename = self.filename,
+            line     = self.line,
+            column   = self.column)
     }
 }
