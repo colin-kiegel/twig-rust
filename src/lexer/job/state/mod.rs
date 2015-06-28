@@ -11,37 +11,43 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
-// ## exports ##
-pub mod initial;
-pub mod _final;
-//pub mod block;
-//pub mod data;
-//pub mod interpolation;
-//pub mod string;
-//pub mod var;
-pub use self::initial::Initial;
+/////////////
+// imports //
+/////////////
 
-// ## imports ##
 use lexer::SyntaxError;
 use lexer::job::Job;
 use std::fmt::Debug;
-//use self::_final::Final;
-//use block;
-//use data;
-//use interpolation;
-//use string;
-//use var;
+
+/////////////
+// exports //
+/////////////
+
+pub mod initial;
+pub mod data;
+pub mod _final;
+pub use self::initial::Initial;
+
 
 pub trait Tokenize : Debug {
     fn new() -> Box<Self>
         where Self : Sized;
-        
-    fn is_finished(&self) -> bool;
-    
-    fn step(&self, &mut Job) -> Result<Box<Tokenize>,SyntaxError>;
+
+    fn is_finished(&self) -> bool{
+        false
+    }
+
+    fn step<'a>(&self, &mut Job<'a>) -> Result<Box<Tokenize>,SyntaxError>;
+
+    fn get_type(&self) -> Code;
+
+    fn is_type(&self, code: Code) -> bool {
+        self.get_type() == code
+    }
 }
 
 #[allow(dead_code)]
+#[derive(PartialEq)]
 pub enum Code {
     Data            = 0,
     Block           = 1,
@@ -49,7 +55,7 @@ pub enum Code {
     String          = 3,
     Interpolation   = 4,
     Initial         = -1, // orig: implicit sub-state of Data
-    End             = -2, // orig: implicit sub-state
+    Final           = -2, // orig: implicit sub-state
 }
 
 #[allow(dead_code)]

@@ -11,61 +11,66 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
-// exports
-pub mod error;
-pub mod job;
-pub mod options;
-pub use self::options::Options;
-pub use self::error::*;//{SyntaxErrorCode, SyntaxError};
+//////////////
+// imports  //
+//////////////
 
-
-// imports
+use std::rc::Rc;
 #[cfg(test)]
 mod test;
-mod regex_patterns;
 mod token;
-use self::regex_patterns::RegexPatterns;
-use std::rc::Rc;
 use template;
 use environment::Environment;
-use lexer::job::state::Tokenize;
 use lexer::job::Job;
+use lexer::job::state::Tokenize;
+use regex::Error as regexError;
+
+/////////////
+// exports //
+/////////////
+
+pub mod error;
+pub mod job;
+pub mod patterns;
+pub use self::patterns::Patterns;
+pub use self::patterns::options::Options;
+pub use self::error::{SyntaxErrorCode, SyntaxError};
+
 
 // TODO: where does this belong?
 //const PUNCTUATION           : &'static str = "()[]{}?:.,|";
 
 #[allow(dead_code)]
 struct Lexer {
-    env: Rc<Environment>,
+    environment: Rc<Environment>,
     options: Rc<Options>,
-    patterns: Rc<RegexPatterns>,
+    patterns: Patterns,
 }
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
-impl<'r, 't> Lexer {
-    pub fn new(env: Environment, opt: Options) -> Lexer {
+impl<'a, 'r, 't> Lexer {
+    pub fn new(env: Environment, opt: Options) -> Result<Lexer, regexError> {
         let env = Rc::new(env);
         let opt = Rc::new(opt);
-        let patterns = Rc::new(RegexPatterns::new(env.clone(), opt.clone())
-                        .unwrap()); // TODO Error-Handling
-        
-        Lexer {
-            env: env,
+        let patterns = try!(Patterns::new(env.clone(), opt.clone())); // TODO Error-Handling ?
+
+        Ok(Lexer {
+            environment: env,
             options: opt,
             patterns: patterns,
-        }
+        })
     }
-    
-    pub fn tokenize(&'t mut self, template: &'r Rc<template::Raw>) -> Result<token::Stream, SyntaxError>
+
+    pub fn tokenize(&'t self, template: &'r template::Raw) -> Result<token::Stream, SyntaxError>
         where 'r: 't // the template must outlive the Lexer
     {
         // TODO set/handle encoding (note: Twig-PHP assumes ASCII)
         let job = Job::new(template, &self.patterns);
-        
+
         job.tokenize()
     }
-    
+
     fn lex_expression(&self) {
     /*
         // whitespace
@@ -132,9 +137,9 @@ impl<'r, 't> Lexer {
         else {
             throw new Twig_Error_Syntax(sprintf('Unexpected character "%s"', $this->code[$this->cursor]), $this->lineno, $this->filename);
         }
-    */    
+    */
     }
-    
+
     fn lex_raw_data(&self) {
     /*
         if (!preg_match(str_replace('%s', $tag, $this->regexes['lex_raw_data']), $this->code, $match, PREG_OFFSET_CAPTURE, $this->cursor)) {
@@ -149,9 +154,9 @@ impl<'r, 't> Lexer {
         }
 
         $this->pushToken(Twig_Token::TEXT_TYPE, $text);
-    */    
+    */
     }
-    
+
     fn lex_comment(&self) {
     /*
         if (!preg_match($this->regexes['lex_comment'], $this->code, $match, PREG_OFFSET_CAPTURE, $this->cursor)) {
@@ -181,5 +186,14 @@ impl<'r, 't> Lexer {
             ++$this->cursor;
         }
     */
+    }
+}
+
+impl<'a> Default for Lexer {
+    fn default() -> Lexer {
+        let env = Environment::default();
+        let options = Options::default();
+
+        Lexer::new(env, options).unwrap()
     }
 }

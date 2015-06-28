@@ -10,38 +10,68 @@
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
+
+/////////////
+// imports //
+/////////////
+
 use super::*;
+use lexer::SyntaxError;
+use lexer::job::Job;
+use super::_final::Final;
+use lexer::token::Token;
+use lexer::patterns::token_start::CaptureData;
+use lexer::patterns::Extract;
 
+/////////////
+// exports //
+/////////////
+
+#[derive(Debug)]
 #[allow(dead_code)]
-struct Data(State);
+pub struct Data;
 
+#[allow(unused_variables)]
 impl Tokenize for Data {
-    fn lex<T>(&mut self) -> &mut T 
-    where T: Tokenize {
-    /*
-            // if no matches are left we return the rest of the template as simple text token
-        if (self.position == self.token_iter.count() - 1) {
-            tokens.push(Token::new(
-                token::Type::Eof,
-                token::Value("".to_string()),
-                cursor.get_position() 
-            ));
-        
-            self.pushToken(Twig_Token::TEXT_TYPE, substr($this->code, $this->cursor));
-            $this->cursor = $this->end;
+    fn new() -> Box<Self> {
+        Box::new(Data)
+    }
 
-            return;
+    fn get_type(&self) -> Code {
+        Code::Data
+    }
+
+    fn step<'a>(&self, job: &mut Job<'a>) -> Result<Box<Tokenize>,SyntaxError> {
+        // if no matches are left we return the rest of the template as simple text token
+        if job.token_iter.peek().is_none() {
+            let slice = job.cursor.slice_to_end().to_string();
+            job.push_token(Token::Text(slice));
+
+            return Ok(Final::new())
         }
 
         // Find the first token after the current cursor
-        $position = $this->positions[0][++$this->position];
-        while ($position[1] < $this->cursor) {
-            if ($this->position == count($this->positions[0]) - 1) {
-                return;
-            }
-            $position = $this->positions[0][++$this->position];
-        }
+        let ref captures = job.next_token_after_cursor().expect("no token matches left - this should not happen");
+        let data : CaptureData = job.patterns.token_start.extract(captures);
 
+        let whitespace_trim : bool = match job.token_iter.peek() {
+            None             => false,
+            Some(captures)   => {
+                let next_token = job.patterns.token_start.extract(captures);
+
+                next_token.whitespace_trim
+            },
+        };
+
+
+        //let (start, end) = match job.next_token_after_cursor() {
+          //  Some(x) => x,
+
+            // TODO if the panic does *not* occur, we might safely merge this with above 'if no matches left'
+            // *otherwise* check first, how orig engine behaves in this case
+     //   };
+
+/*
         // push the template text first
         $text = $textContent = substr($this->code, $this->cursor, $position[1] - $this->cursor);
         if (isset($this->positions[2][$this->position][0])) {
@@ -79,5 +109,41 @@ impl Tokenize for Data {
         }
         */
         unimplemented!();
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use std::rc::Rc;
+    use lexer::job::Job;
+    use template::raw::Raw as Template;
+    use lexer::Patterns;
+    use lexer::job::state::{Tokenize, Code};
+    use lexer::token::Token;
+
+    #[test]
+    pub fn no_more_tokens() {
+        const CODE : &'static str = "only data no tokens";
+        const FILENAME : &'static str = "only data";
+
+        let ref template = Rc::new(Template::new(CODE, FILENAME));
+        let ref patterns = Rc::new(Patterns::default());
+        let mut job = Job::new(template, patterns);
+
+        let state = Data::new().step(&mut job).unwrap();
+
+        if !state.is_type(Code::Final) {
+            panic!("not final state");
+        }
+
+        println!("tokens are: {}", job.tokens.to_string());
+
+        assert_eq!(job.tokens.len(), 1);
+
+        let t_x = Token::Text(CODE.to_string());
+        let t_o : Token = job.tokens.into_iter().last().unwrap().into();
+
+        assert_eq!(t_o, t_x);
     }
 }
