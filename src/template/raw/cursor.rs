@@ -15,7 +15,6 @@
 // imports //
 /////////////
 
-use error;
 use lexer::SyntaxError;
 use lexer::SyntaxErrorCode;
 
@@ -50,7 +49,7 @@ impl<'a> Cursor<'a> {
         self.lineno += text.lines().count();
 
         if self.pos > self.end {
-            return err!("out of range", SyntaxErrorCode::Unknown);
+            return err!(SyntaxErrorCode::Unknown, "out of range");
         }
 
         Ok(())

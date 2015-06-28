@@ -19,18 +19,23 @@ pub use super::*;
 
 #[macro_export]
 macro_rules! err {
-    ( $message:expr, $code:expr ) => ({
-            //use super::*;
+    ( $code:expr ) => ({
+            Err(::error::Error::new(err_details!(None), $code))
+        });
 
-            Err(error::Error::new(err_details!($message), $code))
+    ( $code:expr, $message:expr ) => ({
+            Err(::error::Error::new(err_details!(Some($message.to_string())), $code)) // TODO: treat Strings differently
+        });
+    ( $code:expr, $message:expr, $cause:expr ) => ({
+            Err(::error::Error::new(err_details!(Some($message.to_string())), $code).chain(Box::new($cause)))
         });
 }
 
 #[macro_export]
 macro_rules! err_details {
-    ( $message:expr ) => ({
-            error::Details {
-                message : $message.clone(),
+    ( $opt_message:expr ) => ({
+            ::error::Details {
+                message : $opt_message,
                 module_path : module_path!(),
                 filename : file!(),
                 line : line!(),

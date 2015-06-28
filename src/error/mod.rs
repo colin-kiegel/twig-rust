@@ -57,7 +57,7 @@ pub struct Error<T> {
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Details {
-    pub message : &'static str, // TODO make this Option<&str> - requires additional macro logic
+    pub message : Option<String>,
     pub module_path : &'static str,
     pub filename : &'static str,
     pub line : u32,
@@ -80,8 +80,30 @@ impl<T> Error<T>
         }
     }
 
-    pub fn chain(&mut self, cause: Box<ErrorTrait>) {
-        self.cause = Some(cause)
+    pub fn code(&self) -> &T {
+        &self.code
+    }
+
+    pub fn details(&self) -> &Details {
+        &self.details
+    }
+
+    pub fn description(&self) -> &str {
+        self.description.as_ref()
+    }
+
+    pub fn cause(&self) -> Option<&ErrorTrait> {
+        use std::borrow::Borrow;
+        match self.cause {
+            Some(ref error) => Some(error.borrow()),
+            None => None
+        }
+    }
+
+    pub fn chain(mut self, cause: Box<ErrorTrait>) -> Self {
+        self.cause = Some(cause);
+
+        self
     }
 }
 
@@ -112,8 +134,13 @@ impl<T> fmt::Display for Error<T> {
 
 impl ToString for Details {
     fn to_string(&self) -> String {
-        format!("{message} in {path}/{filename}:{line}:{column}",
-            message  = self.message,
+
+        format!("{message}{in_}{path}/{filename}:{line}:{column}",
+            message  = match self.message {
+                    Some(ref msg) => msg.as_ref(),
+                    None => "",
+                },
+            in_      = if self.message.is_some() { " in " } else { "" },
             path     = self.module_path,
             filename = self.filename,
             line     = self.line,

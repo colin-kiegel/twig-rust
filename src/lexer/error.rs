@@ -27,7 +27,7 @@ pub type LexerError = error::Error<LexerErrorCode>;
 
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum SyntaxErrorCode {
     Unknown,
     UnexpectedCharacter,
@@ -38,14 +38,15 @@ pub enum SyntaxErrorCode {
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum LexerErrorCode {
     Logic,
     InvalidPatternMatch,
+    InvalidValue,
 }
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum TokenErrorCode {
     NoValue,
 }
@@ -67,6 +68,7 @@ impl ToString for LexerErrorCode {
         match *self {
             LexerErrorCode::Logic => "Logic",
             LexerErrorCode::InvalidPatternMatch => "InvalidPatternMatch",
+            LexerErrorCode::InvalidValue => "InvalidValue",
         }.to_string()
     }
 }
