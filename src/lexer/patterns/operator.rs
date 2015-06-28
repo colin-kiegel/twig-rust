@@ -17,62 +17,124 @@
 // imports //
 /////////////
 
+use environment::Environment;
 use regex;
 use regex::Error as regexError;
-use environment::Environment;
+use std::rc::Rc;
 
 /////////////
 // exports //
 /////////////
 
-pub type Regex = regex::Regex;
+pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
+#[derive(PartialEq)]
+pub struct Pattern {
+    regex: regex::Regex,
+    environment: Rc<Environment>,
+}
 
 #[allow(dead_code)]
-pub struct Match;
+#[derive(Debug, PartialEq)]
+pub struct CaptureData {
+    pub position: (usize, usize),
+    pub tag: Tag,
+}
 
 #[allow(dead_code)]
-#[allow(unused_variables)]
-pub fn regex(env: &Environment) -> Result<Regex, regexError> {
-    //$operators = array_merge(
-        //array('='),
-        // TODO array_keys($this->env->getUnaryOperators()),
-        // TODO array_keys($this->env->getBinaryOperators())
-    //);
+#[derive(Debug, PartialEq)]
+pub enum Tag {
+    // Block,
+    // Comment,
+    // Variable,
+}
 
-    //$operators = array_combine($operators, array_map('strlen', $operators));
-    //arsort($operators);
+#[allow(dead_code, unused_variables)]
+impl Pattern {
+    pub fn new(env: Rc<Environment>) -> Result<Pattern, regexError> {
+        Ok(Pattern {
+            regex: {
+                //$operators = array_merge(
+                    //array('='),
+                    // TODO array_keys($this->env->getUnaryOperators()),
+                    // TODO array_keys($this->env->getBinaryOperators())
+                //);
 
-    //$regex = array();
-    //foreach ($operators as $operator => $length) {
-        // an operator that ends with a character must be followed by
-        // a whitespace or a parenthesis
-        //if (ctype_alpha($operator[$length - 1])) {
-        //    $r = preg_quote($operator, '/').'(?=[\s()])';
-        //} else {
-        //    $r = preg_quote($operator, '/');
-        //}
+                //$operators = array_combine($operators, array_map('strlen', $operators));
+                //arsort($operators);
 
-        // an operator with a space can be any amount of whitespaces
-        //$r = preg_replace('/\s+/', '\s+', $r);
+                //$regex = array();
+                //foreach ($operators as $operator => $length) {
+                    // an operator that ends with a character must be followed by
+                    // a whitespace or a parenthesis
+                    //if (ctype_alpha($operator[$length - 1])) {
+                    //    $r = preg_quote($operator, '/').'(?=[\s()])';
+                    //} else {
+                    //    $r = preg_quote($operator, '/');
+                    //}
 
-        //$regex[] = $r;
-    //}
+                    // an operator with a space can be any amount of whitespaces
+                    //$r = preg_replace('/\s+/', '\s+', $r);
 
-    //return '/'.implode('|', $regex).'/A';
-    unimplemented!()
+                    //$regex[] = $r;
+                //}
+
+                //return '/'.implode('|', $regex).'/A';
+                unimplemented!()
+            },
+            environment: env,
+        })
+    }
+}
+
+impl<'t> super::Extract<'t> for Pattern {
+    type Item = CaptureData;
+
+    fn regex(&self) -> &regex::Regex {
+        &self.regex
+    }
+
+    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
+        CaptureData {
+            position: match captures.pos(0) {
+                Some(position) => position,
+                _ => unreachable!(),
+            },
+            tag: match captures.at(1) {
+                _ => unreachable!(),
+            },
+        }
+    }
 }
 
 #[cfg(test)]
 mod test {
+    use super::*;
     use environment::Environment;
-    use regex;
+    use lexer::patterns::Extract;
+    use std::rc::Rc;
 
     #[test]
-    pub fn regex() {
-        let rx_o = super::regex(&Environment::default()).unwrap();
-        let rx_x = regex::Regex::new(r"").unwrap();
+    pub fn as_str() {
+        let environment = Rc::<Environment>::default();
+        let pattern = Pattern::new(environment).unwrap();
 
-        assert_eq!(rx_o, rx_x);
+        assert_eq!(
+            pattern.as_str(),
+            r""
+        );
+    }
+
+    #[test]
+    pub fn extract() {
+        let environment = Rc::<Environment>::default();
+        let pattern = Pattern::new(environment).unwrap();
+
+        assert_eq!(
+            pattern.extract(&r"Lorem Ipsum"),
+            None
+        );
+
+        unimplemented!();
     }
 }

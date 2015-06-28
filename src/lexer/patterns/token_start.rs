@@ -26,7 +26,7 @@ use std::rc::Rc;
 // exports //
 /////////////
 
-pub type Extractor<'a, 'b> = super::Extractor<'a, 'b, Pattern>;
+pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
 #[derive(PartialEq)]
 pub struct Pattern {
@@ -63,7 +63,7 @@ impl Pattern {
     }   // orig: '/('.$tag_variable[0].'|'.$tag_block[0].'|'.$tag_comment[0].')('.$whitespace_trim.')?/s'
 }
 
-impl super::Extract for Pattern {
+impl<'t> super::Extract<'t> for Pattern {
     type Item = CaptureData;
 
     fn regex(&self) -> &regex::Regex {
@@ -94,21 +94,21 @@ impl super::Extract for Pattern {
 mod test {
     use super::*;
     use lexer::patterns::{Options, Extract};
-    use regex;
     use std::rc::Rc;
 
     #[test]
-    pub fn regx() {
+    pub fn as_str() {
         let options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
-        let rx_o = pattern.regex();
-        let rx_x = regex::Regex::new(r"(\{\{|\{%|\{\#)(-)?").unwrap();
 
-        assert_eq!(*rx_o, rx_x);
+        assert_eq!(
+            pattern.as_str(),
+            r"(\{\{|\{%|\{\#)(-)?"
+        );
     }
 
     #[test]
-    pub fn extract_var() {
+    pub fn extract() {
         let options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 

@@ -18,7 +18,7 @@
 #[allow(dead_code)]
 pub const VERSION : &'static str = "1.18.1";
 
-#[derive(Default)]
+#[derive(Default, PartialEq)]
 pub struct Environment;
 
 #[allow(dead_code)]

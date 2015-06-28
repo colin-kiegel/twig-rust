@@ -17,35 +17,88 @@
 // imports //
 /////////////
 
-use super::*;
+use super::Options;
 use regex;
 use regex::Error as regexError;
+use std::rc::Rc;
 
 /////////////
 // exports //
 /////////////
 
-pub type Regex = regex::Regex;
+pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
+#[derive(PartialEq)]
+pub struct Pattern {
+    regex: regex::Regex,
+    options: Rc<Options>,
+}
 
 #[allow(dead_code)]
-pub struct Match;
+#[derive(Debug, PartialEq)]
+pub struct CaptureData {
+    pub position: (usize, usize),
+}
 
-pub fn regex(opt: &Options) -> Result<Regex, regexError> {
-    Ok(try_new_regex!(format!(r"\A{i0}\s*",
-        i0 = opt.interpolation_start.quoted())))
-}   // orig: '/'.$interpolation[0].'\s*/A'
+impl Pattern {
+    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+        Ok(Pattern {
+            regex: try_new_regex!(format!(r"\A{i0}\s*",
+                i0 = opt.interpolation_start.quoted())),
+            options: opt,
+        })
+    }   // orig: '/'.$interpolation[0].'\s*/A'
+}
+
+impl<'t> super::Extract<'t> for Pattern {
+    type Item = CaptureData;
+
+    fn regex(&self) -> &regex::Regex {
+        &self.regex
+    }
+
+    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
+        CaptureData {
+            position: match captures.pos(0) {
+                Some(position) => position,
+                _ => unreachable!(),
+            }
+        }
+    }
+}
 
 #[cfg(test)]
 mod test {
-    use super::super::*;
-    use regex;
+    use super::*;
+    use lexer::patterns::{Options, Extract};
+    use std::rc::Rc;
 
     #[test]
-    pub fn regex() {
-        let rx_o = super::regex(&Options::default()).unwrap();
-        let rx_x = regex::Regex::new(r"\A\#\{\s*").unwrap();
+    pub fn as_str() {
+        let options = Rc::<Options>::default();
+        let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(rx_o, rx_x);
+        assert_eq!(
+            pattern.as_str(),
+            r"\A\#\{\s*"
+        );
+    }
+
+    #[test]
+    pub fn extract() {
+        let options = Rc::<Options>::default();
+        let pattern = Pattern::new(options).unwrap();
+
+        assert_eq!(
+            pattern.extract(&r"{Lorem Ipsum"),
+            None
+        );
+
+        assert_eq!(
+            pattern.extract(&r"#{      Lorem Ipsum"),
+            Some(CaptureData {
+                position: (0,8)
+            })
+        );
     }
 }

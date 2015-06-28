@@ -6,7 +6,7 @@
  */
 
 /**
- * The `interpolation end` pattern used by the lexer to tokenize the templates.
+ * The `block` pattern used by the lexer to tokenize the templates.
  *
  * Written as regular expressions (perl-style).
  *
@@ -43,11 +43,12 @@ pub struct CaptureData {
 impl Pattern {
     pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*{i1}",
-                i1 = opt.interpolation_end.quoted())),
+            regex: try_new_regex!(format!(r"\A\s*(?:{ws}{b1}\s*|\s*{b1})\n?",
+                ws = opt.whitespace_trim.quoted(),
+                b1 = opt.tag_block_end.quoted())),
             options: opt,
         })
-    }   // orig: '/\s*'.$interpolation[1].'/A'
+    }   // orig: '/\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')\n?/A'
 }
 
 impl<'t> super::Extract<'t> for Pattern {
@@ -80,7 +81,7 @@ mod test {
 
         assert_eq!(
             pattern.as_str(),
-            r"\A\s*\}"
+            r"\A\s*(?:-%\}\s*|\s*%\})\n?"
         );
     }
 
@@ -90,15 +91,10 @@ mod test {
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
-            pattern.extract(&r"Lorem Ipsum}"),
+            pattern.extract(&r"Lorem Ipsum"),
             None
         );
 
-        assert_eq!(
-            pattern.extract(&r"       }"),
-            Some(CaptureData {
-                position: (0, 8)
-            })
-        );
+        unimplemented!();
     }
 }

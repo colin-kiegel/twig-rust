@@ -29,11 +29,11 @@ use environment::Environment;
 #[macro_use]
 pub mod macros;
 pub mod options;
-pub mod var;
-pub mod block;
+pub mod var_end;
+pub mod block_end;
 pub mod raw_data;
 pub mod operator;
-pub mod comment;
+pub mod comment_end;
 pub mod block_raw;
 pub mod block_line;
 pub mod token_start;
@@ -51,16 +51,16 @@ pub use self::options::Options;
 pub struct Patterns {
     pub options: Rc<Options>,
     pub environment: Rc<Environment>,
-    pub var: var::Regex,
-    pub block: block::Regex,
-    pub raw_data: raw_data::Regex,
-    //pub operator: operator::Regex,
-    pub comment: comment::Regex,
-    pub block_raw: block_raw::Regex,
-    pub block_line: block_line::Regex,
+    pub var_end: var_end::Pattern,
+    pub block_end: block_end::Pattern,
+    pub raw_data: raw_data::Pattern,
+    //pub operator: operator::Pattern,
+    pub comment_end: comment_end::Pattern,
+    pub block_raw: block_raw::Pattern,
+    pub block_line: block_line::Pattern,
     pub token_start: token_start::Pattern,
-    pub interpolation_start: interpolation_start::Regex,
-    pub interpolation_end: interpolation_end::Regex,
+    pub interpolation_start: interpolation_start::Pattern,
+    pub interpolation_end: interpolation_end::Pattern,
 }
 
 #[allow(dead_code)]
@@ -68,16 +68,16 @@ pub struct Patterns {
 impl Patterns {
     pub fn new(env: Rc<Environment>, opt: Rc<Options>) -> Result<Patterns, regexError> {
         Ok(Patterns {
-            var: try!(var::regex(&opt)),
-            raw_data: try!(raw_data::regex(&opt)),
-            //operator: try!(operator::regex(&env)),
-            block: try!(block::regex(&opt)),
-            comment: try!(comment::regex(&opt)),
-            block_raw: try!(block_raw::regex(&opt)),
-            block_line: try!(block_line::regex(&opt)),
+            var_end: try!(var_end::Pattern::new(opt.clone())),
+            raw_data: try!(raw_data::Pattern::new(opt.clone())),
+            //operator: try!(operator::Pattern::new(&env)),
+            block_end: try!(block_end::Pattern::new(opt.clone())),
+            comment_end: try!(comment_end::Pattern::new(opt.clone())),
+            block_raw: try!(block_raw::Pattern::new(opt.clone())),
+            block_line: try!(block_line::Pattern::new(opt.clone())),
             token_start: try!(token_start::Pattern::new(opt.clone())),
-            interpolation_start: try!(interpolation_start::regex(&opt)),
-            interpolation_end: try!(interpolation_end::regex(&opt)),
+            interpolation_start: try!(interpolation_start::Pattern::new(opt.clone())),
+            interpolation_end: try!(interpolation_end::Pattern::new(opt.clone())),
             options: opt,
             environment: env,
         })
@@ -93,13 +93,13 @@ impl<'a> Default for Patterns {
     }
 }
 
-pub struct Extractor<'p, 't, Pattern: 'p> {
+pub struct ExtractIter<'p, 't, Pattern: 'p> {
     pattern: &'p Pattern,
     captures_iter: regex::FindCaptures<'p, 't>
 }
 
-impl<'p, 't, Pattern> Iterator for Extractor<'p, 't, Pattern>
-    where Pattern: Extract
+impl<'p, 't, Pattern> Iterator for ExtractIter<'p, 't, Pattern>
+    where Pattern: Extract<'t>
 {
     type Item = Pattern::Item;
 
@@ -112,7 +112,7 @@ impl<'p, 't, Pattern> Iterator for Extractor<'p, 't, Pattern>
 }
 
 // to be implemented by all sub-patterns
-pub trait Extract {
+pub trait Extract<'t> {
     type Item;
 
     #[inline]
@@ -120,19 +120,19 @@ pub trait Extract {
     fn item_from_captures(&self, captures: &regex::Captures) -> Self::Item
         where Self::Item: Sized;
 
-    fn extract(&self, text: &str) -> Option<Self::Item> {
+    fn extract(&self, text: &'t str) -> Option<Self::Item> {
         match self.captures(text) {
             Some(captures) => Some(self.item_from_captures(&captures)),
             None => None,
         }
     }
 
-    fn extract_iter<'p, 't>(&'p self, text: &'t str) -> Extractor<'p, 't, Self>
+    fn extract_iter<'p>(&'p self, text: &'t str) -> ExtractIter<'p, 't, Self>
         where Self: Sized
     {
-        Extractor {
+        ExtractIter {
             pattern: self,
-            captures_iter: self.captures_iter(text),
+            captures_iter: self.captures_iter(text)
         }
     }
 
@@ -150,31 +150,31 @@ pub trait Extract {
 
     /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.find_iter
     #[inline]
-    fn find_iter<'r, 't>(&'r self, text: &'t str) -> regex::FindMatches<'r, 't> {
+    fn find_iter<'r>(&'r self, text: &'t str) -> regex::FindMatches<'r, 't> {
         self.regex().find_iter(text)
     }
 
     /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.captures
     #[inline]
-    fn captures<'t>(&self, text: &'t str) -> Option<regex::Captures<'t>> {
+    fn captures(&self, text: &'t str) -> Option<regex::Captures<'t>> {
         self.regex().captures(text)
     }
 
     /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.captures_iter
     #[inline]
-    fn captures_iter<'r, 't>(&'r self, text: &'t str) -> regex::FindCaptures<'r, 't> {
+    fn captures_iter<'r>(&'r self, text: &'t str) -> regex::FindCaptures<'r, 't> {
         self.regex().captures_iter(text)
     }
 
     /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.split
     #[inline]
-    fn split<'r, 't>(&'r self, text: &'t str) -> regex::RegexSplits<'r, 't> {
+    fn split<'r>(&'r self, text: &'t str) -> regex::RegexSplits<'r, 't> {
         self.regex().split(text)
     }
 
     /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.splitn
     #[inline]
-    fn splitn<'r, 't>(&'r self, text: &'t str, limit: usize) -> regex::RegexSplitsN<'r, 't> {
+    fn splitn<'r>(&'r self, text: &'t str, limit: usize) -> regex::RegexSplitsN<'r, 't> {
         self.regex().splitn(text, limit)
     }
 

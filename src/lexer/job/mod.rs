@@ -42,7 +42,7 @@ pub struct Job<'a> {
     tokens: token::Stream<'a>,
     cursor: template::raw::Cursor<'a>,
     position: usize,
-    token_start_iter: Peekable<token_start::Extractor<'a, 'a>>, // orig: positions
+    token_start_iter: Peekable<token_start::ExtractIter<'a, 'a>>, // orig: positions
     brackets: Vec<(&'a str, usize/*TODO LineNo*/)>,
     //states: Vec<State>, // or codes?
 }

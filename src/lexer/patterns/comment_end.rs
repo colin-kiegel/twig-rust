@@ -6,7 +6,7 @@
  */
 
 /**
- * The `interpolation end` pattern used by the lexer to tokenize the templates.
+ * The `comment` pattern used by the lexer to tokenize the templates.
  *
  * Written as regular expressions (perl-style).
  *
@@ -37,17 +37,27 @@ pub struct Pattern {
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub struct CaptureData {
-    pub position: (usize, usize)
+    pub position: (usize, usize),
+    pub tag: Tag,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, PartialEq)]
+pub enum Tag {
+    // Block,
+    // Comment,
+    // Variable,
 }
 
 impl Pattern {
     pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*{i1}",
-                i1 = opt.interpolation_end.quoted())),
+            regex: try_new_regex!(format!(r"(?:{ws}{c1}\s*|{c1})\n?",
+                ws = opt.whitespace_trim.quoted(),
+                c1 = opt.tag_comment_end.quoted())),
             options: opt,
         })
-    }   // orig: '/\s*'.$interpolation[1].'/A'
+    }   // orig: '/(?:'.$whitespace_trim.$tag_comment[1].'\s*|'.$tag_comment[1].')\n?/s'
 }
 
 impl<'t> super::Extract<'t> for Pattern {
@@ -62,7 +72,10 @@ impl<'t> super::Extract<'t> for Pattern {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
-            }
+            },
+            tag: match captures.at(1) {
+                _ => unreachable!(),
+            },
         }
     }
 }
@@ -80,7 +93,7 @@ mod test {
 
         assert_eq!(
             pattern.as_str(),
-            r"\A\s*\}"
+            r"(?:-\#\}\s*|\#\})\n?"
         );
     }
 
@@ -90,15 +103,10 @@ mod test {
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
-            pattern.extract(&r"Lorem Ipsum}"),
+            pattern.extract(&r"Lorem Ipsum"),
             None
         );
 
-        assert_eq!(
-            pattern.extract(&r"       }"),
-            Some(CaptureData {
-                position: (0, 8)
-            })
-        );
+        unimplemented!();
     }
 }
