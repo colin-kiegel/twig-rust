@@ -1,0 +1,137 @@
+/*
+ * This file is part of Twig (ported to Rust).
+ *
+ * For the copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+/**
+ * The tokens_start pattern used by the lexer to tokenize the templates.
+ *
+ * Written as regular expressions (perl-style).
+ *
+ * @author Colin Kiegel <kiegel@gmx.de>
+ */
+
+/////////////
+// imports //
+/////////////
+
+use super::*;
+use regex;
+use regex::Error as regexError;
+use std::rc::Rc;
+
+/////////////
+// exports //
+/////////////
+
+#[derive(PartialEq)]
+pub struct Pattern {
+    regex: regex::Regex,
+    options: Rc<Options>,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, PartialEq)]
+pub struct CaptureData {
+    pub whitespace_trim: bool,
+    pub tag: Tag,
+}
+
+#[allow(dead_code)]
+#[derive(Debug, PartialEq)]
+pub enum Tag {
+    Block,
+    Comment,
+    Variable,
+}
+
+impl Pattern {
+    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+        Ok(Pattern {
+            regex: try_new_regex!(format!(r"({v0}|{b0}|{c0})({ws})?",
+                ws = opt.whitespace_trim.quoted(),
+                b0 = opt.tag_block_start.quoted(),
+                c0 = opt.tag_comment_start.quoted(),
+                v0 = opt.tag_variable_start.quoted())),
+            options: opt,
+        })
+    }   // orig: '/('.$tag_variable[0].'|'.$tag_block[0].'|'.$tag_comment[0].')('.$whitespace_trim.')?/s'
+
+
+//
+//
+//    fn extract_iter<'b, 't, F>(&'b self, text: &'t str) -> Iterator
+//
+//        where F: Fn(regex::Captures) -> CaptureData {
+//////    fn captures_iter() -> Map<FindCaptures<'r, 't>, F>
+//////        where F: FnMut(Self::Item) -> B {
+//            let f = |captures: regex::Captures| self.extract(&captures);
+//            self.regex().captures_iter(text).map(f)
+//    }
+}
+
+//    where F: FnMut(Captures<'r, 't>) -> T;
+//struct ExtractIterator<'a, 't>;
+
+impl super::Extract<CaptureData> for Pattern {
+    fn regex(&self) -> &regex::Regex {
+        &self.regex
+    }
+
+    fn extract(&self, captures: &regex::Captures) -> CaptureData {
+        let tag = match captures.at(1) {
+            Some(x) if x == self.options.tag_block_start.raw()    => Tag::Block,
+            Some(x) if x == self.options.tag_comment_start.raw()  => Tag::Comment,
+            Some(x) if x == self.options.tag_variable_start.raw() => Tag::Variable,
+            _ => unreachable!(),
+        };
+        let whitespace_trim = match captures.at(2) {
+            Some(_) => true,
+            None    => false,
+        };
+
+        CaptureData {
+            whitespace_trim: whitespace_trim,
+            tag: tag,
+        }
+    }
+
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    //use lexer::patterns::*;
+    use lexer::patterns::Extract;
+    use lexer::patterns::Options;
+    use regex;
+    use std::rc::Rc;
+
+    #[test]
+    pub fn regx() {
+        let options = Rc::<Options>::default();
+        let pattern = Pattern::new(options).unwrap();
+        let rx_o = pattern.regex();
+        let rx_x = regex::Regex::new(r"(\{\{|\{%|\{\#)(-)?").unwrap();
+
+        assert_eq!(*rx_o, rx_x);
+    }
+
+    #[test]
+    pub fn extract_var() {
+        let options = Rc::<Options>::default();
+        let rx = Pattern::new(options).unwrap();
+
+        assert!(rx.regex().captures(&r"{-{").is_none(), "captures() must return None");
+
+        let data_o = rx.extract(&rx.regex.captures(&r"{{-").unwrap());
+        let data_x = CaptureData { whitespace_trim: true, tag: Tag::Variable};
+        assert_eq!(data_o, data_x);
+
+        let data_o = rx.extract(&rx.regex.captures(&r"{{").unwrap());
+        let data_x = CaptureData { whitespace_trim: false, tag: Tag::Variable};
+        assert_eq!(data_o, data_x);
+    }
+}
