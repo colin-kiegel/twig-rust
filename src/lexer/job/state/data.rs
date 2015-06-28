@@ -21,7 +21,6 @@ use lexer::job::Job;
 use super::_final::Final;
 use lexer::token::Token;
 use lexer::patterns::token_start::CaptureData;
-use lexer::patterns::Extract;
 
 /////////////
 // exports //
@@ -43,7 +42,7 @@ impl Tokenize for Data {
 
     fn step<'a>(&self, job: &mut Job<'a>) -> Result<Box<Tokenize>,SyntaxError> {
         // if no matches are left we return the rest of the template as simple text token
-        if job.token_iter.peek().is_none() {
+        if job.token_start_iter.peek().is_none() {
             let slice = job.cursor.slice_to_end().to_string();
             job.push_token(Token::Text(slice));
 
@@ -51,16 +50,15 @@ impl Tokenize for Data {
         }
 
         // Find the first token after the current cursor
-        let ref captures = job.next_token_after_cursor().expect("no token matches left - this should not happen");
-        let data : CaptureData = job.patterns.token_start.extract(captures);
+        //let ref captures = job.next_token_after_cursor().expect("no token matches left - this should not happen");
+        //let data : CaptureData = job.patterns.token_start.extract(captures);
+        let data : CaptureData = job
+            .next_token_start_after_cursor()
+            .expect("no token matches left - this should not happen");
 
-        let whitespace_trim : bool = match job.token_iter.peek() {
-            None             => false,
-            Some(captures)   => {
-                let next_token = job.patterns.token_start.extract(captures);
-
-                next_token.whitespace_trim
-            },
+        let next_whitespace_trim : bool = match job.token_start_iter.peek() {
+            None       => false,
+            Some(next) => next.whitespace_trim,
         };
 
 

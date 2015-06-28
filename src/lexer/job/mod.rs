@@ -15,7 +15,6 @@
 // imports //
 /////////////
 
-use regex;
 use template;
 use std::iter::Peekable;
 use lexer::patterns::Extract;
@@ -24,6 +23,7 @@ use lexer::token::Token;
 use lexer::token;
 use lexer::SyntaxError;
 use self::state::Tokenize;
+use lexer::patterns::token_start;
 
 /////////////
 // exports //
@@ -42,7 +42,7 @@ pub struct Job<'a> {
     tokens: token::Stream<'a>,
     cursor: template::raw::Cursor<'a>,
     position: usize,
-    token_iter: Peekable<regex::FindCaptures<'a ,'a>>, // orig: positions
+    token_start_iter: Peekable<token_start::Extractor<'a, 'a>>, // orig: positions
     brackets: Vec<(&'a str, usize/*TODO LineNo*/)>,
     //states: Vec<State>, // or codes?
 }
@@ -51,7 +51,7 @@ pub struct Job<'a> {
 impl<'a> Job<'a> {
     pub fn new(template: &'a template::Raw, patterns: &'a Patterns) -> Box<Job<'a>> {
             // find all token starts in one go:
-            let token_iter = patterns.token_start.regex().captures_iter(&template.code);
+            let token_start_iter = patterns.token_start.extract_iter(&template.code);
             let cursor = template::raw::Cursor::new(template);
             let tokens = token::Stream::new(template);
             println!("Starting with {:?}", cursor);
@@ -61,7 +61,7 @@ impl<'a> Job<'a> {
             template: template.clone(),
             tokens: tokens,
             cursor: cursor,
-            token_iter: token_iter.peekable(),
+            token_start_iter: token_start_iter.peekable(),
             position: Default::default(),
             brackets: Default::default(),
             current_var_block_line: Default::default(),
@@ -94,12 +94,11 @@ impl<'a> Job<'a> {
     }
 
     /// Find the first token after the current cursor
-    pub fn next_token_after_cursor(&mut self) -> Option<regex::Captures<'a>> {
+    pub fn next_token_start_after_cursor(&mut self) -> Option<token_start::CaptureData> {
         let position = self.cursor.get_position();
 
-        self.token_iter.find(|x| {
-            let start = x.pos(0).expect("capture group must have a position").0;
-            start >= position
+        self.token_start_iter.find(|x| {
+            x.position.0 >= position
         })
     }
 }

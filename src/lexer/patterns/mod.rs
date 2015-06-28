@@ -48,8 +48,6 @@ pub use self::options::Options;
 //const REGEX_DQ_STRING_DELIM : &'static str = r"\A\"";
 //const REGEX_DQ_STRING_PART  : &'static str = r"\A[^#\"\\]*(?:(?:\\[.\n]|#(?!\\{))[^#\"\\]*)*";
 
-//#[derive(Debug)]
-//#[derive(PartialEq)]
 pub struct Patterns {
     pub options: Rc<Options>,
     pub environment: Rc<Environment>,
@@ -64,44 +62,6 @@ pub struct Patterns {
     pub interpolation_start: interpolation_start::Regex,
     pub interpolation_end: interpolation_end::Regex,
 }
-
-// to be implemented by the sub-modules
-pub trait Extract<T> {
-    fn regex(&self) -> &regex::Regex;
-    fn extract(&self, captures: &regex::Captures) -> T
-        where T: Sized;
-
-//    fn extractor<F>(&self) -> F
-//        where F: Fn(&regex::Captures) -> T;
-
-//
-//    fn extract_iter<'a, 't, F>(&'a self, text: &'t str) -> Map<regex::FindCaptures<'a, 't>, F>
-//        where F: Fn(regex::Captures<'t>) -> T;
-//        where Self: Sized,
-//              T: Sized {
-//            self.regex().captures_iter(text).map(|captures| self.extract(&captures))
-//    }
-}
-
-#[allow(dead_code)]
-pub struct Extractor<'a, 't, T> {
-    extract: Box<Fn(regex::Captures<'t>) -> T>,
-    captures_iter: regex::FindCaptures<'a, 't>
-}
-
-// Take a look at https://github.com/rust-lang/rust/pull/19849
-// for implementing iterators
-/*impl<'a, 't, T> Iterator for Extractor<'a, 't, T> {
-    type Item = T;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.captures_iter.next() {
-            Some(item) => call(self.extract, item),
-            None       => None,
-        }
-    }
-}*/
-//pub type ExtractIterator<'a, 't, T, F> = Map<regex::FindCaptures<'a, 't>, Fn(regex::Captures<'t>) -> T>;
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
@@ -130,6 +90,116 @@ impl<'a> Default for Patterns {
         let opt = Rc::new(Options::default());
 
         Patterns::new(env, opt).unwrap()
+    }
+}
+
+pub struct Extractor<'p, 't, Pattern: 'p> {
+    pattern: &'p Pattern,
+    captures_iter: regex::FindCaptures<'p, 't>
+}
+
+impl<'p, 't, Pattern> Iterator for Extractor<'p, 't, Pattern>
+    where Pattern: Extract
+{
+    type Item = Pattern::Item;
+
+    fn next(&mut self) -> Option<Pattern::Item> {
+        match self.captures_iter.next() {
+            Some(captures) => Some(self.pattern.item_from_captures(&captures)),
+            None => None,
+        }
+    }
+}
+
+// to be implemented by all sub-patterns
+pub trait Extract {
+    type Item;
+
+    #[inline]
+    fn regex(&self) -> &regex::Regex;
+    fn item_from_captures(&self, captures: &regex::Captures) -> Self::Item
+        where Self::Item: Sized;
+
+    fn extract(&self, text: &str) -> Option<Self::Item> {
+        match self.captures(text) {
+            Some(captures) => Some(self.item_from_captures(&captures)),
+            None => None,
+        }
+    }
+
+    fn extract_iter<'p, 't>(&'p self, text: &'t str) -> Extractor<'p, 't, Self>
+        where Self: Sized
+    {
+        Extractor {
+            pattern: self,
+            captures_iter: self.captures_iter(text),
+        }
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.is_match
+    #[inline]
+    fn is_match(&self, text: &str) -> bool {
+        self.regex().is_match(text)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.find
+    #[inline]
+    fn find(&self, text: &str) -> Option<(usize, usize)> {
+        self.regex().find(text)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.find_iter
+    #[inline]
+    fn find_iter<'r, 't>(&'r self, text: &'t str) -> regex::FindMatches<'r, 't> {
+        self.regex().find_iter(text)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.captures
+    #[inline]
+    fn captures<'t>(&self, text: &'t str) -> Option<regex::Captures<'t>> {
+        self.regex().captures(text)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.captures_iter
+    #[inline]
+    fn captures_iter<'r, 't>(&'r self, text: &'t str) -> regex::FindCaptures<'r, 't> {
+        self.regex().captures_iter(text)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.split
+    #[inline]
+    fn split<'r, 't>(&'r self, text: &'t str) -> regex::RegexSplits<'r, 't> {
+        self.regex().split(text)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.splitn
+    #[inline]
+    fn splitn<'r, 't>(&'r self, text: &'t str, limit: usize) -> regex::RegexSplitsN<'r, 't> {
+        self.regex().splitn(text, limit)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.replace
+    #[inline]
+    fn replace<R: regex::Replacer>(&self, text: &str, rep: R) -> String {
+        self.regex().replace(text, rep)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.replace_all
+    #[inline]
+    fn replace_all<R: regex::Replacer>(&self, text: &str, rep: R) -> String {
+        self.regex().replace_all(text, rep)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.replacen
+    #[inline]
+    fn replacen<R: regex::Replacer>(&self, text: &str, limit: usize, rep: R) -> String {
+        self.regex().replacen(text, limit, rep)
+    }
+
+    /// http://doc.rust-lang.org/regex/regex/enum.Regex.html#method.as_str
+    #[inline]
+    fn as_str<'a>(&'a self) -> &'a str {
+        self.regex().as_str()
     }
 }
 

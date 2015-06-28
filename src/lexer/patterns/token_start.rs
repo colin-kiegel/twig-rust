@@ -17,7 +17,7 @@
 // imports //
 /////////////
 
-use super::*;
+use super::Options;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
@@ -25,6 +25,8 @@ use std::rc::Rc;
 /////////////
 // exports //
 /////////////
+
+pub type Extractor<'a, 'b> = super::Extractor<'a, 'b, Pattern>;
 
 #[derive(PartialEq)]
 pub struct Pattern {
@@ -35,6 +37,7 @@ pub struct Pattern {
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub struct CaptureData {
+    pub position: (usize, usize),
     pub whitespace_trim: bool,
     pub tag: Tag,
 }
@@ -58,54 +61,39 @@ impl Pattern {
             options: opt,
         })
     }   // orig: '/('.$tag_variable[0].'|'.$tag_block[0].'|'.$tag_comment[0].')('.$whitespace_trim.')?/s'
-
-
-//
-//
-//    fn extract_iter<'b, 't, F>(&'b self, text: &'t str) -> Iterator
-//
-//        where F: Fn(regex::Captures) -> CaptureData {
-//////    fn captures_iter() -> Map<FindCaptures<'r, 't>, F>
-//////        where F: FnMut(Self::Item) -> B {
-//            let f = |captures: regex::Captures| self.extract(&captures);
-//            self.regex().captures_iter(text).map(f)
-//    }
 }
 
-//    where F: FnMut(Captures<'r, 't>) -> T;
-//struct ExtractIterator<'a, 't>;
+impl super::Extract for Pattern {
+    type Item = CaptureData;
 
-impl super::Extract<CaptureData> for Pattern {
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn extract(&self, captures: &regex::Captures) -> CaptureData {
-        let tag = match captures.at(1) {
-            Some(x) if x == self.options.tag_block_start.raw()    => Tag::Block,
-            Some(x) if x == self.options.tag_comment_start.raw()  => Tag::Comment,
-            Some(x) if x == self.options.tag_variable_start.raw() => Tag::Variable,
-            _ => unreachable!(),
-        };
-        let whitespace_trim = match captures.at(2) {
-            Some(_) => true,
-            None    => false,
-        };
-
+    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
         CaptureData {
-            whitespace_trim: whitespace_trim,
-            tag: tag,
+            position: match captures.pos(0) {
+                Some(position) => position,
+                _ => unreachable!(),
+            },
+            whitespace_trim: match captures.at(2) {
+                Some(_) => true,
+                None    => false,
+            },
+            tag: match captures.at(1) {
+                Some(x) if x == self.options.tag_block_start.raw()    => Tag::Block,
+                Some(x) if x == self.options.tag_comment_start.raw()  => Tag::Comment,
+                Some(x) if x == self.options.tag_variable_start.raw() => Tag::Variable,
+                _ => unreachable!(),
+            },
         }
     }
-
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    //use lexer::patterns::*;
-    use lexer::patterns::Extract;
-    use lexer::patterns::Options;
+    use lexer::patterns::{Options, Extract};
     use regex;
     use std::rc::Rc;
 
@@ -122,16 +110,27 @@ mod test {
     #[test]
     pub fn extract_var() {
         let options = Rc::<Options>::default();
-        let rx = Pattern::new(options).unwrap();
+        let pattern = Pattern::new(options).unwrap();
 
-        assert!(rx.regex().captures(&r"{-{").is_none(), "captures() must return None");
+        assert_eq!(
+            pattern.extract(&r"{-{"),
+            None
+        );
 
-        let data_o = rx.extract(&rx.regex.captures(&r"{{-").unwrap());
-        let data_x = CaptureData { whitespace_trim: true, tag: Tag::Variable};
-        assert_eq!(data_o, data_x);
+        assert_eq!(
+            pattern.extract(&r"{{-"),
+            Some(CaptureData {
+                position: (0,3),
+                whitespace_trim: true,
+                tag: Tag::Variable
+            }));
 
-        let data_o = rx.extract(&rx.regex.captures(&r"{{").unwrap());
-        let data_x = CaptureData { whitespace_trim: false, tag: Tag::Variable};
-        assert_eq!(data_o, data_x);
+        assert_eq!(
+            pattern.extract(&r"{{"),
+            Some(CaptureData {
+                position: (0,2),
+                whitespace_trim: false,
+                tag: Tag::Variable
+            }));
     }
 }
