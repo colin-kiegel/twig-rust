@@ -15,100 +15,142 @@
 // imports //
 /////////////
 
-use super::*;
-use lexer::SyntaxError;
-use lexer::job::Job;
+use super::{TokenizeState, Code};
 use super::_final::Final;
+use super::var::Var;
+use super::block::Block;
+use lexer::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
+use lexer::job::Job;
 use lexer::token::Token;
-use lexer::patterns::token_start::CaptureData;
+use lexer::patterns::{token_start, block_raw, Extract};
 
 /////////////
 // exports //
 /////////////
 
-#[derive(Debug)]
 #[allow(dead_code)]
 pub struct Data;
 
 #[allow(unused_variables)]
-impl Tokenize for Data {
-    fn new() -> Box<Self> {
+impl TokenizeState for Data {
+    fn new() -> Box<Data> {
         Box::new(Data)
     }
 
-    fn get_type(&self) -> Code {
+    fn state(&self) -> Code {
         Code::Data
     }
 
-    fn step<'a>(&self, job: &mut Job<'a>) -> Result<Box<Tokenize>,SyntaxError> {
-        // if no matches are left we return the rest of the template as simple text token
-        if job.token_start_iter.peek().is_none() {
-            let slice = job.cursor.slice_to_end().to_string();
-            job.push_token(Token::Text(slice));
+    fn step<'a>(self: Box<Self>, job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
+        let capture = match Self::next_token_start_after_cursor(job) {
+            Some(capture) => capture,
+            None => {
+                let slice = job.cursor.slice_to_end();
+                job.push_token(Token::Text(slice.to_string()));
 
-            return Ok(Final::new())
-        }
-
-        // Find the first token after the current cursor
-        //let ref captures = job.next_token_after_cursor().expect("no token matches left - this should not happen");
-        //let data : CaptureData = job.patterns.token_start.extract(captures);
-        let data : CaptureData = job
-            .next_token_start_after_cursor()
-            .expect("no token matches left - this should not happen");
-
-        let next_whitespace_trim : bool = match job.token_start_iter.peek() {
-            None       => false,
-            Some(next) => next.whitespace_trim,
+                return Ok(Final::new())
+            },
         };
 
+        let mut slice = job.cursor.slice_to(capture.position.0);
 
-        //let (start, end) = match job.next_token_after_cursor() {
-          //  Some(x) => x,
+        // trim whitespace according to the next token
+        match job.token_start_iter.peek() {
+            Some(next) if next.whitespace_trim => {
+                slice = slice.trim_right();
+            },
+            _ => {},
+        };
 
-            // TODO if the panic does *not* occur, we might safely merge this with above 'if no matches left'
-            // *otherwise* check first, how orig engine behaves in this case
-     //   };
+        job.cursor.move_to(capture.position.1);
+        job.push_token(Token::Text(slice.to_string()));
 
-/*
-        // push the template text first
-        $text = $textContent = substr($this->code, $this->cursor, $position[1] - $this->cursor);
-        if (isset($this->positions[2][$this->position][0])) {
-            $text = rtrim($text);
-        }
-        $this->pushToken(Twig_Token::TEXT_TYPE, $text);
-        $this->moveCursor($textContent.$position[0]);
-
-        switch ($this->positions[1][$this->position][0]) {
-            case $this->options['tag_comment'][0]:
-                $this->lexComment();
-                break;
-
-            case $this->options['tag_block'][0]:
+        // process and return new Box<Tokenize> (i.e. new state)
+        match capture.tag {
+            token_start::Tag::Comment => {
+                try!(Self::lex_comment(job));
+                self.step(job) // direct recursion is faster than dynamic dispatch (return self)
+            },
+            token_start::Tag::Block => {
+                // TODO nested matches don't look nice - alternative??
                 // raw data?
-                if (preg_match($this->regexes['lex_block_raw'], $this->code, $match, null, $this->cursor)) {
-                    $this->moveCursor($match[0]);
-                    $this->lexRawData($match[1]);
-                // {% line \d+ %}
-                } elseif (preg_match($this->regexes['lex_block_line'], $this->code, $match, null, $this->cursor)) {
-                    $this->moveCursor($match[0]);
-                    $this->lineno = (int) $match[1];
-                } else {
-                    $this->pushToken(Twig_Token::BLOCK_START_TYPE);
-                    $this->pushState(self::STATE_BLOCK);
-                    $this->currentVarBlockLine = $this->lineno;
-                }
-                break;
+                match job.patterns.block_raw.extract(job.cursor.tail()) {
+                    Some(block_raw) => {
+                        job.cursor.move_by(block_raw.position.1);
+                        try!(Self::lex_raw_data(job, block_raw.tag));
 
-            case $this->options['tag_variable'][0]:
-                $this->pushToken(Twig_Token::VAR_START_TYPE);
-                $this->pushState(self::STATE_VAR);
-                $this->currentVarBlockLine = $this->lineno;
-                break;
+                        return Ok(self);
+                    },
+                    _ => {
+                        // {% line \d+ %}
+                        match job.patterns.block_line.extract(job.cursor.tail()) {
+                            Some(block_line) => {
+                                let block_line = try!(block_line);
+
+                                job.cursor.move_by(block_line.position.1);
+                                job.cursor.set_line(block_line.line);
+
+                                return Ok(self);
+                            },
+                            _ => {
+                                job.current_var_block_line = job.cursor.line();
+                                job.push_token(Token::BlockStart);
+                                job.push_state(self);
+
+                                Ok(Block::new())
+                            },
+                        }
+                    },
+                }
+            },
+            token_start::Tag::Variable => {
+                job.current_var_block_line = job.cursor.line();
+                job.push_token(Token::VarStart);
+                job.push_state(self);
+
+                Ok(Var::new())
+            }
         }
-        */
-        unimplemented!();
     }
 }
+
+impl<'a> Data {
+    fn lex_comment(job: &'a mut Job) -> Result<(), SyntaxError> {
+        match job.patterns.comment_end.find(job.cursor.tail()) {
+            None => return err!(SyntaxErrorCode::UnclosedComment),
+            Some((_, rel_end)) => job.cursor.move_by(rel_end),
+        }
+        Ok(())
+    }
+
+    fn lex_raw_data(job: &'a mut Job, tag: block_raw::Tag) -> Result<(), SyntaxError> {
+        let capture = match job.patterns.raw_data.extract_iter(job.cursor.tail())
+                                                 .find(|capture| capture.tag == tag) {
+            Some(capture) => capture,
+            _ => return err!(SyntaxErrorCode::UnexpectedEof, "Unclosed (raw|verbatim) block"),
+        };
+
+        let mut slice = job.cursor.slice_by(capture.position.0);
+        job.cursor.move_by(capture.position.1);
+
+        if capture.whitespace_trim {
+            slice = slice.trim_right();
+        }
+
+        job.push_token(Token::Text(slice.to_string()));
+        Ok(())
+    }
+
+    /// Find the first token after the current cursor
+    fn next_token_start_after_cursor(job: &'a mut Job) -> Option<token_start::CaptureData> {
+        let position = job.cursor.position();
+
+        job.token_start_iter.find(|x| {
+            x.position.0 >= position
+        })
+    }
+}
+
 
 #[cfg(test)]
 mod test {
@@ -117,7 +159,7 @@ mod test {
     use lexer::job::Job;
     use template::raw::Raw as Template;
     use lexer::Patterns;
-    use lexer::job::state::{Tokenize, Code};
+    use lexer::job::state::{TokenizeState, Code};
     use lexer::token::Token;
 
     #[test]
@@ -131,7 +173,7 @@ mod test {
 
         let state = Data::new().step(&mut job).unwrap();
 
-        if !state.is_type(Code::Final) {
+        if !state.is_state(Code::Final) {
             panic!("not final state");
         }
 

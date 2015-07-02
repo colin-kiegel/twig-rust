@@ -27,6 +27,7 @@ use std::rc::Rc;
 /////////////
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
+pub use super::block_raw::Tag; // enum {Raw, Verbatim}
 
 #[derive(PartialEq)]
 pub struct Pattern {
@@ -38,21 +39,14 @@ pub struct Pattern {
 #[derive(Debug, PartialEq)]
 pub struct CaptureData {
     pub position: (usize, usize),
+    pub whitespace_trim: bool,
     pub tag: Tag,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, PartialEq)]
-pub enum Tag {
-    // Block,
-    // Comment,
-    // Variable,
 }
 
 impl Pattern {
     pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"({b0}{ws}|{b0})\s*(?:end%s)\s*(?:{ws}{b1}\s*|\s*{b1})",
+            regex: try_new_regex!(format!(r"{b0}({ws})?\s*(?:end(raw|verbatim))\s*(?:{ws}{b1}\s*|{b1})",
                 ws = opt.whitespace_trim.quoted(),
                 b0 = opt.tag_block_start.quoted(),
                 b1 = opt.tag_block_end.quoted())),
@@ -74,7 +68,13 @@ impl<'t> super::Extract<'t> for Pattern {
                 Some(position) => position,
                 _ => unreachable!(),
             },
-            tag: match captures.at(1) {
+            whitespace_trim: match captures.at(1) {
+                Some(_) => true,
+                None    => false,
+            },
+            tag: match captures.at(2) {
+                Some("raw") => Tag::Raw,
+                Some("verbatim") => Tag::Verbatim,
                 _ => unreachable!(),
             },
         }

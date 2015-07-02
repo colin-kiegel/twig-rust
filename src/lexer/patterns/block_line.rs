@@ -40,7 +40,7 @@ pub struct Pattern {
 #[derive(Debug, PartialEq)]
 pub struct CaptureData {
     pub position: (usize, usize),
-    pub line: u64,
+    pub line: usize,
 }
 
 impl Pattern {
@@ -68,7 +68,7 @@ impl<'t> super::Extract<'t> for Pattern {
                 _ => unreachable!(),
             },
             line: match captures.at(1) {
-                Some(x) => match x.parse::<u64>() {
+                Some(x) => match x.parse::<usize>() {
                         Ok(line) => line,
                         Err(cause) => {
                             return err!(LexerErrorCode::InvalidValue, x, cause)
@@ -104,6 +104,7 @@ mod test {
 
         assert_eq!(
             // u64::max_value() == 18446744073709551615
+            // u32::max_value() == 4294967295
             pattern.extract(&r"   line   1234567890  %}").unwrap().unwrap(),
             CaptureData {
                 position: (0,24),
@@ -118,6 +119,7 @@ mod test {
         let pattern = Pattern::new(options).unwrap();
 
         // u64::max_value() == 18446744073709551615
+        // u32::max_value() == 4294967295
         let err = pattern.extract(&r"   line   1844674407370955161518446744073709551615  %}").unwrap().unwrap_err();
 
         assert_eq!(

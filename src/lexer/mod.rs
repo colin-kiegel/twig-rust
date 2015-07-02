@@ -22,7 +22,7 @@ mod token;
 use template;
 use environment::Environment;
 use lexer::job::Job;
-use lexer::job::state::Tokenize;
+use lexer::job::state::TokenizeState;
 use regex::Error as regexError;
 
 /////////////
@@ -34,7 +34,7 @@ pub mod job;
 pub mod patterns;
 pub use self::patterns::Patterns;
 pub use self::patterns::options::Options;
-pub use self::error::{SyntaxErrorCode, SyntaxError};
+pub use self::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
 
 
 // TODO: where does this belong?
@@ -62,7 +62,7 @@ impl<'a, 'r, 't> Lexer {
         })
     }
 
-    pub fn tokenize(&'t self, template: &'r template::Raw) -> Result<token::Stream, SyntaxError>
+    pub fn tokenize(&'t self, template: &'r template::Raw) -> Result<token::Stream, LexerError>
         where 'r: 't // the template must outlive the Lexer
     {
         // TODO set/handle encoding (note: Twig-PHP assumes ASCII)

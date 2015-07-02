@@ -46,9 +46,8 @@ pub struct CaptureData {
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Tag {
-    // Block,
-    // Comment,
-    // Variable,
+    Raw,
+    Verbatim,
 }
 
 impl Pattern {
@@ -76,6 +75,8 @@ impl<'t> super::Extract<'t> for Pattern {
                 _ => unreachable!(),
             },
             tag: match captures.at(1) {
+                Some("raw") => Tag::Raw,
+                Some("verbatim") => Tag::Verbatim,
                 _ => unreachable!(),
             },
         }

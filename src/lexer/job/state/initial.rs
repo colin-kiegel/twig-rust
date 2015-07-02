@@ -15,25 +15,23 @@
 // imports //
 /////////////
 
-use super::*;
-use lexer::SyntaxError;
+use super::{TokenizeState, Code};
+use lexer::error::LexerError;
 use lexer::job::Job;
 use super::data::Data;
 
-#[derive(Debug)]
-#[allow(dead_code)]
 pub struct Initial;
 
-impl Tokenize for Initial {
-    fn new() -> Box<Self> {
+impl TokenizeState for Initial {
+    fn new() -> Box<Initial> {
         Box::new(Initial)
     }
 
-    fn get_type(&self) -> Code {
+    fn state(&self) -> Code {
         Code::Initial
     }
 
-    fn step<'a> (&self, _job: &mut Job<'a>) -> Result<Box<Tokenize>,SyntaxError> {
+    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
         // TODO some pre-checks, like len>0?
         Ok(Data::new())
     }

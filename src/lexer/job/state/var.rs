@@ -15,24 +15,23 @@
 // imports //
 /////////////
 
-use super::*;
+use super::{TokenizeState, Code};
+use lexer::error::LexerError;
+use lexer::job::Job;
+use super::data::Data;
 
+pub struct Var;
 
-#[allow(dead_code)]
-struct Var(State);
+impl TokenizeState for Var {
+    fn new() -> Box<Var> {
+        Box::new(Var)
+    }
 
-impl Tokenize for Var {
-    fn lex<T>(&mut self) -> &mut T
-    where T: Tokenize {
-        /*
-        if (empty($this->brackets) && preg_match($this->regexes['lex_var'], $this->code, $match, null, $this->cursor)) {
-            $this->pushToken(Twig_Token::VAR_END_TYPE);
-            $this->moveCursor($match[0]);
-            $this->popState();
-        } else {
-            $this->lexExpression();
-        }
-        */
-        unimplemented!();
+    fn state(&self) -> Code {
+        Code::Var
+    }
+
+    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
+        unimplemented!()
     }
 }

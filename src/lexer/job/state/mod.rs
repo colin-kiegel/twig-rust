@@ -15,9 +15,8 @@
 // imports //
 /////////////
 
-use lexer::SyntaxError;
+use lexer::error::LexerError;
 use lexer::job::Job;
-use std::fmt::Debug;
 
 /////////////
 // exports //
@@ -25,29 +24,33 @@ use std::fmt::Debug;
 
 pub mod initial;
 pub mod data;
+pub mod block;
+pub mod var;
+pub mod string;
+pub mod interpolation;
 pub mod _final;
 pub use self::initial::Initial;
 
 
-pub trait Tokenize : Debug {
-    fn new() -> Box<Self>
-        where Self : Sized;
+pub trait TokenizeState {
+    fn new() -> Box<Self> where
+        Self: Sized;
+
+    fn step<'a>(self: Box<Self>, job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError>;
+
+    fn state(&self) -> Code;
+
+    fn is_state(&self, code: Code) -> bool {
+        self.state() == code
+    }
 
     fn is_finished(&self) -> bool{
         false
     }
-
-    fn step<'a>(&self, &mut Job<'a>) -> Result<Box<Tokenize>,SyntaxError>;
-
-    fn get_type(&self) -> Code;
-
-    fn is_type(&self, code: Code) -> bool {
-        self.get_type() == code
-    }
 }
 
 #[allow(dead_code)]
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Code {
     Data            = 0,
     Block           = 1,

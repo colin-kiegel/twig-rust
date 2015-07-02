@@ -15,30 +15,31 @@
 // imports //
 /////////////
 
-use super::*;
-use lexer::SyntaxError;
+use super::{TokenizeState, Code};
+use lexer::error::LexerError;
 use lexer::job::Job;
 
 /////////////
 // exports //
 /////////////
 
-#[derive(Debug)]
-#[allow(dead_code)]
 pub struct Final {
     is_finished: bool,
 }
 
-impl Tokenize for Final {
-    fn new() -> Box<Self> {
-        Box::new(Final{ is_finished : false })
+impl TokenizeState for Final {
+    fn new() -> Box<Final> {
+        Box::new(Final {
+            is_finished: false
+        })
     }
 
-    fn get_type(&self) -> Code {
+    fn state(&self) -> Code {
         Code::Final
     }
 
     fn is_finished(&self) -> bool {
+        // job.cursor.position() == job.cursor.end() <- implicit alternative?
         self.is_finished
     }
 
@@ -47,7 +48,7 @@ impl Tokenize for Final {
     // http://stackoverflow.com/questions/29985153/trait-object-is-not-object-safe-error
     //fn lex<T>(self: Box<Self>) -> Result<Box<Tokenize<'a>>,SyntaxError>;
 
-    fn step<'a>(&self, _job: &mut Job<'a>) -> Result<Box<Tokenize>,SyntaxError> {
+    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
         Ok(Box::new(Final{ is_finished : true }))
         /*
         if (empty($this->brackets) && preg_match($this->regexes['lex_Final'], $this->code, $match, null, $this->cursor)) {

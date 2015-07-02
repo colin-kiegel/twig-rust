@@ -15,26 +15,23 @@
 // imports //
 /////////////
 
-use super::*;
+use super::{TokenizeState, Code};
+use lexer::error::LexerError;
+use lexer::job::Job;
+use super::data::Data;
 
+pub struct Interpolation;
 
-#[allow(dead_code)]
-struct Interpolation(State);
+impl TokenizeState for Interpolation {
+    fn new() -> Box<Interpolation> {
+        Box::new(Interpolation)
+    }
 
-impl Tokenize for Interpolation {
-    fn lex<T>(&mut self) -> &mut T
-    where T: Tokenize {
-    /*
-        $bracket = end($this->brackets);
-        if ($this->options['interpolation'][0] === $bracket[0] && preg_match($this->regexes['interpolation_end'], $this->code, $match, null, $this->cursor)) {
-            array_pop($this->brackets);
-            $this->pushToken(Twig_Token::INTERPOLATION_END_TYPE);
-            $this->moveCursor($match[0]);
-            $this->popState();
-        } else {
-            $this->lexExpression();
-        }
-    */
-        unimplemented!();
+    fn state(&self) -> Code {
+        Code::Interpolation
+    }
+
+    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
+        unimplemented!()
     }
 }

@@ -21,8 +21,8 @@ use lexer::patterns::Extract;
 use lexer::Patterns;
 use lexer::token::Token;
 use lexer::token;
-use lexer::SyntaxError;
-use self::state::Tokenize;
+use lexer::error::{LexerError, LexerErrorCode};
+use self::state::TokenizeState;
 use lexer::patterns::token_start;
 
 /////////////
@@ -44,7 +44,7 @@ pub struct Job<'a> {
     position: usize,
     token_start_iter: Peekable<token_start::ExtractIter<'a, 'a>>, // orig: positions
     brackets: Vec<(&'a str, usize/*TODO LineNo*/)>,
-    //states: Vec<State>, // or codes?
+    states: Vec<Box<TokenizeState>>,
 }
 
 #[allow(dead_code)]
@@ -62,15 +62,16 @@ impl<'a> Job<'a> {
             tokens: tokens,
             cursor: cursor,
             token_start_iter: token_start_iter.peekable(),
-            position: Default::default(),
-            brackets: Default::default(),
-            current_var_block_line: Default::default(),
-            //states: Vec::default(),
+            position: 0,
+            current_var_block_line: 0,
+            brackets: Vec::default(),
+            states: Vec::default(),
         })
     }
 
-    pub fn tokenize(mut self: Job<'a>) -> Result<token::Stream<'a>, SyntaxError> {
-        let mut tokenizer : Box<Tokenize> = state::Initial::new();
+    pub fn tokenize(mut self: Job<'a>) -> Result<token::Stream<'a>, LexerError> {
+
+        let mut tokenizer : Box<TokenizeState> = state::Initial::new();
 
         while !tokenizer.is_finished() {
             match tokenizer.step(&mut self) {
@@ -89,16 +90,15 @@ impl<'a> Job<'a> {
         // * check if the template can be disassembled into string-objects without
         //   copying - i.e. without calling to_string(&str)
 
-        let position = self.cursor.get_position();
+        let position = self.cursor.position();
         self.tokens.push(token, position);
     }
 
-    /// Find the first token after the current cursor
-    pub fn next_token_start_after_cursor(&mut self) -> Option<token_start::CaptureData> {
-        let position = self.cursor.get_position();
+    pub fn push_state(&mut self, state: Box<TokenizeState>) {
+        self.states.push(state);
+    }
 
-        self.token_start_iter.find(|x| {
-            x.position.0 >= position
-        })
+    pub fn pop_state(&mut self) -> Result<Box<TokenizeState>, LexerError> {
+        self.states.pop().ok_or(error!(LexerErrorCode::InvalidState, "Cannot pop state without a previous state"))
     }
 }

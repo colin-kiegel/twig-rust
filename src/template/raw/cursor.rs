@@ -15,7 +15,7 @@
 // imports //
 /////////////
 
-use lexer::SyntaxError;
+use lexer::error::LexerError;
 use lexer::SyntaxErrorCode;
 
 /////////////
@@ -44,15 +44,27 @@ impl<'a> Cursor<'a> {
         }
     }
 
-    pub fn move_by(&mut self, text: &str) -> Result<(), SyntaxError> { // TODO return a new slice??
-        self.pos += text.chars().count();
-        self.lineno += text.lines().count();
+    // pub fn move_by_text(&mut self, text: &str) -> Result<(), SyntaxError> {
+    //     self.pos += text.chars().count();
+    //     self.lineno += text.lines().count();
+    //
+    //     if self.pos > self.end {
+    //         return err!(SyntaxErrorCode::Unknown, "out of range");
+    //     }
+    //
+    //     Ok(())
+    // }
 
-        if self.pos > self.end {
-            return err!(SyntaxErrorCode::Unknown, "out of range");
+    /// move the cursor `position` by `increment` and keep track of the `lineno`
+    /// # panics
+    /// when the `increment` would move the cursor `position` out of range
+    pub fn move_by(&mut self, increment: usize) {
+        let pos = self.pos + increment;
+        if pos > self.end {
+            panic!("cursor is out of range");
         }
-
-        Ok(())
+        self.lineno += self.template.code[self.pos..pos].lines().count();
+        self.pos = pos;
     }
 
     /// moves the cursor to a new position
@@ -61,11 +73,11 @@ impl<'a> Cursor<'a> {
     /// Panics if `pos` is greater than the template's length.
     pub fn move_to(&mut self, pos: usize) {
         if pos > self.pos {
-            if pos > self.end {
-                panic!("Cursor::move_to() is out of range")
-            }
+            // if pos > self.end {
+            //     panic!("Cursor::move_to() is out of range")
+            // }
             self.lineno += self.template.code[self.pos..pos].lines().count();
-        } else if pos < self.pos {
+        } else {
             self.lineno -= self.template.code[pos..self.pos].lines().count();
         }
         self.pos = pos;
@@ -76,25 +88,44 @@ impl<'a> Cursor<'a> {
         self.pos = self.end;
     }
 
-    pub fn slice_to_end(&mut self) -> &str {
-        let ref slice = &self.template.code[self.pos..];
+    #[inline]
+    pub fn slice_by(&mut self, len: usize) -> &'a str  {
+        let pos = self.pos + len;
+        self.slice_to(pos)
+    }
 
+    #[inline]
+    pub fn slice_to_end(&mut self) -> &'a str {
+        let pos = self.end;
+        self.slice_to(pos)
+    }
+
+    pub fn slice_to(&mut self, pos: usize) -> &'a str  {
+        let ref slice = &self.template.code[self.pos..pos];
         self.lineno += slice.lines().count();
         self.pos = self.end;
 
         slice
     }
 
+    pub fn tail(&mut self) -> &'a str {
+        &self.template.code[self.pos..]
+    }
+
     pub fn is_eof(&self) -> bool {
         self.pos >= self.end
     }
 
-    pub fn get_position(&self) -> usize {
+    pub fn position(&self) -> usize {
         self.pos
     }
 
-    pub fn get_line(&self) -> usize {
+    pub fn line(&self) -> usize {
         self.lineno
+    }
+
+    pub fn set_line(&mut self, line: usize) {
+        self.lineno = line;
     }
 }
 
