@@ -34,6 +34,7 @@
 
 use std::fmt;
 use std::error::Error as ErrorTrait;
+use std::any::Any;
 
 /////////////
 // exports //
@@ -92,6 +93,7 @@ impl<T> Error<T>
         self.description.as_ref()
     }
 
+
     pub fn cause(&self) -> Option<&ErrorTrait> {
         use std::borrow::Borrow;
         match self.cause {
@@ -107,24 +109,21 @@ impl<T> Error<T>
     }
 }
 
-// error: use of unstable library feature 'core': requires RFC and more experience
-//     where T: ::std::marker::Reflect + fmt::Debug {
-//              ^~~~~~~~~~~~~~~~~~~~~~
-// impl<T> ErrorTrait for Error<T>
-//     where T: ::std::marker::Reflect + fmt::Debug {
-//     fn description(&self) -> &str {
-//         self.description.as_ref()
-//     }
-//
-//     fn cause<'a>(&'a self) -> Option<&'a ErrorTrait> {
-//         use std::borrow::Borrow;
-//         // TODO is there a simpler way to go from Option<Box<T>> to Option<&T>? Ask this on SO...
-//         match self.cause {
-//             Some(ref cause) => Some(cause.borrow()),
-//             None            => None
-//         }
-//     }
-// }
+impl<T> ErrorTrait for Error<T>
+    where T: Any + fmt::Debug {
+    fn description(&self) -> &str {
+        self.description.as_ref()
+    }
+
+    fn cause<'a>(&'a self) -> Option<&'a ErrorTrait> {
+        use std::borrow::Borrow;
+        // TODO is there a simpler way to go from Option<Box<T>> to Option<&T>? Ask this on SO...
+        match self.cause {
+            Some(ref cause) => Some(cause.borrow()),
+            None            => None
+        }
+    }
+}
 
 impl<T> fmt::Display for Error<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {

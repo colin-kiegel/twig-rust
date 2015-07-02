@@ -43,12 +43,25 @@ pub enum LexerErrorCode {
     Logic,
     InvalidPatternMatch,
     InvalidValue,
+    InvalidState,
+    SyntaxError,
 }
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum TokenErrorCode {
     NoValue,
+}
+
+impl ::std::convert::From<SyntaxError> for LexerError {
+    fn from(cause: SyntaxError) -> LexerError {
+        let details = ::error::Details {
+            message: None,
+            .. *cause.details()
+        };
+        ::error::Error::new(details, LexerErrorCode::SyntaxError)
+            .chain(Box::new(cause))
+    }
 }
 
 impl ToString for SyntaxErrorCode {
@@ -69,6 +82,8 @@ impl ToString for LexerErrorCode {
             LexerErrorCode::Logic => "Logic",
             LexerErrorCode::InvalidPatternMatch => "InvalidPatternMatch",
             LexerErrorCode::InvalidValue => "InvalidValue",
+            LexerErrorCode::InvalidState => "InvalidState",
+            LexerErrorCode::SyntaxError => "SyntaxError",
         }.to_string()
     }
 }
