@@ -38,7 +38,7 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct CaptureData {
+pub struct ItemData {
     pub position: (usize, usize),
     pub line: usize,
 }
@@ -54,15 +54,15 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = Result<CaptureData, LexerError>;
+    type Item = Result<ItemData, LexerError>;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
     #[inline]
-    fn item_from_captures(&self, captures: &regex::Captures) -> Result<CaptureData, LexerError> {
-        Ok(CaptureData {
+    fn item_from_captures(&self, captures: &regex::Captures) -> Result<ItemData, LexerError> {
+        Ok(ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
@@ -70,8 +70,8 @@ impl<'t> super::Extract<'t> for Pattern {
             line: match captures.at(1) {
                 Some(x) => match x.parse::<usize>() {
                         Ok(line) => line,
-                        Err(cause) => {
-                            return err!(LexerErrorCode::InvalidValue, x, cause)
+                        Err(e) => {
+                            return err!(LexerErrorCode::InvalidValue, x).caused_by(e).into()
                         },
                     },
                 _ => unreachable!(),
@@ -106,7 +106,7 @@ mod test {
             // u64::max_value() == 18446744073709551615
             // u32::max_value() == 4294967295
             pattern.extract(&r"   line   1234567890  %}").unwrap().unwrap(),
-            CaptureData {
+            ItemData {
                 position: (0,24),
                 line: 1234567890
             }

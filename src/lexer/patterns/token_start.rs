@@ -36,7 +36,7 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct CaptureData {
+pub struct ItemData {
     pub position: (usize, usize),
     pub whitespace_trim: bool,
     pub tag: Tag,
@@ -64,14 +64,14 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = CaptureData;
+    type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
-        CaptureData {
+    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+        ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
@@ -119,7 +119,7 @@ mod test {
 
         assert_eq!(
             pattern.extract(&r"{{-"),
-            Some(CaptureData {
+            Some(ItemData {
                 position: (0,3),
                 whitespace_trim: true,
                 tag: Tag::Variable
@@ -127,7 +127,7 @@ mod test {
 
         assert_eq!(
             pattern.extract(&r"{{"),
-            Some(CaptureData {
+            Some(ItemData {
                 position: (0,2),
                 whitespace_trim: false,
                 tag: Tag::Variable

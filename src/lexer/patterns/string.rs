@@ -6,7 +6,7 @@
  */
 
 /**
- * The `var` pattern used by the lexer to tokenize the templates.
+ * The `name` pattern used by the lexer to tokenize the templates.
  *
  * Written as regular expressions (perl-style).
  *
@@ -17,10 +17,8 @@
 // imports //
 /////////////
 
-use super::Options;
 use regex;
 use regex::Error as regexError;
-use std::rc::Rc;
 
 /////////////
 // exports //
@@ -31,39 +29,46 @@ pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 #[derive(PartialEq)]
 pub struct Pattern {
     regex: regex::Regex,
-    options: Rc<Options>,
 }
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct ItemData {
+pub struct ItemData<'a> {
     pub position: (usize, usize),
+    pub escaped_string: &'a str,
+}
+
+impl<'a> ItemData<'a> {
+    pub fn unescape_string(&self) -> String {
+        super::php_stripcslashes(self.escaped_string)
+    }
 }
 
 impl Pattern {
-    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new() -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*(?:{ws}{v1}\s*|{v1})",
-                ws = opt.whitespace_trim.quoted(),
-                v1 = opt.tag_variable_end.quoted())),
-            options: opt,
+            regex: try_new_regex!(r##"(?s)\A"([^#"\\]*(?:\\.[^#"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'"##),
         })
-    }
-}   // orig: '/\s*'.$whitespace_trim.$tag_variable[1].'\s*|\s*'.$tag_variable[1].'/A'
+    }   // orig: '/"([^#"\\\\]*(?:\\\\.[^#"\\\\]*)*)"|\'([^\'\\\\]*(?:\\\\.[^\'\\\\]*)*)\'/As'
+}
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = ItemData;
+    type Item = ItemData<'t>;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+    fn item_from_captures(&self, captures: &regex::Captures<'t>) -> ItemData<'t> {
         ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
             },
+            escaped_string: match captures.at(0) {
+                Some(ref val) => val,
+                _ => unreachable!(),
+            }
         }
     }
 
@@ -71,7 +76,8 @@ impl<'t> super::Extract<'t> for Pattern {
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
         self.find(text).map(|position|
             ItemData {
-                position: position
+                position: position,
+                escaped_string: &text[position.0..position.1],
             })
     }
 }
@@ -79,42 +85,31 @@ impl<'t> super::Extract<'t> for Pattern {
 #[cfg(test)]
 mod test {
     use super::*;
-    use lexer::patterns::{Options, Extract};
-    use std::rc::Rc;
-
-    #[test]
-    pub fn as_str() {
-        let options = Rc::<Options>::default();
-        let pattern = Pattern::new(options).unwrap();
-
-        assert_eq!(
-            pattern.as_str(),
-            r"\A\s*(?:-\}\}\s*|\}\})"
-        );
-    }
+    use lexer::patterns::Extract;
 
     #[test]
     pub fn extract() {
-        let options = Rc::<Options>::default();
-        let pattern = Pattern::new(options).unwrap();
+        let pattern = Pattern::new().unwrap();
 
         assert_eq!(
-            pattern.extract(&r"Lorem Ipsum }}"),
+            pattern.extract(&r##"{Lorem Ipsum"##),
             None
         );
 
         assert_eq!(
-            pattern.extract(&r" }} Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 3),
-            }
+            pattern.extract(&r##""123\.abc"def"##),
+            Some(ItemData {
+                position: (0, 10),
+                escaped_string: r##""123\.abc""##
+            })
         );
 
         assert_eq!(
-            pattern.extract(&r" -}} Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 5),
-            }
+            pattern.extract(&r"'Lorem' Ipsum"),
+            Some(ItemData {
+                position: (0,7),
+                escaped_string: "'Lorem'"
+            })
         );
     }
 }

@@ -36,7 +36,7 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct CaptureData {
+pub struct ItemData {
     pub position: (usize, usize),
     pub tag: Tag,
 }
@@ -88,14 +88,14 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = CaptureData;
+    type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
-        CaptureData {
+    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+        ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
@@ -107,34 +107,34 @@ impl<'t> super::Extract<'t> for Pattern {
     }
 }
 
-#[cfg(test)]
-mod test {
-    use super::*;
-    use environment::Environment;
-    use lexer::patterns::Extract;
-    use std::rc::Rc;
-
-    #[test]
-    pub fn as_str() {
-        let environment = Rc::<Environment>::default();
-        let pattern = Pattern::new(environment).unwrap();
-
-        assert_eq!(
-            pattern.as_str(),
-            r""
-        );
-    }
-
-    #[test]
-    pub fn extract() {
-        let environment = Rc::<Environment>::default();
-        let pattern = Pattern::new(environment).unwrap();
-
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum"),
-            None
-        );
-
-        unimplemented!();
-    }
-}
+// #[cfg(test)]
+// mod test {
+//     use super::*;
+//     use environment::Environment;
+//     use lexer::patterns::Extract;
+//     use std::rc::Rc;
+//
+//     #[test]
+//     pub fn as_str() {
+//         let environment = Rc::<Environment>::default();
+//         let pattern = Pattern::new(environment).unwrap();
+//
+//         assert_eq!(
+//             pattern.as_str(),
+//             r""
+//         );
+//     }
+//
+//     #[test]
+//     pub fn extract() {
+//         let environment = Rc::<Environment>::default();
+//         let pattern = Pattern::new(environment).unwrap();
+//
+//         assert_eq!(
+//             pattern.extract(&r"Lorem Ipsum"),
+//             None
+//         );
+//
+//         unimplemented!();
+//     }
+// }

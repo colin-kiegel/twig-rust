@@ -6,7 +6,7 @@
  */
 
 /**
- * The `interpolation end` pattern used by the lexer to tokenize the templates.
+ * The `name` pattern used by the lexer to tokenize the templates.
  *
  * Written as regular expressions (perl-style).
  *
@@ -17,10 +17,8 @@
 // imports //
 /////////////
 
-use super::Options;
 use regex;
 use regex::Error as regexError;
-use std::rc::Rc;
 
 /////////////
 // exports //
@@ -31,36 +29,38 @@ pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 #[derive(PartialEq)]
 pub struct Pattern {
     regex: regex::Regex,
-    options: Rc<Options>,
 }
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct ItemData {
-    pub position: (usize, usize)
+pub struct ItemData<'a> {
+    pub position: (usize, usize),
+    pub name: &'a str,
 }
 
 impl Pattern {
-    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new() -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*{i1}",
-                i1 = opt.interpolation_end.quoted())),
-            options: opt,
+            regex: try_new_regex!(r"\A[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*"),
         })
-    }   // orig: '/\s*'.$interpolation[1].'/A'
+    }   // orig: '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A'
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = ItemData;
+    type Item = ItemData<'t>;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+    fn item_from_captures(&self, captures: &regex::Captures<'t>) -> ItemData<'t> {
         ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
+                _ => unreachable!(),
+            },
+            name: match captures.at(0) {
+                Some(ref name) => name,
                 _ => unreachable!(),
             }
         }
@@ -70,7 +70,8 @@ impl<'t> super::Extract<'t> for Pattern {
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
         self.find(text).map(|position|
             ItemData {
-                position: position
+                position: position,
+                name: &text[position.0..position.1],
             })
     }
 }
@@ -78,34 +79,27 @@ impl<'t> super::Extract<'t> for Pattern {
 #[cfg(test)]
 mod test {
     use super::*;
-    use lexer::patterns::{Options, Extract};
-    use std::rc::Rc;
-
-    #[test]
-    pub fn as_str() {
-        let options = Rc::<Options>::default();
-        let pattern = Pattern::new(options).unwrap();
-
-        assert_eq!(
-            pattern.as_str(),
-            r"\A\s*\}"
-        );
-    }
+    use lexer::patterns::Extract;
 
     #[test]
     pub fn extract() {
-        let options = Rc::<Options>::default();
-        let pattern = Pattern::new(options).unwrap();
+        let pattern = Pattern::new().unwrap();
 
         assert_eq!(
-            pattern.extract(&r"Lorem Ipsum}"),
+            pattern.extract(&r"{Lorem Ipsum"),
             None
         );
 
         assert_eq!(
-            pattern.extract(&r"       }"),
+            pattern.extract(&r"123abc"),
+            None
+        );
+
+        assert_eq!(
+            pattern.extract(&r"Lorem Ipsum"),
             Some(ItemData {
-                position: (0, 8)
+                position: (0,5),
+                name: "Lorem"
             })
         );
     }

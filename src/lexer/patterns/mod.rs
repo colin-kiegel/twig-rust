@@ -30,15 +30,21 @@ use environment::Environment;
 pub mod macros;
 pub mod options;
 pub mod var_end;
-pub mod block_end;
-pub mod raw_data;
+pub mod block_end; // TODO rename block_line_end ?
+pub mod raw_data; // TODO renamce block_raw_end ?
 pub mod operator;
 pub mod comment_end;
-pub mod block_raw;
-pub mod block_line;
+pub mod block_raw; // TODO rename block_raw_start ?
+pub mod block_line; // TODO rename block_line_start ?
 pub mod token_start;
 pub mod interpolation_start;
 pub mod interpolation_end;
+pub mod name;
+pub mod number;
+//pub mod punctuation;
+pub mod string;
+pub mod dq_string_delim;
+pub mod dq_string_part;
 pub use self::options::Options;
 
 
@@ -61,6 +67,12 @@ pub struct Patterns {
     pub token_start: token_start::Pattern,
     pub interpolation_start: interpolation_start::Pattern,
     pub interpolation_end: interpolation_end::Pattern,
+    pub name: name::Pattern,
+    pub number: number::Pattern,
+    // pub punctuation: punctuation::Pattern,
+    pub string: string::Pattern,
+    pub dq_string_delim: dq_string_delim::Pattern,
+    pub dq_string_part: dq_string_part::Pattern,
 }
 
 #[allow(dead_code)]
@@ -78,6 +90,12 @@ impl Patterns {
             token_start: try!(token_start::Pattern::new(opt.clone())),
             interpolation_start: try!(interpolation_start::Pattern::new(opt.clone())),
             interpolation_end: try!(interpolation_end::Pattern::new(opt.clone())),
+            name: try!(name::Pattern::new()),
+            number: try!(number::Pattern::new()),
+            // punctuation: try!(punctuation::Pattern::new()),
+            string: try!(string::Pattern::new()),
+            dq_string_delim: try!(dq_string_delim::Pattern::new()),
+            dq_string_part: try!(dq_string_part::Pattern::new()),
             options: opt,
             environment: env,
         })
@@ -117,7 +135,7 @@ pub trait Extract<'t> {
 
     #[inline]
     fn regex(&self) -> &regex::Regex;
-    fn item_from_captures(&self, captures: &regex::Captures) -> Self::Item
+    fn item_from_captures(&self, captures: &regex::Captures<'t>) -> Self::Item
         where Self::Item: Sized;
 
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
@@ -203,6 +221,133 @@ pub trait Extract<'t> {
     }
 }
 
+/// Trim whitespace in a *php-compatible* manner
+///
+/// http://php.net/manual/en/function.rtrim.php
+/// trims the following whitespace characters from the end of a string
+/// - " " (ASCII 32 (0x20)), an ordinary space.
+/// - "\t" (ASCII 9 (0x09)), a tab.
+/// - "\n" (ASCII 10 (0x0A)), a new line (line feed).
+/// - "\r" (ASCII 13 (0x0D)), a carriage return.
+/// - "\0" (ASCII 0 (0x00)), the NULL-byte.
+/// - "\x0B" (ASCII 11 (0x0B)), a vertical tab.
+///
+/// Rusts built-in trim_right does not seem to trim "\0"
+pub fn _php_trim_right(slice: &str) -> &str {
+    let ws: &[_] = &[' ', '\t', '\n', '\r', '\0', '\x0B'];
+    slice.trim_right_matches(ws)
+}
+
+fn to_hex(c: &char) -> Option<u32> {
+    match *c {
+        '0'...'9' => Some(*c as u32 - '0' as u32),
+        'a'...'f' => Some(10 + *c as u32 - 'a' as u32),
+        'A'...'F' => Some(10 + *c as u32 - 'A' as u32),
+        _ => None,
+    }
+}
+
+fn to_oct(c: &char) -> Option<u32> {
+    match *c {
+        '0'...'7' => Some(*c as u32 - '0' as u32),
+        _ => None,
+    }
+}
+
+// supposed to be *compatible* with PHP implementation
+// - http://php.net/manual/en/function.stripcslashes.php
+// - https://github.com/php/php-src/blob/master/ext/standard/string.c
+//
+// see also https://en.wikipedia.org/wiki/Escape_sequences_in_C#Table_of_escape_sequences
+//
+pub fn php_stripcslashes(string: &str) -> String {
+    let mut result = String::with_capacity(string.len());
+    let mut it = string.chars();
+    let mut cur : Option<char>;
+
+    'next: loop { // we need manual loop control for lookaheads in some match branches
+        cur = it.next();
+        'current: loop { match cur {
+            None => break 'next,
+            Some('\\') => match it.next() {
+                None => { result.push('\\'); continue 'next },
+                Some('a') => { result.push('\x07'); continue 'next }, // alarm (beep/bell)
+                Some('b') => { result.push('\x08'); continue 'next }, // backspace
+                Some('f') => { result.push('\x0C'); continue 'next }, // formfeed
+                Some('n') => { result.push('\n'); continue 'next }, // new line
+                Some('r') => { result.push('\r'); continue 'next }, // cariage return
+                Some('t') => { result.push('\t'); continue 'next }, // horizontal tab
+                Some('v') => { result.push('\x0B'); continue 'next }, // vertical tab
+                Some('\\') => { result.push('\\'); continue 'next }, // backslash
+                Some('x') => { // assuming *hex* UTF32 representation
+                    let mut v: char;
+                    let mut parsed = 0;
+                    let mut char_u32 = 0;
+
+                    v = match {cur = it.next(); cur} {
+                        None => { result.push('x'); break 'next },
+                        Some(value) => value,
+                    };
+
+                    'hex: while parsed < 3 { match to_hex(&v) {
+                        None => break 'hex,
+                        Some(hex) => {
+                            parsed += 1;
+                            char_u32 = 16*char_u32 + hex;
+                            v = match {cur = it.next(); cur} {
+                                None => break 'hex,
+                                Some(value) => value,
+                            }
+                        }
+                    }}
+
+                    // we don't parse invalid hex
+                    if parsed == 0 { result.push('x'); continue 'next }
+
+                    match ::std::char::from_u32(char_u32) {
+                        None => continue 'current, // discard invalid UTF32
+                        Some(converted) => {
+                            result.push(converted);
+                            continue 'current
+                        },
+                    }
+                },
+                Some(escaped) => { // assuming *octal* UTF32 representation
+                    let mut v = escaped;
+                    let mut parsed = 0;
+                    let mut char_u32 = 0;
+
+                    'octal: while parsed < 3 { match to_oct(&v) {
+                        None => break 'octal,
+                        Some(oct) => {
+                            parsed += 1;
+                            char_u32 = 8*char_u32 + oct;
+                            v = match {cur = it.next(); cur} {
+                                None => break 'octal,
+                                Some(value) => value,
+                            }
+                        }
+                    }}
+
+                    // we don't parse invalid oct
+                    if parsed == 0 { result.push(escaped); continue 'next };
+
+                    match ::std::char::from_u32(char_u32) {
+                        None => continue 'current, // discard invalid UTF32
+                        Some(converted) => {
+                            result.push(converted);
+                            continue 'current
+                        },
+                    }
+                }
+            },
+            Some(value) => { result.push(value); continue 'next },
+        }}
+    }
+
+    return result;
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -211,5 +356,37 @@ mod test {
     // must not panic!
     pub fn default() {
         Patterns::default();
+    }
+
+    #[test]
+    pub fn _php_stripcslashes() {
+        assert_eq!(
+            php_stripcslashes(&r#"\a\b\f\n\r\t\v\\\'\"\?\013\x00"#),
+            "\x07\x08\x0C\n\r\t\x0B\\'\"?\x0B\x00".to_string()
+        );
+
+        assert_eq!(
+            php_stripcslashes(&r#"nothing to strip \"#),
+            r#"nothing to strip \"#.to_string()
+        );
+
+        assert_eq!(
+            php_stripcslashes(&r#"almost nothing to strip \x"#),
+            r#"almost nothing to strip x"#.to_string()
+        );
+    }
+
+    #[test]
+    pub fn php_trim_right() {
+        // Rusts built-in trim_right does not trim "\0"
+        assert_eq!(
+            _php_trim_right("trim me PHP! \0 \t \n \r \x0B \n "),
+            "trim me PHP!"
+        );
+
+        assert_eq!(
+            "trim me RUST! \0 \t \n \r \x0B \n ".trim_right(),
+            "trim me RUST! \0"
+        );
     }
 }

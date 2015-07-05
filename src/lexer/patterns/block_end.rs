@@ -36,14 +36,14 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct CaptureData {
+pub struct ItemData {
     pub position: (usize, usize)
 }
 
 impl Pattern {
     pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*(?:{ws}{b1}\s*|\s*{b1})\n?",
+            regex: try_new_regex!(format!(r"\A\s*(?:{ws}{b1}\s*|{b1})\n?",
                 ws = opt.whitespace_trim.quoted(),
                 b1 = opt.tag_block_end.quoted())),
             options: opt,
@@ -52,19 +52,27 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = CaptureData;
+    type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
-        CaptureData {
+    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+        ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
             }
         }
+    }
+
+    // overwrite for better performance, as long as we only need the position
+    fn extract(&self, text: &'t str) -> Option<Self::Item> {
+        self.find(text).map(|position|
+            ItemData {
+                position: position
+            })
     }
 }
 
@@ -81,7 +89,7 @@ mod test {
 
         assert_eq!(
             pattern.as_str(),
-            r"\A\s*(?:-%\}\s*|\s*%\})\n?"
+            r"\A\s*(?:-%\}\s*|%\})\n?"
         );
     }
 
@@ -91,10 +99,22 @@ mod test {
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
-            pattern.extract(&r"Lorem Ipsum"),
+            pattern.extract(&r"Lorem Ipsum -%}"),
             None
         );
 
-        unimplemented!();
+        assert_eq!(
+            pattern.extract(&r"  -%} Lorem Ipsum").unwrap(),
+            ItemData {
+                position: (0, 6),
+            }
+        );
+
+        assert_eq!(
+            pattern.extract(&r"%}Lorem Ipsum").unwrap(),
+            ItemData {
+                position: (0, 2),
+            }
+        );
     }
 }

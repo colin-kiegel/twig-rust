@@ -38,7 +38,7 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct CaptureData {
+pub struct ItemData {
     pub position: (usize, usize),
     pub tag: Tag,
 }
@@ -53,7 +53,7 @@ pub enum Tag {
 impl Pattern {
     pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*(raw|verbatim)\s*(?:{ws}{b1}\s*|\s*{b1})",
+            regex: try_new_regex!(format!(r"\A\s*(raw|verbatim)\s*(?:{ws}{b1}\s*|{b1})",
                 ws = opt.whitespace_trim.quoted(),
                 b1 = opt.tag_block_end.quoted())),
             options: opt,
@@ -62,14 +62,14 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = CaptureData;
+    type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
-        CaptureData {
+    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+        ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
@@ -96,7 +96,7 @@ mod test {
 
         assert_eq!(
             pattern.as_str(),
-            r"\A\s*(raw|verbatim)\s*(?:-%\}\s*|\s*%\})"
+            r"\A\s*(raw|verbatim)\s*(?:-%\}\s*|%\})"
         );
     }
 
@@ -106,10 +106,24 @@ mod test {
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
-            pattern.extract(&r"Lorem Ipsum"),
+            pattern.extract(&r"Lorem Ipsum raw %}"),
             None
         );
 
-        unimplemented!();
+        assert_eq!(
+            pattern.extract(&r"   raw   %} Lorem").unwrap(),
+            ItemData {
+                position: (0, 11),
+                tag: Tag::Raw
+            }
+        );
+
+        assert_eq!(
+            pattern.extract(&r"verbatim-%}     Lorem Ipsum").unwrap(),
+            ItemData {
+                position: (0, 16),
+                tag: Tag::Verbatim,
+            }
+        );
     }
 }

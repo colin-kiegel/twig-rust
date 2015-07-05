@@ -36,17 +36,8 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct CaptureData {
-    pub position: (usize, usize),
-    pub tag: Tag,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, PartialEq)]
-pub enum Tag {
-    // Block,
-    // Comment,
-    // Variable,
+pub struct ItemData {
+    pub position: (usize, usize)
 }
 
 impl Pattern {
@@ -61,22 +52,27 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = CaptureData;
+    type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
-        CaptureData {
+    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+        ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
             },
-            tag: match captures.at(1) {
-                _ => unreachable!(),
-            },
         }
+    }
+
+    // overwrite for better performance, as long as we only need the position
+    fn extract(&self, text: &'t str) -> Option<Self::Item> {
+        self.find(text).map(|position|
+            ItemData {
+                position: position
+            })
     }
 }
 
@@ -103,10 +99,24 @@ mod test {
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
-            pattern.extract(&r"Lorem Ipsum"),
-            None
+            pattern.extract(&r"Lorem Ipsum #}").unwrap(),
+            ItemData {
+                position: (12, 14)
+            }
         );
 
-        unimplemented!();
+        assert_eq!(
+            pattern.extract(&r"#} Lorem Ipsum").unwrap(),
+            ItemData {
+                position: (0, 2)
+            }
+        );
+
+        assert_eq!(
+            pattern.extract(&r"Lorem -#} Ipsum").unwrap(),
+            ItemData {
+                position: (6, 10)
+            }
+        );
     }
 }

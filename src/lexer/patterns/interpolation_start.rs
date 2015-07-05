@@ -36,7 +36,7 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct CaptureData {
+pub struct ItemData {
     pub position: (usize, usize),
 }
 
@@ -51,19 +51,27 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = CaptureData;
+    type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> CaptureData {
-        CaptureData {
+    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+        ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
             }
         }
+    }
+
+    // overwrite for better performance, as long as we only need the position
+    fn extract(&self, text: &'t str) -> Option<Self::Item> {
+        self.find(text).map(|position|
+            ItemData {
+                position: position
+            })
     }
 }
 
@@ -96,7 +104,7 @@ mod test {
 
         assert_eq!(
             pattern.extract(&r"#{      Lorem Ipsum"),
-            Some(CaptureData {
+            Some(ItemData {
                 position: (0,8)
             })
         );
