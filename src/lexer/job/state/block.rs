@@ -16,22 +16,40 @@
 /////////////
 
 use super::{TokenizeState, Code};
-use lexer::error::LexerError;
 use lexer::job::Job;
-use super::data::Data;
+use lexer::token::Token;
+use lexer::patterns::{Extract};
+use lexer::error::{LexerError};
+use super::shared_traits::LexExpression;
 
 pub struct Block;
 
 impl TokenizeState for Block {
-    fn new() -> Box<Block> {
-        Box::new(Block)
+    fn instance() -> &'static Self {
+        static INSTANCE : &'static Block = &Block;
+
+        INSTANCE
     }
 
     fn state(&self) -> Code {
         Code::Block
     }
 
-    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
-        unimplemented!()
+    fn tokenize<'a>(self: &'static Self, job: &'a mut Job) -> Result<(),LexerError> {
+        if job.brackets.is_empty() {
+            match job.patterns.block_end.extract(job.cursor.tail()) {
+                Some(item) => {
+                    job.cursor.move_by(item.position.1);
+                    job.push_token(Token::BlockEnd);
+
+                    return try!(job.pop_state()).tokenize(job);
+                },
+                _ => {},
+            }
+        };
+
+        return self.lex_expression(job);
     }
 }
+
+impl LexExpression for Block {}

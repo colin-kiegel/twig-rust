@@ -49,7 +49,7 @@ struct Lexer {
 
 #[allow(dead_code)]
 #[allow(unused_variables)]
-impl<'a, 'r, 't> Lexer {
+impl Lexer {
     pub fn new(env: Environment, opt: Options) -> Result<Lexer, regexError> {
         let env = Rc::new(env);
         let opt = Rc::new(opt);
@@ -62,10 +62,9 @@ impl<'a, 'r, 't> Lexer {
         })
     }
 
-    pub fn tokenize(&'t self, template: &'r template::Raw) -> Result<token::Stream, LexerError>
-        where 'r: 't // the template must outlive the Lexer
+    pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream, LexerError>
+        where 't: 'a // the template must outlive the Lexer
     {
-        // TODO set/handle encoding (note: Twig-PHP assumes ASCII)
         let job = Job::new(template, &self.patterns);
 
         job.tokenize()
@@ -189,7 +188,7 @@ impl<'a, 'r, 't> Lexer {
     }
 }
 
-impl<'a> Default for Lexer {
+impl Default for Lexer {
     fn default() -> Lexer {
         let env = Environment::default();
         let options = Options::default();

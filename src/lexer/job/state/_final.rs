@@ -23,33 +23,23 @@ use lexer::job::Job;
 // exports //
 /////////////
 
-pub struct Final {
-    is_finished: bool,
-}
+pub struct Final;
 
 impl TokenizeState for Final {
-    fn new() -> Box<Final> {
-        Box::new(Final {
-            is_finished: false
-        })
+    fn instance() -> &'static Self {
+        static INSTANCE : &'static Final = &Final;
+
+        INSTANCE
     }
 
     fn state(&self) -> Code {
         Code::Final
     }
 
-    fn is_finished(&self) -> bool {
-        // job.cursor.position() == job.cursor.end() <- implicit alternative?
-        self.is_finished
-    }
-
-    // this one requires a read o
-    // https://github.com/rust-lang/rfcs/blob/master/text/0255-object-safety.md
-    // http://stackoverflow.com/questions/29985153/trait-object-is-not-object-safe-error
-    //fn lex<T>(self: Box<Self>) -> Result<Box<Tokenize<'a>>,SyntaxError>;
-
-    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
-        Ok(Box::new(Final{ is_finished : true }))
+    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(),LexerError> {
+        // TODO do some final checks like
+        // - job.cursor.position() == job.cursor.end() <- implicit alternative?
+        Ok(()) // means we are done.
         /*
         if (empty($this->brackets) && preg_match($this->regexes['lex_Final'], $this->code, $match, null, $this->cursor)) {
             $this->pushToken(Twig_Token::Final_END_TYPE);

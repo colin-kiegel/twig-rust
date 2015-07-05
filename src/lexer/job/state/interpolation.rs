@@ -18,20 +18,21 @@
 use super::{TokenizeState, Code};
 use lexer::error::LexerError;
 use lexer::job::Job;
-use super::data::Data;
 
 pub struct Interpolation;
 
 impl TokenizeState for Interpolation {
-    fn new() -> Box<Interpolation> {
-        Box::new(Interpolation)
+    fn instance() -> &'static Self {
+        static INSTANCE : &'static Interpolation = &Interpolation;
+
+        INSTANCE
     }
 
     fn state(&self) -> Code {
         Code::Interpolation
     }
 
-    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
+    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(),LexerError> {
         unimplemented!()
     }
 }

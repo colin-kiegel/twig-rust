@@ -16,13 +16,11 @@
 /////////////
 
 use super::{TokenizeState, Code};
-use super::_final::Final;
-use super::var::Var;
-use super::block::Block;
-use lexer::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
+use lexer::job::state;
 use lexer::job::Job;
 use lexer::token::Token;
 use lexer::patterns::{token_start, block_raw, Extract};
+use lexer::error::{LexerError, SyntaxError, SyntaxErrorCode};
 
 /////////////
 // exports //
@@ -33,43 +31,40 @@ pub struct Data;
 
 #[allow(unused_variables)]
 impl TokenizeState for Data {
-    fn new() -> Box<Data> {
-        Box::new(Data)
+    fn instance() -> &'static Self {
+        static INSTANCE : &'static Data = &Data;
+
+        INSTANCE
     }
 
     fn state(&self) -> Code {
         Code::Data
     }
 
-    fn step<'a>(self: Box<Self>, job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
+    fn tokenize<'a>(self: &'static Self, job: &'a mut Job) -> Result<(),LexerError> {
         let capture = match Self::next_token_start_after_cursor(job) {
             Some(capture) => capture,
             None => {
                 let slice = job.cursor.slice_to_end();
                 job.push_token(Token::Text(slice.to_string()));
 
-                return Ok(Final::new())
+                return state::Final::instance().tokenize(job)
             },
         };
 
         let mut slice = job.cursor.slice_to(capture.position.0);
 
-        // trim whitespace according to the next token
-        match job.token_start_iter.peek() {
-            Some(next) if next.whitespace_trim => {
-                slice = slice.trim_right();
-            },
-            _ => {},
-        };
+        if capture.whitespace_trim {
+            slice = slice.trim_right();
+        }
 
         job.cursor.move_to(capture.position.1);
         job.push_token(Token::Text(slice.to_string()));
 
-        // process and return new Box<Tokenize> (i.e. new state)
         match capture.tag {
             token_start::Tag::Comment => {
                 try!(Self::lex_comment(job));
-                self.step(job) // direct recursion is faster than dynamic dispatch (return self)
+                return self.tokenize(job);
             },
             token_start::Tag::Block => {
                 // TODO nested matches don't look nice - alternative??
@@ -79,7 +74,7 @@ impl TokenizeState for Data {
                         job.cursor.move_by(block_raw.position.1);
                         try!(Self::lex_raw_data(job, block_raw.tag));
 
-                        return Ok(self);
+                        return self.tokenize(job);
                     },
                     _ => {
                         // {% line \d+ %}
@@ -90,14 +85,14 @@ impl TokenizeState for Data {
                                 job.cursor.move_by(block_line.position.1);
                                 job.cursor.set_line(block_line.line);
 
-                                return Ok(self);
+                                return self.tokenize(job);
                             },
                             _ => {
                                 job.current_var_block_line = job.cursor.line();
-                                job.push_token(Token::BlockStart);
                                 job.push_state(self);
+                                job.push_token(Token::BlockStart);
 
-                                Ok(Block::new())
+                                return state::Block::instance().tokenize(job);
                             },
                         }
                     },
@@ -105,10 +100,10 @@ impl TokenizeState for Data {
             },
             token_start::Tag::Variable => {
                 job.current_var_block_line = job.cursor.line();
-                job.push_token(Token::VarStart);
                 job.push_state(self);
+                job.push_token(Token::VarStart);
 
-                Ok(Var::new())
+                return state::Var::instance().tokenize(job);
             }
         }
     }
@@ -117,7 +112,7 @@ impl TokenizeState for Data {
 impl<'a> Data {
     fn lex_comment(job: &'a mut Job) -> Result<(), SyntaxError> {
         match job.patterns.comment_end.find(job.cursor.tail()) {
-            None => return err!(SyntaxErrorCode::UnclosedComment),
+            None => return err!(SyntaxErrorCode::UnclosedComment).into(),
             Some((_, rel_end)) => job.cursor.move_by(rel_end),
         }
         Ok(())
@@ -127,7 +122,7 @@ impl<'a> Data {
         let capture = match job.patterns.raw_data.extract_iter(job.cursor.tail())
                                                  .find(|capture| capture.tag == tag) {
             Some(capture) => capture,
-            _ => return err!(SyntaxErrorCode::UnexpectedEof, "Unclosed (raw|verbatim) block"),
+            _ => return err!(SyntaxErrorCode::UnexpectedEof, "Unclosed (raw|verbatim) block").into(),
         };
 
         let mut slice = job.cursor.slice_by(capture.position.0);
@@ -142,7 +137,7 @@ impl<'a> Data {
     }
 
     /// Find the first token after the current cursor
-    fn next_token_start_after_cursor(job: &'a mut Job) -> Option<token_start::CaptureData> {
+    fn next_token_start_after_cursor(job: &'a mut Job) -> Option<token_start::ItemData> {
         let position = job.cursor.position();
 
         job.token_start_iter.find(|x| {
@@ -154,36 +149,70 @@ impl<'a> Data {
 
 #[cfg(test)]
 mod test {
-    use super::*;
-    use std::rc::Rc;
-    use lexer::job::Job;
-    use template::raw::Raw as Template;
-    use lexer::Patterns;
-    use lexer::job::state::{TokenizeState, Code};
+    use lexer::test::assert_tokenize;
     use lexer::token::Token;
 
     #[test]
     pub fn no_more_tokens() {
-        const CODE : &'static str = "only data no tokens";
-        const FILENAME : &'static str = "only data";
+        assert_tokenize(
+            "only data no tokens",
+            module_path!(),
+            vec![
+                Token::Text("only data no tokens".to_string())
+            ]
+        )
+    }
 
-        let ref template = Rc::new(Template::new(CODE, FILENAME));
-        let ref patterns = Rc::new(Patterns::default());
-        let mut job = Job::new(template, patterns);
+    #[test]
+    pub fn comment() {
+        assert_tokenize(
+            " Hello \n {#- World -#} !",
+            module_path!(),
+            vec![
+                Token::Text(" Hello".to_string()),
+                Token::Text("!".to_string()),
+            ]);
+    }
 
-        let state = Data::new().step(&mut job).unwrap();
+    #[test]
+    pub fn unclosed_comment() {
+        assert_tokenize(
+            " lost in space {#-",
+            module_path!(),
+            vec![
+                Token::Text(" Hello World!".to_string()),
+            ]);
+    }
 
-        if !state.is_state(Code::Final) {
-            panic!("not final state");
-        }
+    #[test]
+    pub fn block_raw() {
+        unimplemented!();
+    }
 
-        println!("tokens are: {}", job.tokens.to_string());
+    #[test]
+    pub fn block_line() {
+        unimplemented!();
+    }
 
-        assert_eq!(job.tokens.len(), 1);
+    #[test]
+    pub fn block() {
+        assert_tokenize(
+            " To \n be   {%-",
+            module_path!(),
+            vec![
+                Token::Text(" To \n be".to_string()),
+                Token::BlockStart
+            ]);
+    }
 
-        let t_x = Token::Text(CODE.to_string());
-        let t_o : Token = job.tokens.into_iter().last().unwrap().into();
-
-        assert_eq!(t_o, t_x);
+    #[test]
+    pub fn var() {
+        assert_tokenize(
+            " or not \n to be !  {{",
+            module_path!(),
+            vec![
+                Token::Text(" or not \n to be !  ".to_string()),
+                Token::VarStart
+            ]);
     }
 }

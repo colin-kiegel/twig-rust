@@ -22,6 +22,7 @@ use lexer::job::Job;
 // exports //
 /////////////
 
+pub mod shared_traits;
 pub mod initial;
 pub mod data;
 pub mod block;
@@ -30,26 +31,30 @@ pub mod string;
 pub mod interpolation;
 pub mod _final;
 pub use self::initial::Initial;
+pub use self::data::Data;
+pub use self::block::Block;
+pub use self::var::Var;
+pub use self::string::String;
+pub use self::interpolation::Interpolation;
+pub use self::_final::Final;
 
-
+// TODO check to remove initial and final state - after all states are implemented
 pub trait TokenizeState {
-    fn new() -> Box<Self> where
+    fn instance() -> &'static Self where // Flyweight- + Singleton-pattern
         Self: Sized;
 
-    fn step<'a>(self: Box<Self>, job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError>;
+    /// tokenize recursively
+    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(), LexerError> {
+        unimplemented!()
+    }
 
     fn state(&self) -> Code;
 
     fn is_state(&self, code: Code) -> bool {
         self.state() == code
     }
-
-    fn is_finished(&self) -> bool{
-        false
-    }
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Code {
     Data            = 0,

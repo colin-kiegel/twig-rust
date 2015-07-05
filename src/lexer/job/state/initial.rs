@@ -23,16 +23,18 @@ use super::data::Data;
 pub struct Initial;
 
 impl TokenizeState for Initial {
-    fn new() -> Box<Initial> {
-        Box::new(Initial)
+    fn instance() -> &'static Self {
+        static INSTANCE : &'static Initial = &Initial;
+
+        INSTANCE
     }
 
     fn state(&self) -> Code {
         Code::Initial
     }
 
-    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
+    fn tokenize<'a>(self: &'static Self, job: &'a mut Job) -> Result<(),LexerError> {
         // TODO some pre-checks, like len>0?
-        Ok(Data::new())
+        return Data::instance().tokenize(job)
     }
 }

@@ -18,20 +18,21 @@
 use super::{TokenizeState, Code};
 use lexer::error::LexerError;
 use lexer::job::Job;
-use super::data::Data;
 
 pub struct String;
 
 impl TokenizeState for String {
-    fn new() -> Box<String> {
-        Box::new(String)
+    fn instance() -> &'static Self {
+        static INSTANCE : &'static String = &String;
+
+        INSTANCE
     }
 
     fn state(&self) -> Code {
         Code::String
     }
 
-    fn step<'a>(self: Box<Self>, _job: &'a mut Job) -> Result<Box<TokenizeState>,LexerError> {
+    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(),LexerError> {
         unimplemented!()
     }
 }
