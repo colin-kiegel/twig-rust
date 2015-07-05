@@ -29,7 +29,8 @@ pub enum Token {
     BlockEnd,
     VarEnd,
     Name(String),
-    Number(String),
+    IntegerNumber(u64), // orig. Number
+    FloatingNumber(f64), // orig. Number
     String(String),
     Operator(String),
     Punctuation(String),
@@ -47,7 +48,7 @@ pub enum Type {
     BlockEnd           = 3,
     VarEnd             = 4,
     Name               = 5,
-    Number             = 6,
+    Number             = 6, // Floating or Integer
     String             = 7,
     Operator           = 8,
     Punctuation        = 9,
@@ -58,19 +59,21 @@ pub enum Type {
 #[allow(dead_code)]
 #[allow(unused_variables)]
 impl Token {
-    pub fn get_value<'a>(&'a self) -> Option<&'a str> {
+    // Because of Number Types we need to return `String` copys instead of `&'a str`
+    pub fn get_value<'a>(&'a self) -> Option<String> {
         match *self {
             Token::Eof => None,
-            Token::Text(ref x) => Some(x),
+            Token::Text(ref x) => Some(x.to_string()),
             Token::BlockStart => None,
             Token::VarStart => None,
             Token::BlockEnd => None,
             Token::VarEnd => None,
-            Token::Name(ref x) => Some(x),
-            Token::Number(ref x) => Some(x),
-            Token::String(ref x) => Some(x),
-            Token::Operator(ref x) => Some(x),
-            Token::Punctuation(ref x) => Some(x),
+            Token::Name(ref x) => Some(x.to_string()),
+            Token::IntegerNumber(ref x) => Some(x.to_string()),
+            Token::FloatingNumber(ref x) => Some(x.to_string()),
+            Token::String(ref x) => Some(x.to_string()),
+            Token::Operator(ref x) => Some(x.to_string()),
+            Token::Punctuation(ref x) => Some(x.to_string()),
             Token::InterpolationStart => None,
             Token::InterpolationEnd => None,
         }
@@ -85,7 +88,8 @@ impl Token {
             Token::BlockEnd => Type::BlockEnd,
             Token::VarEnd => Type::VarEnd,
             Token::Name(_) => Type::Name,
-            Token::Number(_) => Type::Number,
+            Token::IntegerNumber(_) => Type::Number,
+            Token::FloatingNumber(_) => Type::Number,
             Token::String(_) => Type::String,
             Token::Operator(_) => Type::Operator,
             Token::Punctuation(_) => Type::Punctuation,
