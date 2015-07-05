@@ -35,6 +35,8 @@ pub enum SyntaxErrorCode {
     UnexpectedEof,
     UnclosedBracket,
     UnclosedComment,
+    UnclosedBlock,
+    UnclosedVariable,
 }
 
 #[allow(dead_code)]
@@ -60,7 +62,7 @@ impl ::std::convert::From<SyntaxError> for LexerError {
             .. *cause.details()
         };
         ::error::Error::new(details, LexerErrorCode::SyntaxError)
-            .chain(Box::new(cause))
+            .caused_by(cause)
     }
 }
 
@@ -73,6 +75,8 @@ impl ToString for SyntaxErrorCode {
             SyntaxErrorCode::UnexpectedEof => "UnexpectedEof",
             SyntaxErrorCode::UnclosedBracket => "UnclosedBracket",
             SyntaxErrorCode::UnclosedComment => "UnclosedComment",
+            SyntaxErrorCode::UnclosedBlock => "UnclosedBlock",
+            SyntaxErrorCode::UnclosedVariable => "UnclosedVariable",
         }.to_string()
     }
 }

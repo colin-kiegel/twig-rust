@@ -44,6 +44,10 @@ impl Raw {
     fn fix_linebreaks(&mut self) {
         self.code = self.code.replace("\r\n","\n").replace("\r","\n");
     }
+
+    pub fn filename(&self) -> &str {
+        &self.filename
+    }
 }
 
 #[cfg(test)]

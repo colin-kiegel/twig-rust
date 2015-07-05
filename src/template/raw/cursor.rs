@@ -15,8 +15,8 @@
 // imports //
 /////////////
 
-use lexer::error::LexerError;
-use lexer::SyntaxErrorCode;
+//use lexer::error::LexerError;
+//use lexer::SyntaxErrorCode;
 
 /////////////
 // exports //
@@ -49,7 +49,7 @@ impl<'a> Cursor<'a> {
     //     self.lineno += text.lines().count();
     //
     //     if self.pos > self.end {
-    //         return err!(SyntaxErrorCode::Unknown, "out of range");
+    //         return err!(SyntaxErrorCode::Unknown, "out of range").into();
     //     }
     //
     //     Ok(())
@@ -108,7 +108,11 @@ impl<'a> Cursor<'a> {
         slice
     }
 
-    pub fn tail(&mut self) -> &'a str {
+    pub fn template(&self) -> &super::Raw {
+        &self.template
+    }
+
+    pub fn tail(&self) -> &'a str {
         &self.template.code[self.pos..]
     }
 

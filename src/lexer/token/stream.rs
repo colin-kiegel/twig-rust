@@ -37,7 +37,7 @@ impl Into<Token> for Item {
 }
 
 #[allow(dead_code)]
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Stream<'a> {
     items: Vec<Item>,
     template: Option<&'a template::Raw>,
@@ -76,14 +76,15 @@ impl<'a> Stream<'a> {
 impl<'a> ToString for Stream<'a> {
     /// Returns a string representation of the token stream.
     fn to_string(&self) -> String {
-        let v: Vec<String> = self.items.iter().map(|i| i.token.to_string()).collect();
-        v.connect("\n")
+        let v: Vec<String> = self.items.iter().map(|i| format!("{:?}", i.token)).collect();
+        format!("Tokenstream: [{}]", v.connect(" + "))
     }
 }
 
+// TODO add another token_iter() to the main implementation [using .map(|i| i.into()) as MapIterator]
 impl<'a> IntoIterator for Stream<'a> {
     type Item = self::Item;
-    type IntoIter = <Vec<self::Item> as IntoIterator>::IntoIter;//ExactSizeIterator;
+    type IntoIter = <Vec<self::Item> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
         self.items.into_iter()

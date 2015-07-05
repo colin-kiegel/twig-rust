@@ -65,13 +65,12 @@ pub struct Details {
     pub column : u32,
 }
 
+// TODO read more about Any trait
 #[allow(dead_code)]
 impl<T> Error<T>
-    where T: fmt::Debug {
+    where T: Any + fmt::Debug {
     pub fn new(details: Details, code: T) -> Error<T> {
-        let description = format!("[{code:?}]: {details}",
-            code = code,
-            details = details.to_string());
+        let description = Self::description_string(&code, &details);
 
         Error {
             code : code,
@@ -79,6 +78,12 @@ impl<T> Error<T>
             description: description,
             cause: None,
         }
+    }
+
+    fn description_string(code: &T, details: &Details) -> String {
+        format!("[{code:?}]: {details}",
+            code = code,
+            details = details.to_string())
     }
 
     pub fn code(&self) -> &T {
@@ -89,11 +94,6 @@ impl<T> Error<T>
         &self.details
     }
 
-    pub fn description(&self) -> &str {
-        self.description.as_ref()
-    }
-
-
     pub fn cause(&self) -> Option<&ErrorTrait> {
         use std::borrow::Borrow;
         match self.cause {
@@ -102,13 +102,31 @@ impl<T> Error<T>
         }
     }
 
-    pub fn chain(mut self, cause: Box<ErrorTrait>) -> Self {
-        self.cause = Some(cause);
+    pub fn explain(mut self, message: String) -> Self {
+        self.details.message = Some(message);
+        self.description = Self::description_string(&self.code, &self.details);
 
         self
     }
+
+    pub fn caused_by<X: 'static + ErrorTrait>(mut self, cause: X) -> Self {
+        self.cause = Some(Box::new(cause));
+
+        self
+    }
+
+    pub fn causes<X>(self, wrapper: Error<X>) -> Error<X> where
+        X: Any + fmt::Debug
+    {
+        wrapper.caused_by(self)
+    }
 }
 
+impl<T, V> ::std::convert::Into<Result<V, Error<T>>> for Error<T> {
+    fn into (self) -> Result<V, Error<T>> {
+        Err(self)
+    }
+}
 impl<T> ErrorTrait for Error<T>
     where T: Any + fmt::Debug {
     fn description(&self) -> &str {
