@@ -1,4 +1,6 @@
-!! Important: This is early alpha and not yet functional !!
+!! Important: This is *early alpha* and not yet functional !!
+
+[![Build Status](https://travis-ci.org/colin-kiegel/twig-rust.svg)](https://travis-ci.org/colin-kiegel/twig-rust)
 
 Twig-Rust is (supposed to become) a port of the PHP-library Twig.
 Twig-Rust is released under the new BSD license (code and documentation) - as is the original Twig.
