@@ -23,20 +23,15 @@ use lexer::job::Job;
 // exports //
 /////////////
 
+#[allow(dead_code)]
 pub struct Final;
 
 impl TokenizeState for Final {
-    fn instance() -> &'static Self {
-        static INSTANCE : &'static Final = &Final;
-
-        INSTANCE
-    }
-
-    fn state(&self) -> Code {
+    fn state() -> Code {
         Code::Final
     }
 
-    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(_job: &'a mut Job) -> Result<(),LexerError> {
         // TODO do some final checks like
         // - job.cursor.position() == job.cursor.end() <- implicit alternative?
         Ok(()) // means we are done.
@@ -61,7 +56,7 @@ impl TokenizeState for Final {
 
         tokens.push(Token::new(
             token::Type::Eof,
-            token::Value("".to_string()),//TODO val
+            token::Value("".to_string()),
             cursor.get_position()
         ));
 
@@ -74,9 +69,8 @@ impl TokenizeState for Final {
             //return Error::new(
               //  a,
                 //format!("Unclosed {}", bracket),
-                // TODO ($lineno, $this->filename);
+                // ($lineno, $this->filename);
         //    );
         }*/
-        //unimplemented!();
     }
 }

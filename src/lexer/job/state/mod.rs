@@ -38,20 +38,19 @@ pub use self::string::String;
 pub use self::interpolation::Interpolation;
 pub use self::_final::Final;
 
-// TODO check to remove initial and final state - after all states are implemented
+
 pub trait TokenizeState {
-    fn instance() -> &'static Self where // Flyweight- + Singleton-pattern
+    /// tokenize recursively
+    fn tokenize<'a>(_job: &'a mut Job) -> Result<(), LexerError> where
         Self: Sized;
 
-    /// tokenize recursively
-    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(), LexerError> {
-        unimplemented!()
-    }
+    fn state() -> Code where
+        Self: Sized;
 
-    fn state(&self) -> Code;
-
-    fn is_state(&self, code: Code) -> bool {
-        self.state() == code
+    fn is_state(code: Code) -> bool where
+        Self: Sized
+    {
+        Self::state() == code
     }
 }
 
@@ -64,11 +63,4 @@ pub enum Code {
     Interpolation   = 4,
     Initial         = -1, // orig: implicit sub-state of Data
     Final           = -2, // orig: implicit sub-state
-}
-
-#[allow(dead_code)]
-impl Default for Code {
-    fn default() -> Code {
-        Code::Initial
-    }
 }

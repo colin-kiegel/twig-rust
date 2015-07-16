@@ -20,21 +20,16 @@ use lexer::error::LexerError;
 use lexer::job::Job;
 use super::data::Data;
 
+#[allow(dead_code)]
 pub struct Initial;
 
 impl TokenizeState for Initial {
-    fn instance() -> &'static Self {
-        static INSTANCE : &'static Initial = &Initial;
-
-        INSTANCE
-    }
-
-    fn state(&self) -> Code {
+    fn state() -> Code {
         Code::Initial
     }
 
-    fn tokenize<'a>(self: &'static Self, job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(job: &'a mut Job) -> Result<(),LexerError> {
         // TODO some pre-checks, like len>0?
-        return Data::instance().tokenize(job)
+        return Data::tokenize(job)
     }
 }

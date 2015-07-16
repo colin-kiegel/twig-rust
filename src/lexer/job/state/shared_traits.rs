@@ -18,7 +18,7 @@
 use super::TokenizeState;
 use lexer::job::state;
 use lexer::job::Job;
-use lexer::token::Token;
+use lexer::token::{Token, Punctuation, BracketType};
 use lexer::patterns::{number, Extract};
 use lexer::error::{LexerError, LexerErrorCode, SyntaxErrorCode};
 
@@ -31,37 +31,34 @@ pub trait LexExpression where
 {
     // TODO move this up or find another way to share (like trait)
     //     - because it is shared by block and variable state!
-    fn lex_expression<'a>(&'static self, job: &'a mut Job) -> Result<(), LexerError> {
+    fn lex_expression<'a>(job: &'a mut Job) -> Result<(), LexerError> {
         // whitespace
         let whitespace = job.cursor.tail().len() - job.cursor.tail().trim_left().len();
         job.cursor.move_by(whitespace); // TODO move this into cursor (trim_left?)
 
         if job.cursor.is_eof() {
-            let error_code = match self.state() {
+            let error_code = match Self::state() {
                 state::Code::Block => SyntaxErrorCode::UnclosedBlock,
                 state::Code::Var => SyntaxErrorCode::UnclosedVariable,
-                _ => unimplemented!(),
+                _ => SyntaxErrorCode::Unknown, // should be unreachable
             };
 
             return err!(error_code)
-                .explain(format!("in {file}:{line}",
-                    file = job.template.filename(),
-                    line = job.cursor.line()))
+                .explain(format!("at {cursor}", cursor = job.cursor))
                 .causes(err!(LexerErrorCode::SyntaxError))
                 .into();
         }
 
-        // operators
+        // operators - TODO
         //
-        // unimplented!()
-        // TODO !!!!
+        // unimplemented!()
 
         // names
         match job.patterns.name.extract(job.cursor.tail()) {
             Some(x) => {
                 job.push_token(Token::Name(x.name.to_string()));
                 job.cursor.move_by(x.position.1);
-                return self.tokenize(job);
+                return Self::tokenize(job);
             },
             None => {},
         };
@@ -76,22 +73,62 @@ pub trait LexExpression where
                 };
                 job.push_token(token);
                 job.cursor.move_by(x.position.1);
-                return self.tokenize(job);
+                return Self::tokenize(job);
             },
             None => {},
         };
 
         // punctuation
-        //
-        // unimplented!()
-        // TODO !!!!
+        match job.patterns.punctuation.extract(job.cursor.tail()) {
+            Some(punctuation) => {
+                match punctuation { // check brackets ..
+                    Punctuation::ClosingBracket(ref b) => match job.pop_bracket() {
+                        None => {
+                            return err!(SyntaxErrorCode::UnexpectedBracket)
+                                .explain(format!("Unexpected {b:?} at {cursor}",
+                                    b = b,
+                                    cursor = job.cursor))
+                                .causes(err!(LexerErrorCode::SyntaxError))
+                                .into();
+                        },
+                        Some((b_expected, line)) => {
+                            if *b != b_expected {
+                                return err!(SyntaxErrorCode::UnclosedBracket)
+                                    .explain(format!("Unclosed {b_before:?} from line\
+                                                    {line_before} but found {b:?} at {cursor}",
+                                        b_before = b_expected,
+                                        line_before = line,
+                                        b = b,
+                                        cursor = job.cursor))
+                                    .causes(err!(LexerErrorCode::SyntaxError))
+                                    .into();
+                            }
+
+                            let bracket = (b.clone(), job.cursor.line());
+                            job.push_bracket(bracket);
+                        },
+                    },
+                    Punctuation::OpeningBracket(ref b) => {
+                        let bracket = (b.clone(), job.cursor.line());
+                        job.push_bracket(bracket);
+                    },
+                    _ => {},
+                };
+
+                // .. then ..
+                job.push_token(Token::Punctuation(punctuation));
+                job.cursor.move_by(1);
+                return Self::tokenize(job);
+            },
+            None => {},
+        }
 
         // strings
         match job.patterns.string.extract(job.cursor.tail()) {
             Some(x) => {
                 job.push_token(Token::String(x.unescape_string()));
                 job.cursor.move_by(x.position.1);
-                return self.tokenize(job);
+                return Self::tokenize(job);
             },
             None => {},
         }
@@ -99,32 +136,30 @@ pub trait LexExpression where
         // opening double quoted string
         // TODO switch to more simple pattern?
         //      Alternatively get all data generically from the match
-        match job.patterns.dq_string_delim.extract(job.cursor.tail()) {
+        match job.patterns.string_dq_delim.extract(job.cursor.tail()) {
             Some(_) => {
-                let bracket = ("\"", job.cursor.line()); // TODO introduce a bracket-object?
+                let bracket = (BracketType::DoubleQuote, job.cursor.line());
                 job.push_bracket(bracket);
                 job.cursor.move_by(1);
-                job.push_state(self);
-                return state::String::instance().tokenize(job);
+                try!(state::String::tokenize(job));
+
+                return Self::tokenize(job);
             },
             None => {},
         }
 
         // unlexable
+        println!("Current Job Status: {:?}", job); // DEBUG INFO
+
         let syntax_error = match job.cursor.tail().chars().next() {
             Some(c) => err!(SyntaxErrorCode::UnexpectedCharacter)
-                .explain(format!("'{c}' in {filename}:{line}",
+                .explain(format!("'{c}' at {cursor}",
                     c = c,
-                    line = job.cursor.line(),
-                    filename = job.cursor.template().filename(),
-                )),
+                    cursor = job.cursor)),
             None => err!(SyntaxErrorCode::UnexpectedEof)
-                .explain(format!("in {filename}:{line}",
-                    line = job.cursor.line(),
-                    filename = job.cursor.template().filename(),
-                )),
+                .explain(format!("at {cursor}", cursor = job.cursor)),
         };
 
-        return LexerError::from(syntax_error).into();
+        return syntax_error.causes(err!(LexerErrorCode::SyntaxError)).into();
     }
 }

@@ -19,7 +19,7 @@ use super::{TokenizeState, Code};
 use lexer::job::state;
 use lexer::job::Job;
 use lexer::token::Token;
-use lexer::patterns::{token_start, block_raw, Extract};
+use lexer::patterns::{token_start, verbatim_start, Extract};
 use lexer::error::{LexerError, SyntaxError, SyntaxErrorCode};
 
 /////////////
@@ -31,24 +31,18 @@ pub struct Data;
 
 #[allow(unused_variables)]
 impl TokenizeState for Data {
-    fn instance() -> &'static Self {
-        static INSTANCE : &'static Data = &Data;
-
-        INSTANCE
-    }
-
-    fn state(&self) -> Code {
+    fn state() -> Code {
         Code::Data
     }
 
-    fn tokenize<'a>(self: &'static Self, job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(job: &'a mut Job) -> Result<(),LexerError> {
         let capture = match Self::next_token_start_after_cursor(job) {
             Some(capture) => capture,
             None => {
                 let slice = job.cursor.slice_to_end();
                 job.push_token(Token::Text(slice.to_string()));
 
-                return state::Final::instance().tokenize(job)
+                return state::Final::tokenize(job)
             },
         };
 
@@ -64,17 +58,18 @@ impl TokenizeState for Data {
         match capture.tag {
             token_start::Tag::Comment => {
                 try!(Self::lex_comment(job));
-                return self.tokenize(job);
+
+                return Self::tokenize(job);
             },
             token_start::Tag::Block => {
                 // TODO nested matches don't look nice - alternative??
                 // raw data?
-                match job.patterns.block_raw.extract(job.cursor.tail()) {
-                    Some(block_raw) => {
-                        job.cursor.move_by(block_raw.position.1);
-                        try!(Self::lex_raw_data(job, block_raw.tag));
+                match job.patterns.verbatim_start.extract(job.cursor.tail()) {
+                    Some(verbatim_start) => {
+                        job.cursor.move_by(verbatim_start.position.1);
+                        try!(Self::lex_verbatim_data(job, verbatim_start.tag));
 
-                        return self.tokenize(job);
+                        return Self::tokenize(job);
                     },
                     _ => {
                         // {% line \d+ %}
@@ -85,14 +80,14 @@ impl TokenizeState for Data {
                                 job.cursor.move_by(block_line.position.1);
                                 job.cursor.set_line(block_line.line);
 
-                                return self.tokenize(job);
+                                return Self::tokenize(job);
                             },
                             _ => {
                                 job.current_var_block_line = job.cursor.line();
-                                job.push_state(self);
                                 job.push_token(Token::BlockStart);
+                                try!(state::Block::tokenize(job));
 
-                                return state::Block::instance().tokenize(job);
+                                return Self::tokenize(job);
                             },
                         }
                     },
@@ -100,10 +95,10 @@ impl TokenizeState for Data {
             },
             token_start::Tag::Variable => {
                 job.current_var_block_line = job.cursor.line();
-                job.push_state(self);
                 job.push_token(Token::VarStart);
+                try!(state::Var::tokenize(job));
 
-                return state::Var::instance().tokenize(job);
+                return Self::tokenize(job);
             }
         }
     }
@@ -112,21 +107,25 @@ impl TokenizeState for Data {
 impl<'a> Data {
     fn lex_comment(job: &'a mut Job) -> Result<(), SyntaxError> {
         match job.patterns.comment_end.find(job.cursor.tail()) {
-            None => return err!(SyntaxErrorCode::UnclosedComment).into(),
-            Some((_, rel_end)) => job.cursor.move_by(rel_end),
+            None => return err!(SyntaxErrorCode::UnclosedComment)
+                .explain(format!("at {}", job.cursor))
+                .into(),
+            Some(position) => job.cursor.move_by(position.1),
         }
         Ok(())
     }
 
-    fn lex_raw_data(job: &'a mut Job, tag: block_raw::Tag) -> Result<(), SyntaxError> {
-        let capture = match job.patterns.raw_data.extract_iter(job.cursor.tail())
+    fn lex_verbatim_data(job: &'a mut Job, tag: verbatim_start::Tag) -> Result<(), SyntaxError> {
+        let capture = match job.patterns.verbatim_end.extract_iter(job.cursor.tail())
                                                  .find(|capture| capture.tag == tag) {
             Some(capture) => capture,
-            _ => return err!(SyntaxErrorCode::UnexpectedEof, "Unclosed (raw|verbatim) block").into(),
+            _ => return err!(SyntaxErrorCode::UnexpectedEof, "Unclosed (raw|verbatim) block")
+                .explain(format!("at {}", job.cursor))
+                .into(),
         };
 
         let mut slice = job.cursor.slice_by(capture.position.0);
-        job.cursor.move_by(capture.position.1);
+        job.cursor.move_by(capture.position.1 - capture.position.0);
 
         if capture.whitespace_trim {
             slice = slice.trim_right();
@@ -149,14 +148,15 @@ impl<'a> Data {
 
 #[cfg(test)]
 mod test {
+    use lexer::test::tokenize_err;
     use lexer::test::assert_tokenize;
     use lexer::token::Token;
+    use std::error::Error;
 
     #[test]
     pub fn no_more_tokens() {
         assert_tokenize(
             "only data no tokens",
-            module_path!(),
             vec![
                 Token::Text("only data no tokens".to_string())
             ]
@@ -167,7 +167,6 @@ mod test {
     pub fn comment() {
         assert_tokenize(
             " Hello \n {#- World -#} !",
-            module_path!(),
             vec![
                 Token::Text(" Hello".to_string()),
                 Token::Text("!".to_string()),
@@ -176,43 +175,78 @@ mod test {
 
     #[test]
     pub fn unclosed_comment() {
+        let expect = "[UnclosedComment]: at `test-example` line 1 column 19 in ";
+
+        assert_eq!(
+            &tokenize_err(" lost in space {#-").cause().unwrap().description()[0..expect.len()],
+            expect
+        );
+    }
+
+    #[test]
+    pub fn block_verbatim() {
         assert_tokenize(
-            " lost in space {#-",
-            module_path!(),
+            "{% verbatim %}<ul>{% for x in list %}<li>{{ x }}</li>{% endfor %}</ul>{% endverbatim %}",
             vec![
-                Token::Text(" Hello World!".to_string()),
+                Token::Text("".to_string()),
+                Token::Text("<ul>{% for x in list %}<li>{{ x }}</li>{% endfor %}</ul>".to_string()),
+                Token::Text("".to_string()),
             ]);
     }
 
     #[test]
-    pub fn block_raw() {
-        unimplemented!();
-    }
-
-    #[test]
     pub fn block_line() {
-        unimplemented!();
+        let expect = "[UnclosedBlock]: at `test-example` line 100 column 9 in ";
+
+        assert_eq!(
+            &tokenize_err("line1 {% line 99 %}\nline 2{%").cause().unwrap().description()[0..expect.len()],
+            expect
+        );
     }
 
     #[test]
     pub fn block() {
         assert_tokenize(
-            " To \n be   {%-",
-            module_path!(),
+            " To \n be   {%- something -%}  ",
             vec![
                 Token::Text(" To \n be".to_string()),
-                Token::BlockStart
+                Token::BlockStart,
+                Token::Name("something".to_string()),
+                Token::BlockEnd,
+                Token::Text("".to_string()),
             ]);
+    }
+
+    #[test]
+    pub fn unclosed_block() {
+        let expect = "[UnclosedBlock]: at `test-example` line 2 column 10 in ";
+
+        assert_eq!(
+            &tokenize_err(" To \n be   {%-").cause().unwrap().description()[0..expect.len()],
+            expect
+        );
     }
 
     #[test]
     pub fn var() {
         assert_tokenize(
-            " or not \n to be !  {{",
-            module_path!(),
+            " foo bar  {{ x }} baz",
             vec![
-                Token::Text(" or not \n to be !  ".to_string()),
-                Token::VarStart
+                Token::Text(" foo bar  ".to_string()),
+                Token::VarStart,
+                Token::Name("x".to_string()),
+                Token::VarEnd,
+                Token::Text(" baz".to_string()),
             ]);
+    }
+
+    #[test]
+    pub fn unclosed_var() {
+        let expect = "[UnclosedVariable]: at `test-example` line 2 column 13 in ";
+
+        assert_eq!(
+            &tokenize_err(" or not \n to be !  {{").cause().unwrap().description()[0..expect.len()],
+            expect
+        );
     }
 }

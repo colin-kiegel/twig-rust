@@ -22,33 +22,28 @@ use lexer::patterns::{Extract};
 use lexer::error::{LexerError};
 use super::shared_traits::LexExpression;
 
+#[allow(dead_code)]
 pub struct Block;
 
 impl TokenizeState for Block {
-    fn instance() -> &'static Self {
-        static INSTANCE : &'static Block = &Block;
-
-        INSTANCE
-    }
-
-    fn state(&self) -> Code {
+    fn state() -> Code {
         Code::Block
     }
 
-    fn tokenize<'a>(self: &'static Self, job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(job: &'a mut Job) -> Result<(),LexerError> {
         if job.brackets.is_empty() {
             match job.patterns.block_end.extract(job.cursor.tail()) {
                 Some(item) => {
                     job.cursor.move_by(item.position.1);
                     job.push_token(Token::BlockEnd);
 
-                    return try!(job.pop_state()).tokenize(job);
+                    return Ok(());//try!(job.pop_state()).tokenize(job);
                 },
                 _ => {},
             }
         };
 
-        return self.lex_expression(job);
+        return Self::lex_expression(job);
     }
 }
 

@@ -16,23 +16,35 @@
 /////////////
 
 use super::{TokenizeState, Code};
-use lexer::error::LexerError;
 use lexer::job::Job;
+use lexer::token::Token;
+use lexer::patterns::{Extract};
+use lexer::error::{LexerError};
+use super::shared_traits::LexExpression;
 
+#[allow(dead_code)]
 pub struct Var;
 
 impl TokenizeState for Var {
-    fn instance() -> &'static Self {
-        static INSTANCE : &'static Var = &Var;
-
-        INSTANCE
-    }
-
-    fn state(&self) -> Code {
+    fn state() -> Code {
         Code::Var
     }
 
-    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(),LexerError> {
-        unimplemented!()
+    fn tokenize<'a>(job: &'a mut Job) -> Result<(),LexerError> {
+        if job.brackets.is_empty() {
+            match job.patterns.var_end.extract(job.cursor.tail()) {
+                Some(item) => {
+                    job.cursor.move_by(item.position.1);
+                    job.push_token(Token::VarEnd);
+
+                    return Ok(());//try!(job.pop_state()).tokenize(job);
+                },
+                _ => {},
+            }
+        };
+
+        return Self::lex_expression(job);
     }
 }
+
+impl LexExpression for Var {}

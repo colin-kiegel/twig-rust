@@ -15,12 +15,13 @@
 // imports //
 /////////////
 
+use std::fmt;
 use template;
 use lexer::patterns::Extract;
 use lexer::Patterns;
-use lexer::token::Token;
+use lexer::token::{Token, BracketType};
 use lexer::token;
-use lexer::error::{LexerError, LexerErrorCode};
+use lexer::error::LexerError;
 use self::state::TokenizeState;
 use lexer::patterns::token_start;
 
@@ -43,8 +44,7 @@ pub struct Job<'a> {
     cursor: template::raw::Cursor<'a>,
     position: usize,
     token_start_iter: token_start::ExtractIter<'a, 'a>, // orig: positions
-    brackets: Vec<(&'a str, usize/*TODO LineNo*/)>,
-    states: Vec<&'static TokenizeState>,
+    brackets: Vec<(BracketType, usize/*TODO LineNo*/)>,
 }
 
 #[allow(dead_code)]
@@ -63,59 +63,50 @@ impl<'a> Job<'a> {
             position: 0,
             current_var_block_line: 0,
             brackets: Vec::default(),
-            states: Vec::default(),
         })
     }
 
-
     pub fn tokenize(mut self: Job<'a>) -> Result<token::Stream<'a>, LexerError> {
-        // The TokenizeStates call each other recursively to avoid dynamic dispatch
-        // whenever possible. Dynamic dispatch is only needed after a previous state
-        // is popped from the state stack. :-)
-        //
-        // NOTE: even that last dynamic dispatch is not needed anymore
-        //       the general idea is to replace
-        //          - `push_state(); return new_state().tokenize();`
-        //       with
-        //          - `return new_state().tokenize().and_then(|| self.tokenize());`
-        //
-        //       However the `pop_state()` calls are scattered accross curious places
-        //       so this would be some quite risky refactoring. We also loose debugging
-        //       information about the nesting of lexer states. It's not clear if it's
-        //       worth it.
-        //
-        try!(state::Initial::instance().tokenize(&mut self)); // TODO wrap the error?
+        // The TokenizeStates call each other *recursively* to avoid dynamic dispatch
+        // for better performance. However, we loose debugging information about the
+        // nesting of lexer states.
+        try!(state::Initial::tokenize(&mut self));
+        // TODO check whether we returned from *final* state
 
         Ok(self.tokens)
     }
 
-    pub fn push_bracket(&mut self, bracket: (&'a str, usize)) {
+    pub fn push_bracket(&mut self, bracket: (BracketType, usize)) {
         self.brackets.push(bracket)
     }
 
-    pub fn pop_bracket(&mut self) -> Option<(&'a str, usize)> {
+    pub fn pop_bracket(&mut self) -> Option<(BracketType, usize)> {
         self.brackets.pop()
     }
 
     // Only needed for the states of the job
-    // - TODO: does it make sense to put it in a trait,
+    // - TODO: does it make sense to put `push_token` in a trait,
     //   only visible to the states, i.e. hiding it from clients?
     pub fn push_token(&mut self, token: token::Token) {
-        // TODO sometime in the future:
+        // TODO sometime in the future: cow<_>
         // * check if the template can be disassembled into string-objects without
         //   copying - i.e. without calling to_string(&str)
 
         let position = self.cursor.position();
         self.tokens.push(token, position);
     }
+}
 
-    /// Push previous state - to be able to
-    pub fn push_state(&mut self, state: &'static TokenizeState) {
-        self.states.push(state);
-    }
 
-    // Pop previous state
-    pub fn pop_state(&mut self) -> Result<&'static TokenizeState, LexerError> {
-        self.states.pop().ok_or(err!(LexerErrorCode::InvalidState, "No previous state!"))
+impl<'a> fmt::Debug for Job<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "[\n\
+            Cursor: {cursor}\n\
+            Tokenstream: {tokens}\n\
+            Brackets: {brackets:?}\n\
+            ]",
+            cursor = self.cursor,
+            tokens = self.tokens,
+            brackets = self.brackets)
     }
 }

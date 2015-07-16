@@ -19,20 +19,15 @@ use super::{TokenizeState, Code};
 use lexer::error::LexerError;
 use lexer::job::Job;
 
+#[allow(dead_code)]
 pub struct Interpolation;
 
 impl TokenizeState for Interpolation {
-    fn instance() -> &'static Self {
-        static INSTANCE : &'static Interpolation = &Interpolation;
-
-        INSTANCE
-    }
-
-    fn state(&self) -> Code {
+    fn state() -> Code {
         Code::Interpolation
     }
 
-    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(_job: &'a mut Job) -> Result<(),LexerError> {
         unimplemented!()
     }
 }

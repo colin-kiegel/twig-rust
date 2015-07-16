@@ -19,20 +19,15 @@ use super::{TokenizeState, Code};
 use lexer::error::LexerError;
 use lexer::job::Job;
 
+#[allow(dead_code)]
 pub struct String;
 
 impl TokenizeState for String {
-    fn instance() -> &'static Self {
-        static INSTANCE : &'static String = &String;
-
-        INSTANCE
-    }
-
-    fn state(&self) -> Code {
+    fn state() -> Code {
         Code::String
     }
 
-    fn tokenize<'a>(self: &'static Self, _job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(_job: &'a mut Job) -> Result<(),LexerError> {
         unimplemented!()
     }
 }
