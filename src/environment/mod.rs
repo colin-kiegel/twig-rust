@@ -55,19 +55,17 @@ impl Environment {
 #[allow(dead_code)]
 #[cfg(test)]
 mod test {
-    use super::*;
+    // use super::*;
 
     //#[test]
-    pub fn get_unary_operators() {
-        let mut e = Environment;
-        e.get_unary_operators();
-        unimplemented!();
-    }
+    // pub fn get_unary_operators() {
+    //     let mut e = Environment;
+    //     e.get_unary_operators();
+    // }
 
     //#[test]
-    pub fn get_binary_operators() {
-        let mut e = Environment;
-        e.get_binary_operators();
-        unimplemented!();
-    }
+    // pub fn get_binary_operators() {
+    //     let mut e = Environment;
+    //     e.get_binary_operators();
+    // }
 }
