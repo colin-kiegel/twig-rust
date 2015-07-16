@@ -6,24 +6,7 @@
  */
 
 /**
- * Twig base error.
- *
- * This error class and its children must only be used when
- * an error occurs during the loading of a template, when a syntax error
- * is detected in a template, or when rendering a template. Other
- * errors must use regular error classes (like when the template
- * cache directory is not writable for instance).
- *
- * To help debugging template issues, this class tracks the original template
- * name and line where the error occurred.
- *
- * Whenever possible, you must set these information (original template name
- * and line number) yourself by passing them to the constructor. If some or all
- * these information are not available from where you throw the exception, then
- * this class will guess them automatically (when the line number is set to -1
- * and/or the filename is set to null). As this is a costly operation, this
- * can be disabled by passing false for both the filename and the line number
- * when creating a new instance of this class.
+ * Twig base exception.
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
@@ -33,7 +16,6 @@
 /////////////
 
 use std::fmt;
-use std::error::Error as ErrorTrait;
 use std::any::Any;
 
 /////////////
@@ -42,37 +24,34 @@ use std::any::Any;
 
 #[macro_use]
 pub mod macros;
+pub use std::error::Error;
 
 // TODO Read more about error handling in rust
 //http://doc.rust-lang.org/std/error/index.html
 
-#[allow(dead_code)]
-#[derive(Debug)]
-pub struct Error<T> {
+pub struct Exception<T> {
     code: T,
     details: Details,
     description: String,
-    cause: Option<Box<ErrorTrait>>,
+    cause: Option<Box<Error>>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Details {
     pub message : Option<String>,
-    pub module_path : &'static str,
-    pub filename : &'static str,
+    pub module_path : &'static str, // e.g. twig::lexer::job::state::shared_traits
+    pub filename : &'static str,    // e.g. /src/lexer/job/state/shared_traits.rs
     pub line : u32,
     pub column : u32,
 }
 
 // TODO read more about Any trait
-#[allow(dead_code)]
-impl<T> Error<T>
+impl<T> Exception<T>
     where T: Any + fmt::Debug {
-    pub fn new(details: Details, code: T) -> Error<T> {
+    pub fn new(details: Details, code: T) -> Exception<T> {
         let description = Self::description_string(&code, &details);
 
-        Error {
+        Exception {
             code : code,
             details : details,
             description: description,
@@ -86,20 +65,13 @@ impl<T> Error<T>
             details = details.to_string())
     }
 
+    #[allow(dead_code)] // only used by tests
     pub fn code(&self) -> &T {
         &self.code
     }
 
     pub fn details(&self) -> &Details {
         &self.details
-    }
-
-    pub fn cause(&self) -> Option<&ErrorTrait> {
-        use std::borrow::Borrow;
-        match self.cause {
-            Some(ref error) => Some(error.borrow()),
-            None => None
-        }
     }
 
     pub fn explain(mut self, message: String) -> Self {
@@ -109,31 +81,56 @@ impl<T> Error<T>
         self
     }
 
-    pub fn caused_by<X: 'static + ErrorTrait>(mut self, cause: X) -> Self {
+    pub fn caused_by<X: 'static + Error>(mut self, cause: X) -> Self {
         self.cause = Some(Box::new(cause));
 
         self
     }
 
-    pub fn causes<X>(self, wrapper: Error<X>) -> Error<X> where
+    pub fn causes<X>(self, wrapper: Exception<X>) -> Exception<X> where
         X: Any + fmt::Debug
     {
         wrapper.caused_by(self)
     }
+
+    pub fn iter(&self) -> ErrorIter {
+        ErrorIter {
+            next: Some(self),
+        }
+    }
 }
 
-impl<T, V> ::std::convert::Into<Result<V, Error<T>>> for Error<T> {
-    fn into (self) -> Result<V, Error<T>> {
+pub struct ErrorIter<'a> {
+    next: Option<&'a Error>
+}
+
+impl<'a> Iterator for ErrorIter<'a> {
+    type Item = &'a Error;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        return match self.next {
+            Some(err) => {
+                self.next = err.cause();
+                Some(err)
+            }
+            None => None,
+        }
+    }
+}
+
+impl<T, V> ::std::convert::Into<Result<V, Exception<T>>> for Exception<T> {
+    fn into (self) -> Result<V, Exception<T>> {
         Err(self)
     }
 }
-impl<T> ErrorTrait for Error<T>
-    where T: Any + fmt::Debug {
+impl<T> Error for Exception<T>
+    where T: Any + fmt::Debug
+{
     fn description(&self) -> &str {
         self.description.as_ref()
     }
 
-    fn cause<'a>(&'a self) -> Option<&'a ErrorTrait> {
+    fn cause<'a>(&'a self) -> Option<&'a Error> {
         use std::borrow::Borrow;
         // TODO is there a simpler way to go from Option<Box<T>> to Option<&T>? Ask this on SO...
         match self.cause {
@@ -143,22 +140,33 @@ impl<T> ErrorTrait for Error<T>
     }
 }
 
-impl<T> fmt::Display for Error<T> {
+impl<T> fmt::Display for Exception<T>
+    where T: Any + fmt::Debug
+{
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{}", self.description)
+        write!(f, "{}", self.description())
+    }
+}
+
+impl<T> fmt::Debug for Exception<T>
+    where T: Any + fmt::Debug
+{
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let recursive_desc = self.iter().map(|e| e.description())
+             .collect::<Vec<&str>>().connect(" caused by\n - ");
+        write!(f, "\n - {}\n", recursive_desc)
     }
 }
 
 impl ToString for Details {
     fn to_string(&self) -> String {
 
-        format!("{message}{in_}{path}/{filename}:{line}:{column}",
+        format!("{message}{in_}{filename}:{line}:{column}",
             message  = match self.message {
                     Some(ref msg) => msg.as_ref(),
                     None => "",
                 },
             in_      = if self.message.is_some() { " in " } else { "" },
-            path     = self.module_path,
             filename = self.filename,
             line     = self.line,
             column   = self.column)

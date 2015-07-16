@@ -21,9 +21,9 @@ use error;
 // exports //
 /////////////
 
-pub type SyntaxError = error::Error<SyntaxErrorCode>;
-pub type TokenError = error::Error<TokenErrorCode>;
-pub type LexerError = error::Error<LexerErrorCode>;
+pub type SyntaxError = error::Exception<SyntaxErrorCode>;
+pub type TokenError = error::Exception<TokenErrorCode>;
+pub type LexerError = error::Exception<LexerErrorCode>;
 
 
 #[allow(dead_code)]
@@ -61,7 +61,7 @@ impl ::std::convert::From<SyntaxError> for LexerError {
             message: None,
             .. *cause.details()
         };
-        ::error::Error::new(details, LexerErrorCode::SyntaxError)
+        ::error::Exception::new(details, LexerErrorCode::SyntaxError)
             .caused_by(cause)
     }
 }
