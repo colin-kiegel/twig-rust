@@ -134,7 +134,5 @@ impl<'t> super::Extract<'t> for Pattern {
 //             pattern.extract(&r"Lorem Ipsum"),
 //             None
 //         );
-//
-//         unimplemented!();
 //     }
 // }

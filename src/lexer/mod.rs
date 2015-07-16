@@ -37,9 +37,6 @@ pub use self::patterns::options::Options;
 pub use self::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
 
 
-// TODO: where does this belong?
-//const PUNCTUATION           : &'static str = "()[]{}?:.,|";
-
 #[allow(dead_code)]
 struct Lexer {
     environment: Rc<Environment>,
@@ -139,7 +136,7 @@ impl Lexer {
     */
     }
 
-    fn lex_raw_data(&self) {
+    fn lex_verbatim_data(&self) {
     /*
         if (!preg_match(str_replace('%s', $tag, $this->regexes['lex_raw_data']), $this->code, $match, PREG_OFFSET_CAPTURE, $this->cursor)) {
             throw new Twig_Error_Syntax(sprintf('Unexpected end of file: Unclosed "%s" block', $tag), $this->lineno, $this->filename);

@@ -6,7 +6,7 @@
  */
 
 /**
- * The `raw_data` pattern used by the lexer to tokenize the templates.
+ * The `verbatim_end` pattern used by the lexer to tokenize the templates.
  *
  * Written as regular expressions (perl-style).
  *
@@ -27,7 +27,7 @@ use std::rc::Rc;
 /////////////
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
-pub use super::block_raw::Tag; // enum {Raw, Verbatim}
+pub use super::verbatim_start::Tag; // enum {Raw, Verbatim}
 
 #[derive(PartialEq)]
 pub struct Pattern {

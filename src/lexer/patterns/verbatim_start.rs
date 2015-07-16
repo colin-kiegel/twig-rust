@@ -13,8 +13,6 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
-// TODO: rename block_raw -> block_verbatim
-
 /////////////
 // imports //
 /////////////

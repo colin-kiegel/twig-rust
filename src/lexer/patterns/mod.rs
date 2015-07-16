@@ -29,50 +29,44 @@ use environment::Environment;
 #[macro_use]
 pub mod macros;
 pub mod options;
+pub mod token_start; // var, comment, block
 pub mod var_end;
-pub mod block_end; // TODO rename block_line_end ?
-pub mod raw_data; // TODO renamce block_raw_end ?
-pub mod operator;
 pub mod comment_end;
-pub mod block_raw; // TODO rename block_raw_start ?
-pub mod block_line; // TODO rename block_line_start ?
-pub mod token_start;
+pub mod block_end;
+pub mod block_line;
+pub mod verbatim_start;
+pub mod verbatim_end;
 pub mod interpolation_start;
 pub mod interpolation_end;
+pub mod operator;
 pub mod name;
 pub mod number;
-//pub mod punctuation;
+pub mod punctuation;
 pub mod string;
-pub mod dq_string_delim;
-pub mod dq_string_part;
+pub mod string_dq_delim;
+pub mod string_dq_part;
 pub use self::options::Options;
 
-
-//const REGEX_NAME            : &'static str = r"\A[a-zA-Z_\x7f-\xff][a-zA-Z\d_\x7f-\xff]*";
-//const REGEX_NUMBER          : &'static str = r"\A\d+(?:\.\d+)?";
-//const REGEX_STRING          : &'static str = r"\A\"([^#\"\\]*(?:\\[.\n][^#\"\\]*)*)\"|'([^'\\]*(?:\\[.\n][^'\\]*)*)'";
-//const REGEX_DQ_STRING_DELIM : &'static str = r"\A\"";
-//const REGEX_DQ_STRING_PART  : &'static str = r"\A[^#\"\\]*(?:(?:\\[.\n]|#(?!\\{))[^#\"\\]*)*";
 
 pub struct Patterns {
     pub options: Rc<Options>,
     pub environment: Rc<Environment>,
     pub var_end: var_end::Pattern,
     pub block_end: block_end::Pattern,
-    pub raw_data: raw_data::Pattern,
+    pub verbatim_end: verbatim_end::Pattern,
     //pub operator: operator::Pattern,
     pub comment_end: comment_end::Pattern,
-    pub block_raw: block_raw::Pattern,
+    pub verbatim_start: verbatim_start::Pattern,
     pub block_line: block_line::Pattern,
     pub token_start: token_start::Pattern,
     pub interpolation_start: interpolation_start::Pattern,
     pub interpolation_end: interpolation_end::Pattern,
     pub name: name::Pattern,
     pub number: number::Pattern,
-    // pub punctuation: punctuation::Pattern,
+    pub punctuation: &'static punctuation::Pattern,
     pub string: string::Pattern,
-    pub dq_string_delim: dq_string_delim::Pattern,
-    pub dq_string_part: dq_string_part::Pattern,
+    pub string_dq_delim: string_dq_delim::Pattern,
+    pub string_dq_part: string_dq_part::Pattern,
 }
 
 #[allow(dead_code)]
@@ -81,21 +75,21 @@ impl Patterns {
     pub fn new(env: Rc<Environment>, opt: Rc<Options>) -> Result<Patterns, regexError> {
         Ok(Patterns {
             var_end: try!(var_end::Pattern::new(opt.clone())),
-            raw_data: try!(raw_data::Pattern::new(opt.clone())),
+            verbatim_end: try!(verbatim_end::Pattern::new(opt.clone())),
             //operator: try!(operator::Pattern::new(&env)),
             block_end: try!(block_end::Pattern::new(opt.clone())),
             comment_end: try!(comment_end::Pattern::new(opt.clone())),
-            block_raw: try!(block_raw::Pattern::new(opt.clone())),
+            verbatim_start: try!(verbatim_start::Pattern::new(opt.clone())),
             block_line: try!(block_line::Pattern::new(opt.clone())),
             token_start: try!(token_start::Pattern::new(opt.clone())),
             interpolation_start: try!(interpolation_start::Pattern::new(opt.clone())),
             interpolation_end: try!(interpolation_end::Pattern::new(opt.clone())),
             name: try!(name::Pattern::new()),
             number: try!(number::Pattern::new()),
-            // punctuation: try!(punctuation::Pattern::new()),
+            punctuation: punctuation::Pattern::instance(),
             string: try!(string::Pattern::new()),
-            dq_string_delim: try!(dq_string_delim::Pattern::new()),
-            dq_string_part: try!(dq_string_part::Pattern::new()),
+            string_dq_delim: try!(string_dq_delim::Pattern::new()),
+            string_dq_part: try!(string_dq_part::Pattern::new()),
             options: opt,
             environment: env,
         })

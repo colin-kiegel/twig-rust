@@ -96,13 +96,16 @@ mod test {
 
         assert_eq!(
             pattern.extract(&r##"" "string two""##),
-            None
+            Some(ItemData {
+                position: (0, 0),
+                escaped_string: "",
+            })
         );
 
         assert_eq!(
-            pattern.extract(&r##""123\.abc"def"##),
+            pattern.extract(&r##"123\.abc"def"##),
             Some(ItemData {
-                position: (0, 10),
+                position: (0, 8),
                 escaped_string: r##"123\.abc"##
             })
         );
@@ -110,8 +113,8 @@ mod test {
         assert_eq!(
             pattern.extract(&r"'Lorem' Ipsum"),
             Some(ItemData {
-                position: (0,7),
-                escaped_string: "Lorem"
+                position: (0,13),
+                escaped_string: "'Lorem' Ipsum"
             })
         );
     }

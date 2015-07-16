@@ -46,7 +46,8 @@ pub struct ItemData {
 impl Pattern {
     pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*line\s+(\d+)\s*{b1}",
+            regex: try_new_regex!(format!(r"\A\s*line\s+(\d+)\s*(?:{ws}{b1}\s*|{b1})",
+                ws = opt.whitespace_trim.quoted(),
                 b1 = opt.tag_block_end.quoted())),
             options: opt,
         })
@@ -93,7 +94,7 @@ mod test {
 
         assert_eq!(
             pattern.as_str(),
-            r"\A\s*line\s+(\d+)\s*%\}"
+            r"\A\s*line\s+(\d+)\s*(?:-%\}\s*|%\})"
         );
     }
 

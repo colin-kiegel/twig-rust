@@ -17,70 +17,61 @@
 // imports //
 /////////////
 
-use regex;
-use regex::Error as regexError;
-
 /////////////
 // exports //
 /////////////
 
-pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
+pub use lexer::token::{Punctuation, BracketType};
+
 
 #[derive(PartialEq)]
-pub struct Pattern {
-    regex: regex::Regex,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, PartialEq)]
-pub struct ItemData {
-    pub position: (usize, usize),
-}
+pub struct Pattern;
 
 impl Pattern {
-    pub fn new() -> Result<Pattern, regexError> {
-        Ok(Pattern {
-            regex: try_new_regex!(r""), // TODO <-- really regex? (uncomment include in super)
-        })
-    }   // orig: '()[]{}?:.,|'
+    pub fn instance() -> &'static Pattern {
+        static INSTANCE: &'static Pattern = &Pattern;
+
+        return INSTANCE;
+    }
 }
 
-impl<'t> super::Extract<'t> for Pattern {
-    type Item = ItemData;
-
-    fn regex(&self) -> &regex::Regex {
-        &self.regex
-    }
-
-    fn item_from_captures(&self, captures: &regex::Captures<'t>) -> ItemData {
-        ItemData {
-            position: match captures.pos(0) {
-                Some(position) => position,
-                _ => unreachable!(),
-            }
-        }
-    }
-
-    // overwrite for better performance, as long as we only need the position
-    fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
-            ItemData {
-                position: position,
-            })
+impl Pattern {   // orig: '()[]{}?:.,|'
+    pub fn extract(&self, text: &str) -> Option<Punctuation> {
+        return match text.chars().next() {
+            Some(c) => match c {
+                '.' => Some(Punctuation::Dot),
+                ',' => Some(Punctuation::Comma),
+                ':' => Some(Punctuation::Colon),
+                '|' => Some(Punctuation::VerticalBar),
+                '?' => Some(Punctuation::QuestionMark),
+                '(' => Some(Punctuation::OpeningBracket(BracketType::Round)),
+                '[' => Some(Punctuation::OpeningBracket(BracketType::Square)),
+                '{' => Some(Punctuation::OpeningBracket(BracketType::Curly)),
+                ')' => Some(Punctuation::ClosingBracket(BracketType::Round)),
+                ']' => Some(Punctuation::ClosingBracket(BracketType::Square)),
+                '}' => Some(Punctuation::ClosingBracket(BracketType::Curly)),
+                _ => None,
+            },
+            None => None,
+        };
     }
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
-    use lexer::patterns::Extract;
 
     #[test]
     pub fn extract() {
-        let pattern = Pattern::new().unwrap();
+        let pattern = Pattern::instance();
 
         assert_eq!(
-            pattern.extract(&r"{Lorem Ipsum"),
+            pattern.extract("{Lorem Ipsum"),
+            Some(Punctuation::OpeningBracket(BracketType::Curly))
+        );
+
+        assert_eq!(
+            pattern.extract("XYZ ,.-/()=?{[}]}"),
             None
         );
     }
