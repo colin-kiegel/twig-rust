@@ -15,6 +15,7 @@
 // imports //
 /////////////
 
+use std::fmt;
 use std::convert::Into;
 use super::{Token, Type};
 use template;
@@ -37,7 +38,7 @@ impl Into<Token> for Item {
 }
 
 #[allow(dead_code)]
-#[derive(Default, Debug)]
+#[derive(Default)]
 pub struct Stream<'a> {
     items: Vec<Item>,
     template: Option<&'a template::Raw>,
@@ -73,11 +74,17 @@ impl<'a> Stream<'a> {
     }
 }
 
-impl<'a> ToString for Stream<'a> {
-    /// Returns a string representation of the token stream.
-    fn to_string(&self) -> String {
+impl<'a> fmt::Display for Stream<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let v: Vec<String> = self.items.iter().map(|i| format!("{}", i.token)).collect();
+        write!(f, "[\n\t{}\n]", v.connect("\n\t"))
+    }
+}
+
+impl<'a> fmt::Debug for Stream<'a> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         let v: Vec<String> = self.items.iter().map(|i| format!("{:?}", i.token)).collect();
-        format!("Tokenstream: [{}]", v.connect(" + "))
+        write!(f, "[\n\t{}\n]", v.connect("\n\t"))
     }
 }
 

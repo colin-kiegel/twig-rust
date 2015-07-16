@@ -12,6 +12,12 @@
  */
 
 /////////////
+// imports //
+/////////////
+
+use std::fmt;
+
+/////////////
 // exports //
 /////////////
 
@@ -20,7 +26,7 @@ pub use self::stream::Stream;
 
 
 #[allow(dead_code)]
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 pub enum Token {
     Eof,
     Text(String),
@@ -33,9 +39,29 @@ pub enum Token {
     FloatingNumber(f64), // orig. Number
     String(String),
     Operator(String),
-    Punctuation(String),
+    Punctuation(Punctuation),
     InterpolationStart,
     InterpolationEnd,
+}
+
+#[derive(Debug, PartialEq)]
+pub enum Punctuation {
+    Dot,
+    Comma,
+    Colon,
+    VerticalBar,
+    QuestionMark,
+    OpeningBracket(BracketType),
+    ClosingBracket(BracketType),
+}
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum BracketType {
+    Round,
+    Square,
+    Curly,
+    DoubleQuote, // Pseudo-Bracket - never being pushed to a real token Stream
+                 // but used as a temporary state of the lexer
 }
 
 #[allow(dead_code)]
@@ -73,7 +99,7 @@ impl Token {
             Token::FloatingNumber(ref x) => Some(x.to_string()),
             Token::String(ref x) => Some(x.to_string()),
             Token::Operator(ref x) => Some(x.to_string()),
-            Token::Punctuation(ref x) => Some(x.to_string()),
+            Token::Punctuation(ref x) => Some(format!("{:?}",x)),
             Token::InterpolationStart => None,
             Token::InterpolationEnd => None,
         }
@@ -103,13 +129,19 @@ impl Token {
     }
 }
 
-impl ToString for Token {
-    /// Returns a string representation of the token type.
-    fn to_string(&self) -> String {
-        let typ = self.get_type().get_name(false);
+impl fmt::Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let typ = self.get_type().get_name(true);
+        write!(f, "{}", typ)
+    }
+}
+
+impl fmt::Debug for Token {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        let typ = self.get_type().get_name(true);
         match self.get_value() {
-            Some(ref val) => format!("{typ}({val})", typ = typ, val = val),
-            None          => format!("{typ}", typ = typ),
+            Some(ref val) => write!(f, "{typ}({val:?})", typ = typ, val = val),
+            None          => write!(f, "{typ}", typ = typ),
         }
     }
 }
