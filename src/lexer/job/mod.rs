@@ -17,13 +17,11 @@
 
 use std::fmt;
 use template;
-use lexer::patterns::Extract;
+use lexer::patterns::{token_start, Extract};
 use lexer::Patterns;
-use lexer::token::{Token, BracketType};
-use lexer::token;
+use lexer::token::{self, Token, BracketType};
 use lexer::error::LexerError;
 use self::state::TokenizeState;
-use lexer::patterns::token_start;
 
 /////////////
 // exports //
@@ -35,20 +33,19 @@ pub mod state;
 // Finite State Machine loosely inspired by
 // * http://www.huffingtonpost.com/damien-radtke/rustic-state-machines-for_b_4466566.html
 
-#[allow(dead_code)]
 pub struct Job<'a> {
     patterns: &'a Patterns,
-    template: &'a template::Raw,
+    _template: &'a template::Raw,
     current_var_block_line: usize,
     tokens: token::Stream<'a>,
     cursor: template::raw::Cursor<'a>,
-    position: usize,
+    _position: usize,
     token_start_iter: token_start::ExtractIter<'a, 'a>, // orig: positions
     brackets: Vec<(BracketType, usize/*TODO LineNo*/)>,
 }
 
-#[allow(dead_code)]
 impl<'a> Job<'a> {
+    #[allow(dead_code)] // TODO testcase
     pub fn new(template: &'a template::Raw, patterns: &'a Patterns) -> Box<Job<'a>> {
         let token_start_iter = patterns.token_start.extract_iter(&template.code);
         let cursor = template::raw::Cursor::new(&template);
@@ -56,16 +53,17 @@ impl<'a> Job<'a> {
 
         Box::new(Job {
             patterns: patterns,
-            template: template,
+            _template: template,
             tokens: tokens,
             cursor: cursor,
             token_start_iter: token_start_iter,
-            position: 0,
+            _position: 0,
             current_var_block_line: 0,
             brackets: Vec::default(),
         })
     }
 
+    #[allow(dead_code)] // TODO testcase
     pub fn tokenize(mut self: Job<'a>) -> Result<token::Stream<'a>, LexerError> {
         // The TokenizeStates call each other *recursively* to avoid dynamic dispatch
         // for better performance. However, we loose debugging information about the
@@ -97,7 +95,7 @@ impl<'a> Job<'a> {
     }
 }
 
-
+// TODO switch to Debug-Builder once stable
 impl<'a> fmt::Debug for Job<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         write!(f, "[\n\

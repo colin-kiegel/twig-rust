@@ -34,7 +34,6 @@ pub struct Pattern {
     options: Rc<Options>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub struct ItemData {
     pub position: (usize, usize),
@@ -42,7 +41,6 @@ pub struct ItemData {
     pub tag: Tag,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Tag {
     Block,

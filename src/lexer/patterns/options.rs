@@ -49,7 +49,6 @@ impl<'a> Into<OptionData> for &'a str {
     }
 }
 
-#[allow(dead_code)]
 impl OptionData {
     pub fn raw(&self) -> &str {
         self.raw.as_ref()

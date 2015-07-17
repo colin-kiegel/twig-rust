@@ -20,7 +20,7 @@ use lexer::error::LexerError;
 use lexer::job::Job;
 use super::data::Data;
 
-#[allow(dead_code)]
+#[allow(dead_code)] // dummy
 pub struct Initial;
 
 impl TokenizeState for Initial {

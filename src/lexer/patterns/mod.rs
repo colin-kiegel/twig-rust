@@ -69,7 +69,6 @@ pub struct Patterns {
     pub string_dq_part: string_dq_part::Pattern,
 }
 
-#[allow(dead_code)]
 #[allow(unused_variables)]
 impl Patterns {
     pub fn new(env: Rc<Environment>, opt: Rc<Options>) -> Result<Patterns, regexError> {

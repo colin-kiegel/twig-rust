@@ -24,7 +24,6 @@ use template;
 // exports //
 /////////////
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Item {
     token:      Token,
@@ -37,21 +36,19 @@ impl Into<Token> for Item {
     }
 }
 
-#[allow(dead_code)]
 #[derive(Default)]
 pub struct Stream<'a> {
     items: Vec<Item>,
-    template: Option<&'a template::Raw>,
+    _template: Option<&'a template::Raw>,
 }
 
-#[allow(dead_code)]
 #[allow(unused_variables)]
 impl<'a> Stream<'a> {
     /// Constructor
     pub fn new(template: &'a template::Raw) -> Stream<'a> {
         Stream {
             items: Vec::new(),
-            template: Some(template),
+            _template: Some(template),
         }
     }
 
@@ -62,14 +59,14 @@ impl<'a> Stream<'a> {
         });
     }
 
-    pub fn is_eof(&self) -> bool {
+    pub fn _is_eof(&self) -> bool {
         match self.items.last()  {
             Some(x) => x.token.is_type(Type::Eof),
             None    => true,
         }
     }
 
-    pub fn len(&self) -> usize {
+    pub fn _len(&self) -> usize {
         self.items.len()
     }
 }

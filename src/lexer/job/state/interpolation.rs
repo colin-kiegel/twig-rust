@@ -19,7 +19,8 @@ use super::{TokenizeState, Code};
 use lexer::error::LexerError;
 use lexer::job::Job;
 
-#[allow(dead_code)]
+
+#[allow(dead_code)] // dummy
 pub struct Interpolation;
 
 impl TokenizeState for Interpolation {

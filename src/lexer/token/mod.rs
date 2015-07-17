@@ -25,10 +25,9 @@ pub mod stream;
 pub use self::stream::Stream;
 
 
-#[allow(dead_code)]
 #[derive(PartialEq)]
 pub enum Token {
-    Eof,
+    _Eof,
     Text(String),
     BlockStart,
     VarStart,
@@ -38,10 +37,10 @@ pub enum Token {
     IntegerNumber(u64), // orig. Number
     FloatingNumber(f64), // orig. Number
     String(String),
-    Operator(String),
+    _Operator(String),
     Punctuation(Punctuation),
-    InterpolationStart,
-    InterpolationEnd,
+    _InterpolationStart,
+    _InterpolationEnd,
 }
 
 #[derive(Debug, PartialEq)]
@@ -64,7 +63,6 @@ pub enum BracketType {
                  // but used as a temporary state of the lexer
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum Type {
     Eof                = -1,
@@ -82,13 +80,12 @@ pub enum Type {
     InterpolationEnd   = 11,
 }
 
-#[allow(dead_code)]
 #[allow(unused_variables)]
 impl Token {
     // Because of Number Types we need to return `String` copys instead of `&'a str`
     pub fn get_value<'a>(&'a self) -> Option<String> {
         match *self {
-            Token::Eof => None,
+            Token::_Eof => None,
             Token::Text(ref x) => Some(x.to_string()),
             Token::BlockStart => None,
             Token::VarStart => None,
@@ -98,16 +95,16 @@ impl Token {
             Token::IntegerNumber(ref x) => Some(x.to_string()),
             Token::FloatingNumber(ref x) => Some(x.to_string()),
             Token::String(ref x) => Some(x.to_string()),
-            Token::Operator(ref x) => Some(x.to_string()),
+            Token::_Operator(ref x) => Some(x.to_string()),
             Token::Punctuation(ref x) => Some(format!("{:?}",x)),
-            Token::InterpolationStart => None,
-            Token::InterpolationEnd => None,
+            Token::_InterpolationStart => None,
+            Token::_InterpolationEnd => None,
         }
     }
 
     pub fn get_type(&self) -> Type {
         match *self {
-            Token::Eof => Type::Eof,
+            Token::_Eof => Type::Eof,
             Token::Text(_) => Type::Text,
             Token::BlockStart => Type::BlockStart,
             Token::VarStart => Type::VarStart,
@@ -117,13 +114,14 @@ impl Token {
             Token::IntegerNumber(_) => Type::Number,
             Token::FloatingNumber(_) => Type::Number,
             Token::String(_) => Type::String,
-            Token::Operator(_) => Type::Operator,
+            Token::_Operator(_) => Type::Operator,
             Token::Punctuation(_) => Type::Punctuation,
-            Token::InterpolationStart => Type::InterpolationStart,
-            Token::InterpolationEnd => Type::InterpolationEnd,
+            Token::_InterpolationStart => Type::InterpolationStart,
+            Token::_InterpolationEnd => Type::InterpolationEnd,
         }
     }
 
+    #[allow(dead_code)] // TODO testcase
     pub fn is_type(&self, typ: Type) -> bool {
         self.get_type() == typ
     }
@@ -146,7 +144,6 @@ impl fmt::Debug for Token {
     }
 }
 
-#[allow(dead_code)]
 #[allow(unused_variables)]
 impl Type {
     /// Returns the name of the token type (internal representation).
@@ -181,7 +178,7 @@ impl Type {
 
     /// Returns the description of the token type in plain english.
 
-    pub fn get_description(&self) -> String {
+    pub fn _get_description(&self) -> String {
          match *self {
             Type::Eof => "end of template",
             Type::Text => "text",

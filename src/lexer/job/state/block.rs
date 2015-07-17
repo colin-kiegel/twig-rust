@@ -22,7 +22,7 @@ use lexer::patterns::{Extract};
 use lexer::error::{LexerError};
 use super::shared_traits::LexExpression;
 
-#[allow(dead_code)]
+#[allow(dead_code)] // dummy
 pub struct Block;
 
 impl TokenizeState for Block {

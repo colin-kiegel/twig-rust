@@ -23,7 +23,8 @@ use lexer::job::Job;
 // exports //
 /////////////
 
-#[allow(dead_code)]
+
+#[allow(dead_code)] // dummy
 pub struct Final;
 
 impl TokenizeState for Final {

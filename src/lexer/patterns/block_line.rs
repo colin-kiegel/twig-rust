@@ -36,7 +36,6 @@ pub struct Pattern {
     options: Rc<Options>,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub struct ItemData {
     pub position: (usize, usize),

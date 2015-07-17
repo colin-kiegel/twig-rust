@@ -19,8 +19,6 @@ pub mod cursor;
 pub use self::cursor::Cursor as Cursor;
 
 
-#[allow(dead_code)]
-#[allow(unused_variables)]
 #[derive(Default)]
 #[derive(Debug)]
 pub struct Raw {
@@ -28,9 +26,9 @@ pub struct Raw {
     pub code: String,
 }
 
-#[allow(dead_code)]
 #[allow(unused_variables)]
 impl Raw {
+    #[allow(dead_code)] // TODO testcase
     pub fn new(code: &str, filename: &str) -> Raw {
         let mut x = Raw {
             filename: filename.to_string(),

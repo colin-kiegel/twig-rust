@@ -26,7 +26,6 @@ pub type TokenError = error::Exception<TokenErrorCode>;
 pub type LexerError = error::Exception<LexerErrorCode>;
 
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum SyntaxErrorCode {
     Unknown,
@@ -39,20 +38,18 @@ pub enum SyntaxErrorCode {
     UnclosedVariable,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum LexerErrorCode {
-    Logic,
-    InvalidPatternMatch,
+    _Logic,
+    _InvalidPatternMatch,
     InvalidValue,
-    InvalidState,
+    _InvalidState,
     SyntaxError,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 pub enum TokenErrorCode {
-    NoValue,
+    _NoValue,
 }
 
 impl ::std::convert::From<SyntaxError> for LexerError {
@@ -83,10 +80,10 @@ impl ToString for SyntaxErrorCode {
 impl ToString for LexerErrorCode {
     fn to_string(&self) -> String {
         match *self {
-            LexerErrorCode::Logic => "Logic",
-            LexerErrorCode::InvalidPatternMatch => "InvalidPatternMatch",
+            LexerErrorCode::_Logic => "Logic",
+            LexerErrorCode::_InvalidPatternMatch => "InvalidPatternMatch",
             LexerErrorCode::InvalidValue => "InvalidValue",
-            LexerErrorCode::InvalidState => "InvalidState",
+            LexerErrorCode::_InvalidState => "InvalidState",
             LexerErrorCode::SyntaxError => "SyntaxError",
         }.to_string()
     }
@@ -94,7 +91,7 @@ impl ToString for LexerErrorCode {
 impl ToString for TokenErrorCode {
     fn to_string(&self) -> String {
         match *self {
-            TokenErrorCode::NoValue => "NoValue",
+            TokenErrorCode::_NoValue => "NoValue",
         }.to_string()
     }
 }

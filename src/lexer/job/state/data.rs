@@ -26,7 +26,7 @@ use lexer::error::{LexerError, SyntaxError, SyntaxErrorCode};
 // exports //
 /////////////
 
-#[allow(dead_code)]
+
 pub struct Data;
 
 #[allow(unused_variables)]
