@@ -18,7 +18,6 @@
 use std::rc::Rc;
 #[cfg(test)]
 mod test;
-mod token;
 use template;
 use environment::Environment;
 use lexer::job::Job;
@@ -30,6 +29,7 @@ use regex::Error as regexError;
 /////////////
 
 pub mod error;
+pub mod token;
 pub mod job;
 pub mod patterns;
 pub use self::patterns::Patterns;

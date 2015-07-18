@@ -20,5 +20,7 @@ extern crate regex;
 #[macro_use]
 mod error;
 mod lexer;
+mod parser;
 mod environment;
 mod template;
+mod runtime;
