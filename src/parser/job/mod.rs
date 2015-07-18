@@ -26,8 +26,23 @@ use parser::Parser;
 
 
 pub struct Job<'a> {
-    tokens: &'a token::Stream<'a>,
-    _parser: &'a Parser,
+    // NOT-STACK:
+    _parser: &'a Parser,    // orig: env
+    // stack,
+    // handlers,
+    // visitors,
+    // expressionParser,
+
+    // STACK:
+    tokens: &'a token::Stream<'a>, // orig: stream // really stacked???
+    // parent,
+    // blocks,
+    // blockStack,
+    // macros,
+    // reservedMacroNames,
+    // importedSymbols,
+    // traits,
+    // embeddedTemplates,
 }
 
 impl<'a> Job<'a> {

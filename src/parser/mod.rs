@@ -16,7 +16,7 @@
 //////////////
 
 use std::rc::Rc;
-use environment::Environment;
+use compiler::Compiler;
 use lexer::token;
 use self::job::Job;
 
@@ -24,27 +24,29 @@ use self::job::Job;
 // exports //
 /////////////
 
+pub mod error;
 pub mod job;
 pub mod node;
-pub mod error;
+pub mod node_visitor;
 pub use self::error::*;
 pub use self::node::Node;
+pub use self::node_visitor::NodeVisitor;
 
 
 pub struct Parser {
-    _environment: Rc<Environment>,
+    _compiler: Rc<Compiler>,
 }
 
 impl Parser {
-    pub fn new(env: Environment) -> Parser {
+    pub fn new(compiler: Compiler) -> Parser {
         Parser {
-            _environment: Rc::new(env),
+            _compiler: Rc::new(compiler),
         }
     }
 
-    pub fn _environment(&self) -> &Environment {
+    pub fn _compiler(&self) -> &Compiler {
         use std::ops::Deref;
-        self._environment.deref()
+        self._compiler.deref()
     }
 
     #[allow(dead_code)] // TODO testcase
@@ -59,8 +61,8 @@ impl Parser {
 
 impl Default for Parser {
     fn default() -> Parser {
-        let env = Environment::default();
+        let compiler = Compiler::default();
 
-        Parser::new(env)
+        Parser::new(compiler)
     }
 }

@@ -19,7 +19,7 @@ use std::rc::Rc;
 #[cfg(test)]
 mod test;
 use template;
-use environment::Environment;
+use compiler::Compiler;
 use lexer::job::Job;
 use lexer::job::state::TokenizeState;
 use regex::Error as regexError;
@@ -36,21 +36,21 @@ pub use self::patterns::Patterns;
 pub use self::patterns::options::Options;
 pub use self::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
 
-
-struct Lexer {
-    _environment: Rc<Environment>,
+//#[derive(PartialEq)]
+pub struct Lexer {
+    _compiler: Rc<Compiler>,
     _options: Rc<Options>,
     patterns: Patterns,
 }
 
 impl Lexer {
-    pub fn new(env: Environment, opt: Options) -> Result<Lexer, regexError> {
-        let env = Rc::new(env);
+    pub fn new(compiler: Compiler, opt: Options) -> Result<Lexer, regexError> {
+        let compiler = Rc::new(compiler);
         let opt = Rc::new(opt);
-        let patterns = try!(Patterns::new(env.clone(), opt.clone())); // TODO Error-Handling ?
+        let patterns = try!(Patterns::new(compiler.clone(), opt.clone())); // TODO Error-Handling ?
 
         Ok(Lexer {
-            _environment: env,
+            _compiler: compiler,
             _options: opt,
             patterns: patterns,
         })
@@ -68,9 +68,9 @@ impl Lexer {
 
 impl Default for Lexer {
     fn default() -> Lexer {
-        let env = Environment::default();
+        let compiler = Compiler::default();
         let options = Options::default();
 
-        Lexer::new(env, options).unwrap()
+        Lexer::new(compiler, options).unwrap()
     }
 }

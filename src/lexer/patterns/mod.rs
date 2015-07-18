@@ -20,7 +20,7 @@
 use std::rc::Rc;
 use regex;
 use regex::Error as regexError;
-use environment::Environment;
+use compiler::Compiler;
 
 /////////////
 // exports //
@@ -47,10 +47,10 @@ pub mod string_dq_delim;
 pub mod string_dq_part;
 pub use self::options::Options;
 
-
+//#[derive(PartialEq)]
 pub struct Patterns {
     pub options: Rc<Options>,
-    pub environment: Rc<Environment>,
+    pub compiler: Rc<Compiler>,
     pub var_end: var_end::Pattern,
     pub block_end: block_end::Pattern,
     pub verbatim_end: verbatim_end::Pattern,
@@ -71,7 +71,7 @@ pub struct Patterns {
 
 #[allow(unused_variables)]
 impl Patterns {
-    pub fn new(env: Rc<Environment>, opt: Rc<Options>) -> Result<Patterns, regexError> {
+    pub fn new(compiler: Rc<Compiler>, opt: Rc<Options>) -> Result<Patterns, regexError> {
         Ok(Patterns {
             var_end: try!(var_end::Pattern::new(opt.clone())),
             verbatim_end: try!(verbatim_end::Pattern::new(opt.clone())),
@@ -90,17 +90,17 @@ impl Patterns {
             string_dq_delim: try!(string_dq_delim::Pattern::new()),
             string_dq_part: try!(string_dq_part::Pattern::new()),
             options: opt,
-            environment: env,
+            compiler: compiler,
         })
     }
 }
 
 impl<'a> Default for Patterns {
     fn default() -> Patterns {
-        let env = Rc::new(Environment::default());
+        let compiler = Rc::new(Compiler::default());
         let opt = Rc::new(Options::default());
 
-        Patterns::new(env, opt).unwrap()
+        Patterns::new(compiler, opt).unwrap()
     }
 }
 

@@ -17,7 +17,7 @@
 // imports //
 /////////////
 
-use environment::Environment;
+use compiler::Compiler;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
@@ -26,12 +26,11 @@ use std::rc::Rc;
 // exports //
 /////////////
 
-pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
+pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, _Pattern>;
 
-#[derive(PartialEq)]
-pub struct Pattern {
+pub struct _Pattern {
     regex: regex::Regex,
-    environment: Rc<Environment>,
+    _compiler: Rc<Compiler>,
 }
 
 #[allow(dead_code)]
@@ -50,9 +49,9 @@ pub enum Tag {
 }
 
 #[allow(dead_code, unused_variables)]
-impl Pattern {
-    pub fn new(env: Rc<Environment>) -> Result<Pattern, regexError> {
-        Ok(Pattern {
+impl _Pattern {
+    pub fn new(compiler: Rc<Compiler>) -> Result<_Pattern, regexError> {
+        Ok(_Pattern {
             regex: {
                 //$operators = array_merge(
                     //array('='),
@@ -82,12 +81,12 @@ impl Pattern {
                 //return '/'.implode('|', $regex).'/A';
                 unimplemented!()
             },
-            environment: env,
+            _compiler: compiler,
         })
     }
 }
 
-impl<'t> super::Extract<'t> for Pattern {
+impl<'t> super::Extract<'t> for _Pattern {
     type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
@@ -106,6 +105,15 @@ impl<'t> super::Extract<'t> for Pattern {
         }
     }
 }
+
+impl PartialEq for _Pattern {
+    fn eq(&self, other: &Self) -> bool {
+        self.regex == other.regex
+    }
+}
+
+
+// TODO: test-cases?
 
 // #[cfg(test)]
 // mod test {
