@@ -17,20 +17,20 @@
 // imports //
 /////////////
 
-use compiler::Compiler;
 use regex;
 use regex::Error as regexError;
-use std::rc::Rc;
+use compiler::{UnaryOperator, BinaryOperator};
 
 /////////////
 // exports //
 /////////////
 
-pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, _Pattern>;
+pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
-pub struct _Pattern {
+
+#[derive(Debug)]
+pub struct Pattern {
     regex: regex::Regex,
-    _compiler: Rc<Compiler>,
 }
 
 #[allow(dead_code)]
@@ -48,45 +48,67 @@ pub enum Tag {
     // Variable,
 }
 
+struct Builder {
+    whitespace: regex::Regex,
+}
+
+impl Builder {
+    fn new() -> Result<Builder, regexError> {
+        Ok(Builder {
+            whitespace: try!(regex::Regex::new(r"\s+"))
+        })
+    }
+
+    fn operators_to_regex(&self, unary: &Vec<UnaryOperator>, binary: &Vec<BinaryOperator>) -> String {
+        let mut operators : Vec<(usize, &str)> = Vec::with_capacity(1 + unary.len() + binary.len());
+
+        operators.push(("=".len(), "="));
+
+        for x in unary.iter()  { operators.push((x.repr.len(), &x.repr)) }
+        for x in binary.iter() { operators.push((x.repr.len(), &x.repr)) }
+
+        // sort in reverse order (i.e. descending): 10,9,8,7,6 ..
+        // -> not sure why we do this(!)
+        operators.sort_by(|&(ref len_a,_),&(ref len_b,_)| len_b.cmp(len_a));
+
+        // collect regex "patternA|patternB|.."
+        return operators.iter().map(|&(_, op)| self.operator_to_regex(op))
+             .collect::<Vec<String>>().connect("|");
+    }
+
+    fn operator_to_regex(&self, operator: &str) -> String {
+        // an operator that ends with a character must be followed by
+        // a whitespace or a parenthesis
+        let mut rx : String = regex::quote(operator);
+
+        rx = self.whitespace.replace_all(&rx, r"\s+");
+        // orig: r = preg_replace('/\s+/', '\s+', r);
+
+        if let Some(c) = operator.chars().last() {
+            if c.is_alphabetic() { // TODO:  regex does not support lookahead(!)
+                panic!("operator_to_regex(): operator ends in alphanumeric character (!)");
+                // r.push(r"(?=[\s()])");
+            }
+        }
+
+        return rx;
+    }
+}
+
 #[allow(dead_code, unused_variables)]
-impl _Pattern {
-    pub fn new(compiler: Rc<Compiler>) -> Result<_Pattern, regexError> {
-        Ok(_Pattern {
+impl Pattern {
+    pub fn new(unary: &Vec<UnaryOperator>, binary: &Vec<BinaryOperator>) -> Result<Pattern, regexError> {
+        Ok(Pattern {
             regex: {
-                //$operators = array_merge(
-                    //array('='),
-                    // TODO array_keys($this->env->getUnaryOperators()),
-                    // TODO array_keys($this->env->getBinaryOperators())
-                //);
+                let regex = try!(Builder::new()).operators_to_regex(unary, binary);
 
-                //$operators = array_combine($operators, array_map('strlen', $operators));
-                //arsort($operators);
-
-                //$regex = array();
-                //foreach ($operators as $operator => $length) {
-                    // an operator that ends with a character must be followed by
-                    // a whitespace or a parenthesis
-                    //if (ctype_alpha($operator[$length - 1])) {
-                    //    $r = preg_quote($operator, '/').'(?=[\s()])';
-                    //} else {
-                    //    $r = preg_quote($operator, '/');
-                    //}
-
-                    // an operator with a space can be any amount of whitespaces
-                    //$r = preg_replace('/\s+/', '\s+', $r);
-
-                    //$regex[] = $r;
-                //}
-
-                //return '/'.implode('|', $regex).'/A';
-                unimplemented!()
-            },
-            _compiler: compiler,
+                try!(regex::Regex::new(&regex))
+            }
         })
     }
 }
 
-impl<'t> super::Extract<'t> for _Pattern {
+impl<'t> super::Extract<'t> for Pattern {
     type Item = ItemData;
 
     fn regex(&self) -> &regex::Regex {
@@ -106,7 +128,7 @@ impl<'t> super::Extract<'t> for _Pattern {
     }
 }
 
-impl PartialEq for _Pattern {
+impl PartialEq for Pattern {
     fn eq(&self, other: &Self) -> bool {
         self.regex == other.regex
     }

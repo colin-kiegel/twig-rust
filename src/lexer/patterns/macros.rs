@@ -15,19 +15,11 @@
 // exports //
 /////////////
 
-pub use super::*;
 
 macro_rules! quote {
     ($string:expr) => ({
         use regex;
         regex::quote(&$string)
-    });
-}
-
-macro_rules! regex_concat {
-    ($modifier:expr, $pattern:expr) => ({
-        //format!("/{}/{}", $pattern, $modifier)
-        &("/".to_string() + &$pattern + "/" + &$modifier)
     });
 }
 
