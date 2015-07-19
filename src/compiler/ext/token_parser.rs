@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Node visitor
+/// Extension `token parser` definition
 ///
 /// @author Colin Kiegel <kiegel@gmx.de>
 
@@ -17,4 +17,4 @@ use std::fmt::Debug;
 // exports //
 /////////////
 
-pub trait NodeVisitor : Debug {}
+pub trait TokenParser : Debug {} // TODO switch from trait to struct?

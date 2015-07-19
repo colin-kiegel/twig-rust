@@ -28,6 +28,7 @@ pub mod node;
 pub use self::node::NodeOutput;
 
 #[allow(dead_code)]
+#[derive(Debug)]
 pub struct Runtime {
     data: HashMap<String, String>,
     writer: String, // TODO switch to a 'more generic' string writer
@@ -36,11 +37,23 @@ pub struct Runtime {
 
 #[allow(dead_code)]
 impl Runtime {
-    pub fn with_capacity(writer: usize, data: usize) -> Runtime {
+    pub fn new() -> Runtime {
         Runtime {
-            data: HashMap::with_capacity(data),
-            writer: String::with_capacity(writer),
+            data: HashMap::new(),
+            writer: String::new(),
         }
+    }
+
+    pub fn reserve_writer(&mut self, additional: usize) -> &mut Runtime {
+        self.writer.reserve(additional);
+
+        self
+    }
+
+    pub fn reserve_data(&mut self, additional: usize) -> &mut Runtime {
+        self.data.reserve(additional);
+
+        self
     }
 
     pub fn run(&mut self, node: &NodeOutput) {

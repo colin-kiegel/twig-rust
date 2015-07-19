@@ -16,12 +16,28 @@
 /////////////
 
 use std::collections::HashMap;
+use compiler;
 
 /////////////
 // exports //
 /////////////
 
-// Extensions:
+// Abstract extension traits + structs // TODO check what needs to be trait / can be struct
+pub mod filter;
+pub mod function;
+pub mod global;
+pub mod node_visitor;
+pub mod operator;
+pub mod test;
+pub mod token_parser;
+pub use self::filter::Filter;
+pub use self::function::Function;
+pub use self::global::Global;
+pub use self::node_visitor::NodeVisitor;
+pub use self::operator::{UnaryOperator, BinaryOperator};
+pub use self::test::Test;
+pub use self::token_parser::TokenParser;
+// Concrete extensions:
 pub mod core;
 pub mod debug;
 pub mod escaper;
@@ -38,9 +54,6 @@ pub use self::profiler::Profiler;
 pub use self::sandbox::Sandbox;
 pub use self::staging::Staging;
 pub use self::string_loader::StringLoader;
-// Other:
-pub use compiler::{self, TokenParser};
-pub use parser::NodeVisitor;
 
 
 pub trait Extension : ::std::fmt::Debug {
@@ -62,32 +75,32 @@ pub trait Extension : ::std::fmt::Debug {
     }
 
     /// Get the filters to register with the compiler.
-    fn filters(&self) -> HashMap<String, Box<()>> {
+    fn filters(&self) -> HashMap<String, Box<Filter>> {
         HashMap::new()
     }
 
     /// Get the tests to register with the compiler.
-    fn tests(&self) -> HashMap<String, Box<()>> {
+    fn tests(&self) -> HashMap<String, Box<Test>> {
         HashMap::new()
     }
 
     /// Get the functions to register with the compiler.
-    fn functions(&self) -> HashMap<String, Box<()>> {
+    fn functions(&self) -> HashMap<String, Box<Function>> {
         HashMap::new()
     }
 
     /// Get the unary operators to register with the compiler.
-    fn unary_operators(&self) -> Vec<()> {
+    fn unary_operators(&self) -> Vec<UnaryOperator> {
         Vec::new()
     }
 
     /// Get the binary operators to register with the compiler.
-    fn binary_operators(&self) -> Vec<()> {
+    fn binary_operators(&self) -> Vec<BinaryOperator> {
         Vec::new()
     }
 
     /// Get the global variables to register with the compiler.
-    fn globals(&self) -> Vec<()> {
+    fn globals(&self) -> Vec<Box<Global>> {
         Vec::new()
     }
 }

@@ -8,23 +8,23 @@
 /// @author Colin Kiegel <kiegel@gmx.de>
 
 /////////////
+// exports //
+/////////////
+
+#[macro_use]
+pub mod error;
+pub mod compiler;
+pub mod lexer;
+pub mod parser;
+pub mod runtime;
+
+/////////////
 // imports //
 /////////////
 
 extern crate regex;
 
-#[macro_use]
-mod error;
-mod lexer;
-mod parser;
 mod template;
-mod runtime;
-
-/////////////
-// exports //
-/////////////
-
-pub mod compiler;
 
 
 // TODO switch to `if let` pattern https://github.com/rust-lang/rfcs/pull/160

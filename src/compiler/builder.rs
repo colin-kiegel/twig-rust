@@ -16,17 +16,12 @@
 /////////////
 
 use std::path::Path;
-use std::ops::Deref;
-use std::collections::HashMap;
 use compiler::{Compiler, options, Options, ext, Extension};
-use compiler::error::*;
+use compiler::error::{TwigError, TwigErrorCode};
 
 /////////////
 // exports //
 /////////////
-
-// pub mod options;
-// pub use self::options::Options;
 
 
 #[allow(dead_code)]
@@ -34,30 +29,20 @@ pub const VERSION : &'static str = "1.18.1";
 
 #[derive(Debug)]
 pub struct Builder {
-    options: Options,
-    extensions: HashMap<String, Box<Extension>>, // TODO check for alternative Map-Types
-    ext_staging: Option<Box<ext::Staging>>,
+    opt: Options,
+    ext: Vec<Box<Extension>>,
 }
 
 impl Default for Builder {
     fn default() -> Builder {
-        let b = Builder {
-            options: Options::default(),
-            extensions: HashMap::default(), // TODO check for alternative Map-Types
-            ext_staging: Some(ext::Staging::new()),
-        };
-
-        let autoescape = b.options.autoescape;
-        let optimizations = b.options.optimizations;
-
-        return b
-            .add_extension(ext::Core::new())
-            .add_extension(ext::Escaper::new(autoescape))
-            .add_extension(ext::Optimizer::new(optimizations));
+        Builder {
+            opt: Options::default(),
+            ext: vec![ext::Core::new()], // core extension
+        }
     }
 }
 
-/// Builds instances of the Twig Compiler
+/// Builds an instance of the Twig Compiler, according to supplied options and compiler extensions.
 // /
 // / # Examples
 // /
@@ -80,14 +65,14 @@ impl Builder {
     /// When set to true, it automatically set "auto_reload" to true as well
     ///     (default to false)
     pub fn set_debug(mut self, debug: bool) -> Self {
-        self.options.debug = debug;
+        self.opt.debug = debug;
 
         self
     }
 
     /// The charset used by the templates (default to UTF-8)
     pub fn set_charset(mut self, set_charset: options::Charset) -> Self {
-        self.options.charset = set_charset;
+        self.opt.charset = set_charset;
 
         self
     }
@@ -95,7 +80,7 @@ impl Builder {
     /// Whether to ignore invalid variables in templates
     ///     (default to false).
     pub fn set_strict_variables(mut self, strict_variables: bool) -> Self {
-        self.options.strict_variables = strict_variables;
+        self.opt.strict_variables = strict_variables;
 
         self
     }
@@ -107,14 +92,14 @@ impl Builder {
     ///     * filename: set the autoescaping strategy based on the template filename extension
     ///     * PHP callback: a PHP callback that returns an escaping strategy based on the template "filename"
     pub fn set_autoescape(mut self, autoescape: options::Autoescape) -> Self {
-        self.options.autoescape = autoescape;
+        self.opt.autoescape = autoescape;
 
         self
     }
 
     /// An absolute path where to store the compiled templates (optional)
     pub fn set_cache(mut self, cache: Option<&Path>) -> Self {
-        self.options.cache = cache.map(|reference| reference.to_owned());
+        self.opt.cache = cache.map(|reference| reference.to_owned());
 
         self
     }
@@ -123,76 +108,95 @@ impl Builder {
     ///     If you don't provide the auto_reload option, it will be
     ///     determined automatically based on the debug value.
     pub fn set_auto_reload(mut self, auto_reload: Option<bool>) -> Self {
-        self.options.auto_reload = auto_reload;
+        self.opt.auto_reload = auto_reload;
 
         self
     }
 
     /// A flag that indicates whether optimizations are applied
     pub fn set_optimizations(mut self, optimizations: options::Optimizations) -> Self {
-        self.options.optimizations = optimizations;
+        self.opt.optimizations = optimizations;
 
         self
     }
 
     /// Get all options
     pub fn options(&self) -> &Options {
-        &self.options
+        &self.opt
     }
 
     /// Registers an extension
     pub fn add_extension(mut self, extension: Box<Extension>) -> Self {
-        self.extensions.insert(extension.name().to_string(), extension);
+        self.ext.push(extension);
 
         self
     }
 
     /// Get all registered extensions
-    pub fn extensions(&self) -> ::std::collections::hash_map::Iter<String, Box<Extension>> {
-        self.extensions.iter()
+    pub fn extensions(&self) -> ::std::slice::Iter<Box<Extension>> {
+        self.ext.iter()
     }
 
     // TODO : Environment to Compiler
-    pub fn compiler(mut self) -> Compiler {
+    pub fn compiler(mut self) -> Result<Compiler, TwigError> {
         let mut c = Compiler::default();
+        let o = self.opt;
 
-        for (_, extension) in self.extensions.iter_mut() {
-            c.init_extension(extension.deref().deref());
+        // add default extensions
+        self.ext.push(ext::Escaper::new(o.autoescape));
+        self.ext.push(ext::Optimizer::new(o.optimizations));
+
+        // init extensions
+        for extension in self.ext.into_iter() {
+            try!(c.init_extension(&*extension));
+            c.extensions.insert(extension.name().to_string(), extension); // TODO move to fn
         }
-        c.extensions = c.extensions;
 
-        if let Some(staging) = self.ext_staging {
-            c.init_extension(staging.deref());
-            c.ext_staging = Some(staging);
-        }
+        // init staging extension
+        let staging = ext::Staging::new();
+        try!(c.init_extension(&*staging));
+        c.ext_staging = Some(staging);
 
-        return c;
+        return Ok(c);
     }
 }
 
 impl Compiler {
     // protected fn
-    fn init_extension(&mut self, ext: &Extension) {
-        ext.init(self);
+    fn init_extension(&mut self, ext: &Extension) -> Result<(), TwigError> {
+        ext.init(self); // TODO check order - before or after registering filters, etc.?
 
-        // filters
-        for (key, value) in ext.filters() { // TODO optimize
-            self.filters.insert(key, value);
+        for (k, v) in ext.filters() {
+            if let Some(prev) = self.filters.insert(k, v) {
+                return err!(TwigErrorCode::Logic)
+                    .explain(format!("Duplicate filter {p:?} while loading extension {x:?}.",
+                        p = prev, x = ext.name()))
+                    .into();
+                }
         }
-
-        // functions
-        for (key, value) in ext.functions() { // TODO optimize
-            self.functions.insert(key, value);
+        for (k, v) in ext.functions() {
+            if let Some(prev) = self.functions.insert(k, v) {
+                return err!(TwigErrorCode::Logic)
+                    .explain(format!("Duplicate function {p:?} while loading extension {x:?}.",
+                        p = prev, x = ext.name()))
+                    .into();
+            }
         }
-
-        // tests
-        for (key, value) in ext.tests() { // TODO optimize
-            self.tests.insert(key, value);
+        for (k, v) in ext.tests() {
+            if let Some(prev) = self.tests.insert(k, v) {
+                return err!(TwigErrorCode::Logic)
+                    .explain(format!("Duplicate test {p:?} while loading extension {x:?}.",
+                        p = prev, x = ext.name()))
+                    .into();
+            }
         }
-
-        // token parsers
-        for (key, value) in ext.token_parsers() { // TODO optimize
-            self.token_parsers.insert(key, value);
+        for (k, v) in ext.token_parsers() {
+            if let Some(prev) = self.token_parsers.insert(k, v) {
+                return err!(TwigErrorCode::Logic)
+                    .explain(format!("Duplicate token parser {p:?} while loading extension {x:?}.",
+                        p = prev, x = ext.name()))
+                    .into();
+            }
         }
 
         // TODO: `vec.append()` is not yet stable ...
@@ -201,6 +205,7 @@ impl Compiler {
         for x in ext.binary_operators() { self.binary_operators.push(x) }
 
         // TODO register globals???
+        Ok(())
     }
 
     /**

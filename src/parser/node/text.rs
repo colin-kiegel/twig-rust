@@ -45,7 +45,8 @@ mod test {
     #[test]
     fn run() {
         let text = "Hello World";
-        let mut rt = Runtime::with_capacity(10, 0);
+        let mut rt = Runtime::new();
+        rt.reserve_writer(20);
         let node = Text { data: Data {
                 text: &text
             }, ..Default::default() };

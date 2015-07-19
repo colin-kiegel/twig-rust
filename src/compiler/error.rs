@@ -26,12 +26,20 @@ pub type TwigError = error::Exception<TwigErrorCode>;
 #[derive(Debug, PartialEq)]
 pub enum TwigErrorCode {
     Logic,
+    Loader,
+    Lexer,
+    Parser,
+    Runtime,
 }
 
 impl ToString for TwigErrorCode {
     fn to_string(&self) -> String {
         match *self {
             TwigErrorCode::Logic => "Logic",
+            TwigErrorCode::Loader => "Loader",
+            TwigErrorCode::Lexer => "Lexer",
+            TwigErrorCode::Parser => "Parser",
+            TwigErrorCode::Runtime => "Runtime",
         }.to_string()
     }
 }

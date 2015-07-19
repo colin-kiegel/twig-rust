@@ -19,7 +19,7 @@
 
 use regex;
 use regex::Error as regexError;
-use compiler::{UnaryOperator, BinaryOperator};
+use compiler::ext::{UnaryOperator, BinaryOperator};
 
 /////////////
 // exports //

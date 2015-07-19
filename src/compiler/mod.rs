@@ -16,9 +16,6 @@ mod test;
 use std::collections::HashMap;
 use std::path::Path;
 use template::Template;
-use lexer::Lexer;
-//use parser::Parser;
-use parser::NodeVisitor;
 
 /////////////
 // exports //
@@ -26,40 +23,45 @@ use parser::NodeVisitor;
 
 pub mod error;
 pub mod options;
-pub mod token_parser;
 pub mod builder;
 pub mod ext;
-pub use self::error::*;
+pub use self::error::{TwigError, TwigErrorCode};
 pub use self::options::Options;
-pub use self::token_parser::TokenParser;
-pub use self::ext::Extension;
 pub use self::builder::Builder;
+pub use self::ext::Extension;
+pub use lexer::{self, Lexer};
+pub use parser::{self, Parser};
+pub use runtime::{self, Runtime};
 
+
+#[derive(Debug)]
+pub struct Loader; // TODO: dummy
+impl Loader { pub fn new() -> Loader { Loader } }
 
 #[derive(Default, Debug)] // TODO - provide a different constructor
 pub struct Compiler {
     options: Options,
-    extensions: HashMap<String, Box<Extension>>, // TODO check for alternative Map-Types
+    extensions: HashMap<String, Box<ext::Extension>>, // TODO check for alternative Map-Types
     ext_staging: Option<Box<ext::Staging>>,
+    loader: Option<Loader>,
+    lexer: Option<Lexer>,
+    parser: Option<Parser>,
+    runtime: Option<Runtime>,
 
-    _loader: (),
-    _lexer: Option<Lexer>,
-    _parser: (),//Option<Parser>,
-    _compiler: (),
+    filters: HashMap<String, Box<ext::Filter>>,
+    functions: HashMap<String, Box<ext::Function>>,
+    tests: HashMap<String, Box<ext::Test>>,
+    token_parsers: HashMap<String, Box<ext::TokenParser>>,
+    node_visitors: Vec<Box<ext::NodeVisitor>>,
+    unary_operators: Vec<ext::UnaryOperator>,
+    binary_operators: Vec<ext::BinaryOperator>,
 
-    filters: HashMap<String, Box<()>>,
-    functions: HashMap<String, Box<()>>,
-    tests: HashMap<String, Box<()>>,
-    token_parsers: HashMap<String, Box<TokenParser>>,
-    node_visitors: Vec<Box<NodeVisitor>>,
-    unary_operators: Vec<()>,
-    binary_operators: Vec<()>,
-
-    _globals: Vec<()>,
-    _loaded_templates: Vec<()>,
-    _template_class_prefix: String, // default: '__TwigTemplate_'
+    _globals: Vec<Box<ext::Global>>,
     _function_callbacks: Vec<()>,
     _filter_callbacks: Vec<()>,
+
+    _template_class_prefix: String, // default: '__TwigTemplate_'
+    _loaded_templates: Vec<()>,
 }
 
 
@@ -131,21 +133,22 @@ impl Compiler {
      * @return Twig_ExtensionInterface A Twig_ExtensionInterface instance
      */
     pub fn get_extension(&self, name: &str) -> Option<&Extension> {
-        self.extensions.get(name).map(|x| ::std::ops::Deref::deref(x))
+        use std::ops::Deref;
+        self.extensions.get(name).map(|x| x.deref())
     }
 
     /// Gets the registered unary Operators.
-    pub fn unary_operators(&mut self) -> &Vec<()> {
+    pub fn unary_operators(&self) -> &Vec<ext::UnaryOperator> {
         &self.unary_operators
     }
 
     /// Gets the registered binary Operators.
-    pub fn binary_operators(&mut self) -> &Vec<()> {
+    pub fn binary_operators(&self) -> &Vec<ext::BinaryOperator> {
         &self.binary_operators
     }
 
     /// Get all registered Token Parsers.
-    pub fn token_parsers(&mut self) -> &HashMap<String, Box<TokenParser>> {
+    pub fn token_parsers(&self) -> &HashMap<String, Box<ext::TokenParser>> {
         &self.token_parsers
     }
 
@@ -174,7 +177,82 @@ impl Compiler {
      *
      * @return Twig_NodeVisitorInterface[] An array of Twig_NodeVisitorInterface instances
      */
-    pub fn node_visitors(&mut self) -> &Vec<Box<NodeVisitor>> {
+    pub fn node_visitors(&self) -> &Vec<Box<ext::NodeVisitor>> {
         &self.node_visitors
+    }
+
+    /// Sets the Lexer instance.
+    pub fn set_loader(&mut self, loader: Loader) -> &mut Compiler {
+        self.loader = Some(loader); // TODO switch to callback pattern to provide arguments
+
+        self
+    }
+
+    /// Gets the parser instance.
+    pub fn loader(&mut self) -> &Loader {
+        match self.loader {
+            Some(ref loader) => return loader,
+            None => {
+                self.loader = Some(Loader::new());
+                return self.loader();
+            }
+        }
+    }
+
+    /// Sets the Lexer instance.
+    pub fn set_lexer(&mut self, lexer: Lexer) -> &mut Compiler {
+        self.lexer = Some(lexer); // TODO switch to callback pattern to provide arguments
+
+        self
+    }
+
+    /// Gets the Lexer instance.
+    pub fn lexer(&mut self) -> Result<&Lexer, TwigError> {
+        match self.lexer {
+            Some(ref lexer) => return Ok(lexer),
+            None => {
+                self.lexer = match Lexer::new(self, lexer::Options::default()) {
+                    Err(e) => return err!(TwigErrorCode::Lexer).caused_by(e).into(),
+                    Ok(lexer) => Some(lexer)
+                };
+                return self.lexer();
+            }
+        }
+    }
+
+    /// Sets the Lexer instance.
+    pub fn set_parser(&mut self, parser: Parser) -> &mut Compiler {
+        self.parser = Some(parser); // TODO switch to callback pattern to provide arguments
+
+        self
+    }
+
+    /// Gets the parser instance.
+    pub fn parser(&mut self) -> &Parser {
+        match self.parser {
+            Some(ref parser) => return parser,
+            None => {
+                self.parser = Some(Parser::new(&self));
+                return self.parser();
+            }
+        }
+    }
+
+    /// Sets the Lexer instance.
+    pub fn set_runtime(&mut self, runtime: Runtime) -> &mut Compiler {
+        self.runtime = Some(runtime); // TODO switch to callback pattern to provide arguments
+
+        self
+    }
+
+    /// Gets the runtime instance.
+    pub fn runtime(&mut self) -> &Runtime {
+        match self.runtime {
+            Some(ref runtime) => return runtime,
+            None => {
+                self.runtime = Some(Runtime::new());
+                return self.runtime();
+            }
+        }
     }
 }

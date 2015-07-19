@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-///
+/// Extension `operator` definition
 ///
 /// @author Colin Kiegel <kiegel@gmx.de>
 
@@ -14,6 +14,9 @@
 /////////////
 // exports //
 /////////////
+
+pub type UnaryOperator = Unary;
+pub type BinaryOperator = Binary;
 
 
 #[derive(Debug, PartialEq)]
@@ -47,7 +50,7 @@ pub struct Class {
 
 /// Unary operator
 #[derive(Debug, PartialEq)]
-pub struct Unary {
+pub struct Unary { // TODO switch from struct to trait?
     pub repr: String, // token representation like "-"
     pub ext: Extension,
     pub prec: Precedence,
@@ -56,7 +59,7 @@ pub struct Unary {
 
 /// Binary operator
 #[derive(Debug, PartialEq)]
-pub struct Binary {
+pub struct Binary { // TODO switch from struct to trait?
     pub repr: String, // token representation like "!="
     pub ext: Extension,
     pub prec: Precedence,

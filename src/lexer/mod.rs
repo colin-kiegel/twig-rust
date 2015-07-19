@@ -22,7 +22,6 @@ use template;
 use compiler::Compiler;
 use lexer::job::Job;
 use lexer::job::state::TokenizeState;
-use regex::Error as regexError;
 
 /////////////
 // exports //
@@ -36,18 +35,23 @@ pub use self::patterns::Patterns;
 pub use self::patterns::options::Options;
 pub use self::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
 
+
 #[derive(PartialEq, Debug)]
 pub struct Lexer {
     patterns: Patterns,
 }
 
 impl Lexer {
-    pub fn new(compiler: Compiler, opt: Options) -> Result<Lexer, regexError> {
-        let compiler = Rc::new(compiler);
-        let opt = Rc::new(opt);
+    pub fn new(compiler: &Compiler, opt: Options) -> Result<Lexer, LexerError> {
+        let opt = Rc::new(opt); // ToDo -> switch to &Options (!)
+
+        let p = match Patterns::new(opt, compiler.unary_operators(), compiler.binary_operators()) {
+            Err(e) => return err!(LexerErrorCode::InvalidPattern).caused_by(e).into(),
+            Ok(p) => p
+        };
 
         Ok(Lexer {
-            patterns: try!(Patterns::new(compiler, opt)), // TODO Error-Handling ?
+            patterns: p,
         })
     }
 
@@ -66,6 +70,6 @@ impl Default for Lexer {
         let compiler = Compiler::default();
         let options = Options::default();
 
-        Lexer::new(compiler, options).unwrap()
+        Lexer::new(&compiler, options).unwrap()
     }
 }

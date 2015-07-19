@@ -17,10 +17,12 @@
 // imports //
 /////////////
 
+use std::iter::Iterator;
 use std::rc::Rc;
 use regex;
 use regex::Error as regexError;
 use compiler::Compiler;
+use compiler::ext::{UnaryOperator, BinaryOperator};
 
 /////////////
 // exports //
@@ -47,15 +49,14 @@ pub mod string_dq_delim;
 pub mod string_dq_part;
 pub use self::options::Options;
 
+
 //#[derive(PartialEq)]
 #[derive(Debug, PartialEq)]
 pub struct Patterns {
-    // pub options: Rc<Options>,
-    // pub compiler: Rc<Compiler>,
     pub var_end: var_end::Pattern,
     pub block_end: block_end::Pattern,
     pub verbatim_end: verbatim_end::Pattern,
-    //pub operator: operator::Pattern,
+    pub operator: operator::Pattern,
     pub comment_end: comment_end::Pattern,
     pub verbatim_start: verbatim_start::Pattern,
     pub block_line: block_line::Pattern,
@@ -72,11 +73,11 @@ pub struct Patterns {
 
 #[allow(unused_variables)]
 impl Patterns {
-    pub fn new(compiler: Rc<Compiler>, opt: Rc<Options>) -> Result<Patterns, regexError> {
+    pub fn new(opt: Rc<Options>, unary: &Vec<UnaryOperator>, binary: &Vec<BinaryOperator>) -> Result<Patterns, regexError> {
         Ok(Patterns {
             var_end: try!(var_end::Pattern::new(opt.clone())),
             verbatim_end: try!(verbatim_end::Pattern::new(opt.clone())),
-            //operator: try!(operator::Pattern::new(&env)),
+            operator: try!(operator::Pattern::new(unary, binary)),
             block_end: try!(block_end::Pattern::new(opt.clone())),
             comment_end: try!(comment_end::Pattern::new(opt.clone())),
             verbatim_start: try!(verbatim_start::Pattern::new(opt.clone())),
@@ -90,8 +91,6 @@ impl Patterns {
             string: try!(string::Pattern::new()),
             string_dq_delim: try!(string_dq_delim::Pattern::new()),
             string_dq_part: try!(string_dq_part::Pattern::new()),
-            // options: opt,
-            // compiler: compiler,
         })
     }
 }
@@ -101,7 +100,7 @@ impl<'a> Default for Patterns {
         let compiler = Rc::new(Compiler::default());
         let opt = Rc::new(Options::default());
 
-        Patterns::new(compiler, opt).unwrap()
+        Patterns::new(opt, compiler.unary_operators(), compiler.binary_operators()).unwrap()
     }
 }
 

@@ -11,6 +11,14 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
+//////////////
+// imports  //
+//////////////
+
+use compiler::Compiler;
+use lexer::token;
+use self::job::Job;
+//use compiler::ext::NodeVisitor;
 
 /////////////
 // exports //
@@ -19,35 +27,23 @@
 pub mod error;
 pub mod job;
 pub mod node;
-pub mod node_visitor;
 pub use self::error::*;
 pub use self::node::Node;
-pub use self::node_visitor::NodeVisitor;
 
-//////////////
-// imports  //
-//////////////
 
-use std::rc::Rc;
-use compiler::Compiler;
-use lexer::token;
-use self::job::Job;
+#[derive(Debug)]
+pub struct Parser;
+    //_compiler: &'a Compiler, // TODO: rm circular reference(!)
 
-pub struct Parser {
-    _compiler: Rc<Compiler>,
-}
 
 impl Parser {
-    pub fn new(compiler: Compiler) -> Parser {
-        Parser {
-            _compiler: Rc::new(compiler),
-        }
+    pub fn new(_compiler: &Compiler) -> Parser {
+        Parser
     }
 
-    pub fn _compiler(&self) -> &Compiler {
-        use std::ops::Deref;
-        self._compiler.deref()
-    }
+    // pub fn _compiler(&self) -> &Compiler {
+    //     &*self._compiler
+    // }
 
     #[allow(dead_code)] // TODO testcase
     pub fn parse<'a, 't> (&'a self, stream: &'t token::Stream<'t>) -> Result<(), ParserError>
@@ -63,6 +59,6 @@ impl Default for Parser {
     fn default() -> Parser {
         let compiler = Compiler::default();
 
-        Parser::new(compiler)
+        Parser::new(&compiler)
     }
 }
