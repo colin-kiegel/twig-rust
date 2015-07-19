@@ -22,7 +22,7 @@ use super::Extension;
 /////////////
 
 
-#[derive(Default, PartialEq)]
+#[derive(Default, Debug, PartialEq)]
 pub struct Optimizer {
     mode: Mode
 }

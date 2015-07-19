@@ -36,10 +36,8 @@ pub use self::patterns::Patterns;
 pub use self::patterns::options::Options;
 pub use self::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
 
-//#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub struct Lexer {
-    _compiler: Rc<Compiler>,
-    _options: Rc<Options>,
     patterns: Patterns,
 }
 
@@ -47,12 +45,9 @@ impl Lexer {
     pub fn new(compiler: Compiler, opt: Options) -> Result<Lexer, regexError> {
         let compiler = Rc::new(compiler);
         let opt = Rc::new(opt);
-        let patterns = try!(Patterns::new(compiler.clone(), opt.clone())); // TODO Error-Handling ?
 
         Ok(Lexer {
-            _compiler: compiler,
-            _options: opt,
-            patterns: patterns,
+            patterns: try!(Patterns::new(compiler, opt)), // TODO Error-Handling ?
         })
     }
 

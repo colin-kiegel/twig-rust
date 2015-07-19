@@ -11,11 +11,14 @@
 // imports //
 /////////////
 
+#[cfg(test)]
+mod test;
 use std::collections::HashMap;
 use std::path::Path;
 use template::Template;
 use lexer::Lexer;
 //use parser::Parser;
+use parser::NodeVisitor;
 
 /////////////
 // exports //
@@ -23,41 +26,40 @@ use lexer::Lexer;
 
 pub mod error;
 pub mod options;
-pub mod parser_broker;
-pub mod factory;
-pub mod extension;
+pub mod token_parser;
+pub mod builder;
+pub mod ext;
 pub use self::error::*;
 pub use self::options::Options;
-pub use self::parser_broker::ParserBroker;
-pub use self::extension::Extension;
-pub use self::factory::Factory;
+pub use self::token_parser::TokenParser;
+pub use self::ext::Extension;
+pub use self::builder::Builder;
 
 
-#[derive(Default)]
+#[derive(Default, Debug)] // TODO - provide a different constructor
 pub struct Compiler {
-    // options: Options,
-    // auto_reload: bool,
+    options: Options,
+    extensions: HashMap<String, Box<Extension>>, // TODO check for alternative Map-Types
+    ext_staging: Option<Box<ext::Staging>>,
+
     _loader: (),
     _lexer: Option<Lexer>,
     _parser: (),//Option<Parser>,
     _compiler: (),
 
-    extensions: HashMap<String, Box<Extension>>, // TODO check for alternative Map-Types
-
-    parsers: Vec<()>,
-    visitors: Vec<()>,
-    _filters: Vec<()>,
-    _tests: Vec<()>,
-    _functions: Vec<()>,
-    _globals: Vec<()>,
+    filters: HashMap<String, Box<()>>,
+    functions: HashMap<String, Box<()>>,
+    tests: HashMap<String, Box<()>>,
+    token_parsers: HashMap<String, Box<TokenParser>>,
+    node_visitors: Vec<Box<NodeVisitor>>,
     unary_operators: Vec<()>,
     binary_operators: Vec<()>,
 
+    _globals: Vec<()>,
     _loaded_templates: Vec<()>,
     _template_class_prefix: String, // default: '__TwigTemplate_'
     _function_callbacks: Vec<()>,
     _filter_callbacks: Vec<()>,
-    staging: Box<extension::Staging>,
 }
 
 
@@ -143,8 +145,8 @@ impl Compiler {
     }
 
     /// Get all registered Token Parsers.
-    pub fn token_parsers(&mut self) -> &Vec<()> {
-        &self.parsers
+    pub fn token_parsers(&mut self) -> &HashMap<String, Box<TokenParser>> {
+        &self.token_parsers
     }
 
     /**
@@ -172,7 +174,7 @@ impl Compiler {
      *
      * @return Twig_NodeVisitorInterface[] An array of Twig_NodeVisitorInterface instances
      */
-    pub fn node_visitors(&mut self) -> &Vec<()> {
-        &self.visitors
+    pub fn node_visitors(&mut self) -> &Vec<Box<NodeVisitor>> {
+        &self.node_visitors
     }
 }

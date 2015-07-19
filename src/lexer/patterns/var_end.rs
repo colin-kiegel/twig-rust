@@ -28,7 +28,7 @@ use std::rc::Rc;
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Pattern {
     regex: regex::Regex,
     options: Rc<Options>,

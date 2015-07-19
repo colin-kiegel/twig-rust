@@ -29,7 +29,7 @@ use std::rc::Rc;
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 pub use super::verbatim_start::Tag; // enum {Raw, Verbatim}
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Pattern {
     regex: regex::Regex,
     options: Rc<Options>,

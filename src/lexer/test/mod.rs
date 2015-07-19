@@ -1,15 +1,11 @@
-/*
- * This file is part of Twig (ported to Rust).
- *
- * For the copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+// This file is part of Twig (ported to Rust).
+//
+// For the copyright and license information, please view the LICENSE
+// file that was distributed with this source code.
 
-/**
- * Lexes a template string.
- *
- * @author Colin Kiegel <kiegel@gmx.de>
- */
+/// Lexer Tests
+///
+/// @author Colin Kiegel <kiegel@gmx.de>
 
 /////////////
 // imports //
@@ -21,6 +17,11 @@ use std::rc::Rc;
 use lexer::token::Token;
 use lexer::token::Punctuation;
 use lexer::LexerError;
+
+/////////////
+// exports //
+/////////////
+
 
 //static TWIG_TEMPLATE_Token::Name : &'static str = "twig.template.html";
 static TWIG_TEMPLATE_CODE : &'static str = include_str!("twig.template.html");

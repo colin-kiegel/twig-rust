@@ -30,7 +30,7 @@ pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 pub use lexer::error::{LexerError, LexerErrorCode};
 
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Pattern {
     regex: regex::Regex,
     options: Rc<Options>,

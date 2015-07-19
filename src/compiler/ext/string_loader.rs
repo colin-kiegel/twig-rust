@@ -6,7 +6,7 @@
  */
 
 /**
- * Profiler Extension
+ * String Loader Extension
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
@@ -23,15 +23,15 @@ use super::Extension;
 
 
 #[allow(dead_code)] // dummy
-#[derive(Default, PartialEq)]
-pub struct Profiler;
+#[derive(Default, Debug, PartialEq)]
+pub struct StringLoader;
 
-impl Extension for Profiler {
-    fn name(&self) -> &str { "profiler" }
+impl Extension for StringLoader {
+    fn name(&self) -> &str { "string_loader" }
 }
 
-impl Profiler {
-    pub fn _new() -> Box<Profiler> {
-        Box::new(Profiler)
+impl StringLoader {
+    pub fn _new() -> Box<StringLoader> {
+        Box::new(StringLoader)
     }
 }

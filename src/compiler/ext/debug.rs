@@ -6,7 +6,7 @@
  */
 
 /**
- * Staging Extension
+ * Debug Extension
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
@@ -23,15 +23,15 @@ use super::Extension;
 
 
 #[allow(dead_code)] // dummy
-#[derive(Default, PartialEq)]
-pub struct Staging;
+#[derive(Default, Debug, PartialEq)]
+pub struct Debug;
 
-impl Extension for Staging {
-    fn name(&self) -> &str { "staging" }
+impl Extension for Debug {
+    fn name(&self) -> &str { "debug" }
 }
 
-impl Staging {
-    pub fn new() -> Box<Staging> {
-        Box::new(Staging)
+impl Debug {
+    pub fn _new() -> Box<Debug> {
+        Box::new(Debug)
     }
 }

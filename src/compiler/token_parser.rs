@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Parser broker
+/// Token parser
 ///
 /// @author Colin Kiegel <kiegel@gmx.de>
 
@@ -11,8 +11,10 @@
 // imports //
 /////////////
 
+use std::fmt::Debug;
+
 /////////////
 // exports //
 /////////////
 
-pub trait ParserBroker {}
+pub trait TokenParser : Debug {}

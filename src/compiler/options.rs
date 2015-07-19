@@ -15,15 +15,19 @@
 // imports //
 /////////////
 
-use compiler::extension::escaper;
-use compiler::extension::optimizer;
+use std::path::{Path, PathBuf};
+use compiler::ext::escaper;
+use compiler::ext::optimizer;
 
 /////////////
 // exports //
 /////////////
 
+pub type Autoescape = escaper::Mode;
+pub type Optimizations = optimizer::Mode;
 
-#[derive(Debug, PartialEq)]
+
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Charset {
     UTF8
 }
@@ -36,40 +40,13 @@ impl Default for Charset {
 
 #[derive(Debug, PartialEq)]
 pub struct Options {
-    /// debug: When set to true, it automatically set "auto_reload" to true as
-    ///     well (default to false).
     pub debug: bool,
-
-    /// charset: The charset used by the templates (default to UTF-8).
     pub charset: Charset,
-
-    /// base_template_class: The base template class to use for generated
-    ///     templates (default to Twig_Template).
-    ///     TODO: We can remove that - since we will not support this kind of code-generation
-    pub _base_template_class: String,
-
-    /// strict_variables: Whether to ignore invalid variables in templates
-    ///     (default to false).
     pub strict_variables: bool,
-
-    /// autoescape: Whether to enable auto-escaping (default to html):
-    ///     * false: disable auto-escaping
-    ///     * true: equivalent to html
-    ///     * html, js: set the autoescaping to one of the supported strategies
-    ///     * filename: set the autoescaping strategy based on the template filename extension
-    ///     * PHP callback: a PHP callback that returns an escaping strategy based on the template "filename"
-    pub autoescape: escaper::Mode,
-
-    /// cache: An absolute path where to store the compiled templates (optional)
-    pub cache: Option<String>,
-
-    /// auto_reload: Whether to reload the template if the original source changed (optional).
-    ///     If you don't provide the auto_reload option, it will be
-    ///     determined automatically based on the debug value.
-    pub auto_reload: Option<bool>,
-
-    /// optimizations: A flag that indicates whether optimizations are applied
-    pub optimizations: optimizer::Mode,
+    pub autoescape: Autoescape,
+    pub cache: Option<PathBuf>,
+    pub auto_reload: Option<bool>, // defaults to `self.debug` if set to `None`
+    pub optimizations: Optimizations,
 }
 
 impl Default for Options {
@@ -77,12 +54,46 @@ impl Default for Options {
         Options {
             debug: false,
             charset: Charset::default(),
-            _base_template_class: "Twig_Template".to_string(),
             strict_variables: false,
             autoescape: escaper::Mode::default(),
             cache: None,
             auto_reload: None,
             optimizations: optimizer::Mode::default(),
         }
+    }
+}
+
+impl Options {
+    pub fn debug(&self) -> bool {
+        self.debug
+    }
+
+    pub fn charset(&self) -> Charset {
+        self.charset
+    }
+
+    pub fn strict_variables(&self) -> bool {
+        self.strict_variables
+    }
+
+    pub fn autoescape(&self) -> Autoescape {
+        self.autoescape
+    }
+
+    pub fn cache(&self) -> Option<&Path> {
+        // TODO: why doesn't this work? -> self.cache.map(|ref buf| buf.as_ref())
+        match self.cache {
+            Some(ref buf) => Some(buf.as_ref()),
+            None => None
+        }
+    }
+
+    /// if unset it defaults to `self.debug()`
+    pub fn auto_reload(&self) -> bool {
+        self.auto_reload.unwrap_or(self.debug)
+    }
+
+    pub fn optimizations(&self) -> Optimizations {
+        self.optimizations
     }
 }

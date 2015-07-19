@@ -48,9 +48,10 @@ pub mod string_dq_part;
 pub use self::options::Options;
 
 //#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Patterns {
-    pub options: Rc<Options>,
-    pub compiler: Rc<Compiler>,
+    // pub options: Rc<Options>,
+    // pub compiler: Rc<Compiler>,
     pub var_end: var_end::Pattern,
     pub block_end: block_end::Pattern,
     pub verbatim_end: verbatim_end::Pattern,
@@ -89,8 +90,8 @@ impl Patterns {
             string: try!(string::Pattern::new()),
             string_dq_delim: try!(string_dq_delim::Pattern::new()),
             string_dq_part: try!(string_dq_part::Pattern::new()),
-            options: opt,
-            compiler: compiler,
+            // options: opt,
+            // compiler: compiler,
         })
     }
 }

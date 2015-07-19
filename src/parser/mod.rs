@@ -11,14 +11,6 @@
  * @author Colin Kiegel <kiegel@gmx.de>
  */
 
-//////////////
-// imports  //
-//////////////
-
-use std::rc::Rc;
-use compiler::Compiler;
-use lexer::token;
-use self::job::Job;
 
 /////////////
 // exports //
@@ -32,6 +24,14 @@ pub use self::error::*;
 pub use self::node::Node;
 pub use self::node_visitor::NodeVisitor;
 
+//////////////
+// imports  //
+//////////////
+
+use std::rc::Rc;
+use compiler::Compiler;
+use lexer::token;
+use self::job::Job;
 
 pub struct Parser {
     _compiler: Rc<Compiler>,

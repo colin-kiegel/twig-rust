@@ -6,7 +6,7 @@
  */
 
 /**
- * Core Extension
+ * Sandbox Extension
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
@@ -23,15 +23,15 @@ use super::Extension;
 
 
 #[allow(dead_code)] // dummy
-#[derive(Default, PartialEq)]
-pub struct Core;
+#[derive(Default, Debug, PartialEq)]
+pub struct Sandbox;
 
-impl Extension for Core {
-    fn name(&self) -> &str { "core" }
+impl Extension for Sandbox {
+    fn name(&self) -> &str { "sandbox" }
 }
 
-impl Core {
-    pub fn new() -> Box<Core> {
-        Box::new(Core)
+impl Sandbox {
+    pub fn _new() -> Box<Sandbox> {
+        Box::new(Sandbox)
     }
 }

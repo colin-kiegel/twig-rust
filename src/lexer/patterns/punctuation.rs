@@ -24,7 +24,7 @@
 pub use lexer::token::{Punctuation, BracketType};
 
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 pub struct Pattern;
 
 impl Pattern {
