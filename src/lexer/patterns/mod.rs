@@ -32,7 +32,7 @@ use compiler::ext::{UnaryOperator, BinaryOperator};
 pub mod macros;
 pub mod options;
 pub mod token_start; // var, comment, block
-pub mod var_end;
+pub mod expression_end;
 pub mod comment_end;
 pub mod block_end;
 pub mod block_line;
@@ -53,7 +53,7 @@ pub use self::options::Options;
 //#[derive(PartialEq)]
 #[derive(Debug, PartialEq)]
 pub struct Patterns {
-    pub var_end: var_end::Pattern,
+    pub expression_end: expression_end::Pattern,
     pub block_end: block_end::Pattern,
     pub verbatim_end: verbatim_end::Pattern,
     pub operator: operator::Pattern,
@@ -75,7 +75,7 @@ pub struct Patterns {
 impl Patterns {
     pub fn new(opt: Rc<Options>, unary: &Vec<UnaryOperator>, binary: &Vec<BinaryOperator>) -> Result<Patterns, regexError> {
         Ok(Patterns {
-            var_end: try!(var_end::Pattern::new(opt.clone())),
+            expression_end: try!(expression_end::Pattern::new(opt.clone())),
             verbatim_end: try!(verbatim_end::Pattern::new(opt.clone())),
             operator: try!(operator::Pattern::new(unary, binary)),
             block_end: try!(block_end::Pattern::new(opt.clone())),
@@ -100,7 +100,7 @@ impl<'a> Default for Patterns {
         let compiler = Rc::new(Compiler::default());
         let opt = Rc::new(Options::default());
 
-        Patterns::new(opt, compiler.unary_operators(), compiler.binary_operators()).unwrap()
+        Patterns::new(opt, compiler.operators_unary(), compiler.operators_binary()).unwrap()
     }
 }
 

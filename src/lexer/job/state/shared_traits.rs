@@ -39,7 +39,7 @@ pub trait LexExpression where
         if job.cursor.is_eof() {
             let error_code = match Self::state() {
                 state::Code::Block => SyntaxErrorCode::UnclosedBlock,
-                state::Code::Var => SyntaxErrorCode::UnclosedVariable,
+                state::Code::Expression => SyntaxErrorCode::UnclosedVariable,
                 _ => SyntaxErrorCode::Unknown, // should be unreachable
             };
 

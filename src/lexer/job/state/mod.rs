@@ -26,14 +26,14 @@ pub mod shared_traits;
 pub mod initial;
 pub mod data;
 pub mod block;
-pub mod var;
+pub mod expression;
 pub mod string;
 pub mod interpolation;
 pub mod _final;
 pub use self::initial::Initial;
 pub use self::data::Data;
 pub use self::block::Block;
-pub use self::var::Var;
+pub use self::expression::Expression;
 pub use self::string::String;
 pub use self::interpolation::Interpolation;
 pub use self::_final::Final;
@@ -58,7 +58,7 @@ pub trait TokenizeState {
 pub enum Code {
     Data            = 0,
     Block           = 1,
-    Var             = 2,
+    Expression      = 2, // orig: var
     String          = 3,
     Interpolation   = 4,
     Initial         = -1, // orig: implicit sub-state of Data

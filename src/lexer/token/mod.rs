@@ -30,9 +30,9 @@ pub enum Token {
     _Eof,
     Text(String),
     BlockStart,
-    VarStart,
+    ExpressionStart, // orig. Var
     BlockEnd,
-    VarEnd,
+    ExpressionEnd,
     Name(String),
     IntegerNumber(u64), // orig. Number
     FloatingNumber(f64), // orig. Number
@@ -64,13 +64,13 @@ pub enum BracketType {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Type {
+pub enum Type { // TODO - remove ?
     Eof                = -1,
     Text               = 0,
     BlockStart         = 1,
-    VarStart           = 2,
+    ExpressionStart    = 2,
     BlockEnd           = 3,
-    VarEnd             = 4,
+    ExpressionEnd      = 4,
     Name               = 5,
     Number             = 6, // Floating or Integer
     String             = 7,
@@ -88,9 +88,9 @@ impl Token {
             Token::_Eof => None,
             Token::Text(ref x) => Some(x.to_string()),
             Token::BlockStart => None,
-            Token::VarStart => None,
+            Token::ExpressionStart => None,
             Token::BlockEnd => None,
-            Token::VarEnd => None,
+            Token::ExpressionEnd => None,
             Token::Name(ref x) => Some(x.to_string()),
             Token::IntegerNumber(ref x) => Some(x.to_string()),
             Token::FloatingNumber(ref x) => Some(x.to_string()),
@@ -107,9 +107,9 @@ impl Token {
             Token::_Eof => Type::Eof,
             Token::Text(_) => Type::Text,
             Token::BlockStart => Type::BlockStart,
-            Token::VarStart => Type::VarStart,
+            Token::ExpressionStart => Type::ExpressionStart,
             Token::BlockEnd => Type::BlockEnd,
-            Token::VarEnd => Type::VarEnd,
+            Token::ExpressionEnd => Type::ExpressionEnd,
             Token::Name(_) => Type::Name,
             Token::IntegerNumber(_) => Type::Number,
             Token::FloatingNumber(_) => Type::Number,
@@ -157,9 +157,9 @@ impl Type {
             Type::Eof => "EOF",
             Type::Text => "TEXT",
             Type::BlockStart => "BLOCK_START",
-            Type::VarStart => "VAR_START",
+            Type::ExpressionStart => "EXPRESSION_START",
             Type::BlockEnd => "BLOCK_END",
-            Type::VarEnd => "VAR_END",
+            Type::ExpressionEnd => "EXPRESSION_END",
             Type::Name => "NAME",
             Type::Number => "NUMBER",
             Type::String => "STRING",
@@ -183,9 +183,9 @@ impl Type {
             Type::Eof => "end of template",
             Type::Text => "text",
             Type::BlockStart => "begin of statement block",
-            Type::VarStart => "begin of print statement",
+            Type::ExpressionStart => "begin of print expression",
             Type::BlockEnd => "end of statement block",
-            Type::VarEnd => "end of print statement",
+            Type::ExpressionEnd => "end of print expression",
             Type::Name => "name",
             Type::Number => "number",
             Type::String => "string",

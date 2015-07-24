@@ -24,19 +24,19 @@ use super::shared_traits::LexExpression;
 
 
 #[allow(dead_code)] // TODO dummy
-pub struct Var;
+pub struct Expression;
 
-impl TokenizeState for Var {
+impl TokenizeState for Expression {
     fn state() -> Code {
-        Code::Var
+        Code::Expression
     }
 
     fn tokenize<'a>(job: &'a mut Job) -> Result<(),LexerError> {
         if job.brackets.is_empty() {
-            match job.patterns.var_end.extract(job.cursor.tail()) {
+            match job.patterns.expression_end.extract(job.cursor.tail()) {
                 Some(item) => {
                     job.cursor.move_by(item.position.1);
-                    job.push_token(Token::VarEnd);
+                    job.push_token(Token::ExpressionEnd);
 
                     return Ok(());//try!(job.pop_state()).tokenize(job);
                 },
@@ -48,4 +48,4 @@ impl TokenizeState for Var {
     }
 }
 
-impl LexExpression for Var {}
+impl LexExpression for Expression {}

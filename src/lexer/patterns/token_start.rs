@@ -45,7 +45,7 @@ pub struct ItemData {
 pub enum Tag {
     Block,
     Comment,
-    Variable,
+    Expression,
 }
 
 impl Pattern {
@@ -55,7 +55,7 @@ impl Pattern {
                 ws = opt.whitespace_trim.quoted(),
                 b0 = opt.tag_block_start.quoted(),
                 c0 = opt.tag_comment_start.quoted(),
-                v0 = opt.tag_variable_start.quoted())),
+                v0 = opt.tag_expression_start.quoted())),
             options: opt,
         })
     }   // orig: '/('.$tag_variable[0].'|'.$tag_block[0].'|'.$tag_comment[0].')('.$whitespace_trim.')?/s'
@@ -81,7 +81,7 @@ impl<'t> super::Extract<'t> for Pattern {
             tag: match captures.at(1) {
                 Some(x) if x == self.options.tag_block_start.raw()    => Tag::Block,
                 Some(x) if x == self.options.tag_comment_start.raw()  => Tag::Comment,
-                Some(x) if x == self.options.tag_variable_start.raw() => Tag::Variable,
+                Some(x) if x == self.options.tag_expression_start.raw() => Tag::Expression,
                 _ => unreachable!(),
             },
         }
@@ -120,7 +120,7 @@ mod test {
             Some(ItemData {
                 position: (0,3),
                 whitespace_trim: true,
-                tag: Tag::Variable
+                tag: Tag::Expression
             }));
 
         assert_eq!(
@@ -128,7 +128,7 @@ mod test {
             Some(ItemData {
                 position: (0,2),
                 whitespace_trim: false,
-                tag: Tag::Variable
+                tag: Tag::Expression
             }));
     }
 }

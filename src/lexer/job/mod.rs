@@ -36,7 +36,7 @@ pub mod state;
 pub struct Job<'a> {
     patterns: &'a Patterns,
     _template: &'a template::Raw,
-    current_var_block_line: usize,
+    current_exp_block_line: usize,
     tokens: token::Stream<'a>,
     cursor: template::raw::Cursor<'a>,
     _position: usize,
@@ -58,7 +58,7 @@ impl<'a> Job<'a> {
             cursor: cursor,
             token_start_iter: token_start_iter,
             _position: 0,
-            current_var_block_line: 0,
+            current_exp_block_line: 0,
             brackets: Vec::default(),
         })
     }

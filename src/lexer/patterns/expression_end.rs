@@ -6,7 +6,7 @@
  */
 
 /**
- * The `var` pattern used by the lexer to tokenize the templates.
+ * The `expression` pattern used by the lexer to tokenize the templates.
  *
  * Written as regular expressions (perl-style).
  *

@@ -35,7 +35,7 @@ pub struct Options {
     pub tag_block_end:          OptionData,
     pub tag_comment_start:      OptionData,
     pub tag_comment_end:        OptionData,
-    pub tag_variable_start:     OptionData,
+    pub tag_expression_start:     OptionData,
     pub tag_variable_end:       OptionData,
     pub whitespace_trim:        OptionData,
 }
@@ -68,7 +68,7 @@ impl Default for Options {
             tag_block_end       : "%}".into(),
             tag_comment_start   : "{#".into(),
             tag_comment_end     : "#}".into(),
-            tag_variable_start  : "{{".into(),
+            tag_expression_start  : "{{".into(),
             tag_variable_end    : "}}".into(),
             whitespace_trim     : "-".into(),
         }
@@ -89,7 +89,7 @@ mod test {
             tag_block_end       : OptionData { raw: "%}".into(), quoted: r"%\}".into()},
             tag_comment_start   : OptionData { raw: "{#".into(), quoted: r"\{\#".into()},
             tag_comment_end     : OptionData { raw: "#}".into(), quoted: r"\#\}".into()},
-            tag_variable_start  : OptionData { raw: "{{".into(), quoted: r"\{\{".into()},
+            tag_expression_start  : OptionData { raw: "{{".into(), quoted: r"\{\{".into()},
             tag_variable_end    : OptionData { raw: "}}".into(), quoted: r"\}\}".into()},
             whitespace_trim     : OptionData { raw: "-".into(),  quoted: r"-".into()},
         };

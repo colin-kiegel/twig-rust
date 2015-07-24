@@ -83,7 +83,7 @@ impl TokenizeState for Data {
                                 return Self::tokenize(job);
                             },
                             _ => {
-                                job.current_var_block_line = job.cursor.line();
+                                job.current_exp_block_line = job.cursor.line();
                                 job.push_token(Token::BlockStart);
                                 try!(state::Block::tokenize(job));
 
@@ -93,10 +93,10 @@ impl TokenizeState for Data {
                     },
                 }
             },
-            token_start::Tag::Variable => {
-                job.current_var_block_line = job.cursor.line();
-                job.push_token(Token::VarStart);
-                try!(state::Var::tokenize(job));
+            token_start::Tag::Expression => {
+                job.current_exp_block_line = job.cursor.line();
+                job.push_token(Token::ExpressionStart);
+                try!(state::Expression::tokenize(job));
 
                 return Self::tokenize(job);
             }
@@ -233,9 +233,9 @@ mod test {
             " foo bar  {{ x }} baz",
             vec![
                 Token::Text(" foo bar  ".to_string()),
-                Token::VarStart,
+                Token::ExpressionStart,
                 Token::Name("x".to_string()),
-                Token::VarEnd,
+                Token::ExpressionEnd,
                 Token::Text(" baz".to_string()),
             ]);
     }
