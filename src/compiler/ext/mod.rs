@@ -90,12 +90,12 @@ pub trait Extension : ::std::fmt::Debug {
     }
 
     /// Get the unary operators to register with the compiler.
-    fn unary_operators(&self) -> Vec<UnaryOperator> {
+    fn operators_unary(&self) -> Vec<UnaryOperator> {
         Vec::new()
     }
 
     /// Get the binary operators to register with the compiler.
-    fn binary_operators(&self) -> Vec<BinaryOperator> {
+    fn operators_binary(&self) -> Vec<BinaryOperator> {
         Vec::new()
     }
 

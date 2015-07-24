@@ -31,6 +31,7 @@ pub mod error;
 pub mod token;
 pub mod job;
 pub mod patterns;
+pub use self::token::Token;
 pub use self::patterns::Patterns;
 pub use self::patterns::options::Options;
 pub use self::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
@@ -45,7 +46,7 @@ impl Lexer {
     pub fn new(compiler: &Compiler, opt: Options) -> Result<Lexer, LexerError> {
         let opt = Rc::new(opt); // ToDo -> switch to &Options (!)
 
-        let p = match Patterns::new(opt, compiler.unary_operators(), compiler.binary_operators()) {
+        let p = match Patterns::new(opt, compiler.operators_unary(), compiler.operators_binary()) {
             Err(e) => return err!(LexerErrorCode::InvalidPattern).caused_by(e).into(),
             Ok(p) => p
         };

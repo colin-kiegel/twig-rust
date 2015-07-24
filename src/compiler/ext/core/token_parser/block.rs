@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Extension `token parser` definition
+///
 ///
 /// @author Colin Kiegel <kiegel@gmx.de>
 
@@ -11,7 +11,7 @@
 // imports //
 /////////////
 
-use std::fmt::Debug;
+use compiler::ext::TokenParser;
 use parser::{self, Parser};
 use lexer;
 
@@ -19,9 +19,15 @@ use lexer;
 // exports //
 /////////////
 
-pub trait TokenParser : Debug {
-    fn tag(&self) -> &'static str;
+#[derive(Debug, Default)]
+pub struct Block;
 
-    fn parse(&self, parser: Parser, token: lexer::Token) -> Box<parser::Node>;
+impl TokenParser for Block {
+    fn tag(&self) -> &'static str {
+        "block"
+    }
 
+    fn parse(&self, _parser: Parser, _token: lexer::Token) -> Box<parser::Node> {
+        unimplemented!()
+    }
 }

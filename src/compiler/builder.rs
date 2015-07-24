@@ -201,8 +201,8 @@ impl Compiler {
 
         // TODO: `vec.append()` is not yet stable ...
         for x in ext.node_visitors() { self.node_visitors.push(x) }
-        for x in ext.unary_operators() { self.unary_operators.push(x) }
-        for x in ext.binary_operators() { self.binary_operators.push(x) }
+        for x in ext.operators_unary() { self.operators_unary.push(x) }
+        for x in ext.operators_binary() { self.operators_binary.push(x) }
 
         // TODO register globals???
         Ok(())

@@ -53,8 +53,8 @@ pub struct Compiler {
     tests: HashMap<String, Box<ext::Test>>,
     token_parsers: HashMap<String, Box<ext::TokenParser>>,
     node_visitors: Vec<Box<ext::NodeVisitor>>,
-    unary_operators: Vec<ext::UnaryOperator>,
-    binary_operators: Vec<ext::BinaryOperator>,
+    operators_unary: Vec<ext::UnaryOperator>,
+    operators_binary: Vec<ext::BinaryOperator>,
 
     _globals: Vec<Box<ext::Global>>,
     _function_callbacks: Vec<()>,
@@ -138,13 +138,13 @@ impl Compiler {
     }
 
     /// Gets the registered unary Operators.
-    pub fn unary_operators(&self) -> &Vec<ext::UnaryOperator> {
-        &self.unary_operators
+    pub fn operators_unary(&self) -> &Vec<ext::UnaryOperator> {
+        &self.operators_unary
     }
 
     /// Gets the registered binary Operators.
-    pub fn binary_operators(&self) -> &Vec<ext::BinaryOperator> {
-        &self.binary_operators
+    pub fn operators_binary(&self) -> &Vec<ext::BinaryOperator> {
+        &self.operators_binary
     }
 
     /// Get all registered Token Parsers.
