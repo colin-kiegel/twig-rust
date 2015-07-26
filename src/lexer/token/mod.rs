@@ -37,7 +37,7 @@ pub enum Token {
     IntegerNumber(u64), // orig. Number
     FloatingNumber(f64), // orig. Number
     String(String),
-    _Operator(String),
+    Operator(String),
     Punctuation(Punctuation),
     _InterpolationStart,
     _InterpolationEnd,
@@ -83,7 +83,7 @@ pub enum Type { // TODO - remove ?
 #[allow(unused_variables)]
 impl Token {
     // Because of Number Types we need to return `String` copys instead of `&'a str`
-    pub fn get_value<'a>(&'a self) -> Option<String> {
+    pub fn value<'a>(&'a self) -> Option<String> {
         match *self {
             Token::_Eof => None,
             Token::Text(ref x) => Some(x.to_string()),
@@ -95,7 +95,7 @@ impl Token {
             Token::IntegerNumber(ref x) => Some(x.to_string()),
             Token::FloatingNumber(ref x) => Some(x.to_string()),
             Token::String(ref x) => Some(x.to_string()),
-            Token::_Operator(ref x) => Some(x.to_string()),
+            Token::Operator(ref x) => Some(x.to_string()),
             Token::Punctuation(ref x) => Some(format!("{:?}",x)),
             Token::_InterpolationStart => None,
             Token::_InterpolationEnd => None,
@@ -114,7 +114,7 @@ impl Token {
             Token::IntegerNumber(_) => Type::Number,
             Token::FloatingNumber(_) => Type::Number,
             Token::String(_) => Type::String,
-            Token::_Operator(_) => Type::Operator,
+            Token::Operator(_) => Type::Operator,
             Token::Punctuation(_) => Type::Punctuation,
             Token::_InterpolationStart => Type::InterpolationStart,
             Token::_InterpolationEnd => Type::InterpolationEnd,
@@ -129,15 +129,15 @@ impl Token {
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let typ = self.get_type().get_name(true);
+        let typ = self.get_type().name(true);
         write!(f, "{}", typ)
     }
 }
 
 impl fmt::Debug for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let typ = self.get_type().get_name(true);
-        match self.get_value() {
+        let typ = self.get_type().name(true);
+        match self.value() {
             Some(ref val) => write!(f, "{typ}({val:?})", typ = typ, val = val),
             None          => write!(f, "{typ}", typ = typ),
         }
@@ -152,7 +152,7 @@ impl Type {
     ///
     /// * `short` - short or long representation
 
-    pub fn get_name(&self, short: bool) -> String {
+    pub fn name(&self, short: bool) -> String {
          let name = match *self {
             Type::Eof => "EOF",
             Type::Text => "TEXT",
@@ -178,7 +178,7 @@ impl Type {
 
     /// Returns the description of the token type in plain english.
 
-    pub fn _get_description(&self) -> String {
+    pub fn _description(&self) -> String {
          match *self {
             Type::Eof => "end of template",
             Type::Text => "text",
@@ -199,7 +199,7 @@ impl Type {
 
 impl ToString for Type {
     fn to_string(&self) -> String {
-         self.get_name(true)
+         self.name(true)
     }
 }
 
@@ -210,7 +210,7 @@ mod test {
     #[test]
     fn new_token() {
         let token = Token::Text("Hello World!".to_string());
-        assert_eq!(token.get_value().unwrap(), "Hello World!".to_string());
+        assert_eq!(token.value().unwrap(), "Hello World!".to_string());
         assert!(token.is_type(Type::Text));
     }
 }

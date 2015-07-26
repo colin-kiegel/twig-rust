@@ -26,12 +26,13 @@ use runtime::NodeOutput;
 
 pub mod text;
 pub use self::text::Text;
+pub use lexer::token::stream::Position;
 
 type NodeDataAttibutes = HashMap<String, String>;
 
 pub trait Node : Debug {
     fn tag(&self) -> &str;
-    fn line(&self) -> usize;
+    fn position(&self) -> &Position;
     fn children(&self) -> &Vec<Box<Node>>;
     fn has_attribute(&self, key: &str) -> bool;
     fn get_attribute(&self, key: &str) -> Result<&str, NodeError>;
@@ -43,7 +44,7 @@ pub trait Node : Debug {
 #[derive(Debug, Default)]
 pub struct GenericNode<T> {
     tag: String,
-    lineno: usize, // or better cursor or position?
+    position: Position,
     nodes: Vec<Box<Node>>, // ??
     attributes: NodeDataAttibutes,
     data: T,
@@ -54,8 +55,8 @@ impl<T> Node for GenericNode<T> where
     T: Debug,
     GenericNode<T>: NodeOutput
 {
-    fn line(&self) -> usize {
-        self.lineno
+    fn position(&self) -> &Position {
+        &self.position
     }
 
     fn tag(&self) -> &str {

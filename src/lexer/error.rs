@@ -40,7 +40,7 @@ pub enum SyntaxErrorCode {
 
 #[derive(Debug, PartialEq)]
 pub enum LexerErrorCode {
-    _Logic,
+    Logic,
     InvalidPattern,
     _InvalidPatternMatch,
     InvalidValue,
@@ -81,7 +81,7 @@ impl ToString for SyntaxErrorCode {
 impl ToString for LexerErrorCode {
     fn to_string(&self) -> String {
         match *self {
-            LexerErrorCode::_Logic => "Logic",
+            LexerErrorCode::Logic => "Logic",
             LexerErrorCode::InvalidPattern => "InvalidPattern",
             LexerErrorCode::_InvalidPatternMatch => "InvalidPatternMatch",
             LexerErrorCode::InvalidValue => "InvalidValue",

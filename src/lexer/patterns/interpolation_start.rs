@@ -40,11 +40,11 @@ pub struct ItemData {
 }
 
 impl Pattern {
-    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new(opt: &Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A{i0}\s*",
                 i0 = opt.interpolation_start.quoted())),
-            options: opt,
+            options: (*opt).clone(),
         })
     }   // orig: '/'.$interpolation[0].'\s*/A'
 }
@@ -82,7 +82,7 @@ mod test {
 
     #[test]
     pub fn as_str() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
@@ -93,7 +93,7 @@ mod test {
 
     #[test]
     pub fn extract() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(

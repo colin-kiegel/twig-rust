@@ -40,12 +40,12 @@ pub struct ItemData {
 }
 
 impl Pattern {
-    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new(opt: &Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"(?:{ws}{c1}\s*|{c1})\n?",
                 ws = opt.whitespace_trim.quoted(),
                 c1 = opt.tag_comment_end.quoted())),
-            options: opt,
+            options: (*opt).clone(),
         })
     }   // orig: '/(?:'.$whitespace_trim.$tag_comment[1].'\s*|'.$tag_comment[1].')\n?/s'
 }
@@ -83,7 +83,7 @@ mod test {
 
     #[test]
     pub fn as_str() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
@@ -94,7 +94,7 @@ mod test {
 
     #[test]
     pub fn extract() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(

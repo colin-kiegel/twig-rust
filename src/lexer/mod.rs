@@ -19,7 +19,7 @@ use std::rc::Rc;
 #[cfg(test)]
 mod test;
 use template;
-use compiler::Compiler;
+use compiler::{Compiler, ExtensionRegistry};
 use lexer::job::Job;
 use lexer::job::state::TokenizeState;
 
@@ -43,10 +43,17 @@ pub struct Lexer {
 }
 
 impl Lexer {
-    pub fn new(compiler: &Compiler, opt: Options) -> Result<Lexer, LexerError> {
-        let opt = Rc::new(opt); // ToDo -> switch to &Options (!)
+    pub fn new(cp: &Compiler, opt: Options) -> Result<Lexer, LexerError> {
+        let ref opt = Rc::new(opt); // TODO -> switch to &Options (!?)
+        let ext = match cp.extensions() {
+            Err(e) => return err!(LexerErrorCode::Logic)
+                .explain(format!("Could not initialize parser due to missing compiler extensions"))
+                .caused_by(e)
+                .into(),
+            Ok(ext) => ext
+        };
 
-        let p = match Patterns::new(opt, compiler.operators_unary(), compiler.operators_binary()) {
+        let p = match Patterns::new(opt, ext) {
             Err(e) => return err!(LexerErrorCode::InvalidPattern).caused_by(e).into(),
             Ok(p) => p
         };
@@ -68,7 +75,8 @@ impl Lexer {
 
 impl Default for Lexer {
     fn default() -> Lexer {
-        let compiler = Compiler::default();
+        let mut compiler = Compiler::default();
+        compiler.set_extensions(ExtensionRegistry::default());
         let options = Options::default();
 
         Lexer::new(&compiler, options).unwrap()

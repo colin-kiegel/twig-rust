@@ -43,12 +43,12 @@ pub struct ItemData {
 }
 
 impl Pattern {
-    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new(opt: &Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A\s*line\s+(\d+)\s*(?:{ws}{b1}\s*|{b1})",
                 ws = opt.whitespace_trim.quoted(),
                 b1 = opt.tag_block_end.quoted())),
-            options: opt,
+            options: (*opt).clone(),
         })
     }   // orig: '/\s*line\s+(\d+)\s*'.$tag_block[1].'/As'
 }
@@ -88,7 +88,7 @@ mod test {
 
     #[test]
     pub fn as_str() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
@@ -99,7 +99,7 @@ mod test {
 
     #[test]
     pub fn extract() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
@@ -115,7 +115,7 @@ mod test {
 
     #[test]
     pub fn extract_max_int() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         // u64::max_value() == 18446744073709551615

@@ -16,8 +16,9 @@
 /////////////
 
 use std::path::Path;
-use compiler::{Compiler, options, Options, ext, Extension};
-use compiler::error::{TwigError, TwigErrorCode};
+use std::rc::Rc;
+use compiler::{Compiler, options, Options, ext, Extension, extension_registry, ExtensionRegistry};
+use compiler::error::{TwigError};
 
 /////////////
 // exports //
@@ -30,19 +31,27 @@ pub const VERSION : &'static str = "1.18.1";
 #[derive(Debug)]
 pub struct Builder {
     opt: Options,
-    ext: Vec<Box<Extension>>,
+    ext: ExtensionRegistry,
 }
 
 impl Default for Builder {
     fn default() -> Builder {
+        let mut ext = ExtensionRegistry::default();
+        ext.push(ext::Core::new()).unwrap(); // core extension
+
         Builder {
             opt: Options::default(),
-            ext: vec![ext::Core::new()], // core extension
+            ext: ext,
         }
     }
 }
 
 /// Builds an instance of the Twig Compiler, according to supplied options and compiler extensions.
+///
+/// The following extensions will be registered by default:
+/// * core
+/// * escaper
+/// * optimizer
 // /
 // / # Examples
 // /
@@ -126,97 +135,36 @@ impl Builder {
     }
 
     /// Registers an extension
-    pub fn add_extension(mut self, extension: Box<Extension>) -> Self {
-        self.ext.push(extension);
+    pub fn add_extension(mut self, extension: Box<Extension>) -> Result<Self, TwigError> {
+        try!(self.ext.push(extension));
 
-        self
+        Ok(self)
     }
 
     /// Get all registered extensions
-    pub fn extensions(&self) -> ::std::slice::Iter<Box<Extension>> {
+    pub fn extensions(&self) -> extension_registry::Iter {
         self.ext.iter()
     }
 
-    // TODO : Environment to Compiler
     pub fn compiler(mut self) -> Result<Compiler, TwigError> {
         let mut c = Compiler::default();
         let o = self.opt;
 
         // add default extensions
-        self.ext.push(ext::Escaper::new(o.autoescape));
-        self.ext.push(ext::Optimizer::new(o.optimizations));
+        try!(self.ext.push(ext::Escaper::new(o.autoescape)));
+        try!(self.ext.push(ext::Optimizer::new(o.optimizations)));
 
         // init extensions
-        for extension in self.ext.into_iter() {
-            try!(c.init_extension(&*extension));
-            c.extensions.insert(extension.name().to_string(), extension); // TODO move to fn
-        }
+        try!(self.ext.init(&mut c));
+        c.ext = Some(Rc::new(self.ext));
 
-        // init staging extension
-        let staging = ext::Staging::new();
-        try!(c.init_extension(&*staging));
-        c.ext_staging = Some(staging);
+        // TODO register staging extension (!)
+        // // init staging extension
+        // let staging = ext::Staging::new();
+        // try!(c.init_extension(&*staging));
+        // c.ext_staging = Some(staging);
 
         return Ok(c);
-    }
-}
-
-impl Compiler {
-    // protected fn
-    fn init_extension(&mut self, ext: &Extension) -> Result<(), TwigError> {
-        ext.init(self); // TODO check order - before or after registering filters, etc.?
-
-        for (k, v) in ext.filters() {
-            if let Some(prev) = self.filters.insert(k, v) {
-                return err!(TwigErrorCode::Logic)
-                    .explain(format!("Duplicate filter {p:?} while loading extension {x:?}.",
-                        p = prev, x = ext.name()))
-                    .into();
-                }
-        }
-        for (k, v) in ext.functions() {
-            if let Some(prev) = self.functions.insert(k, v) {
-                return err!(TwigErrorCode::Logic)
-                    .explain(format!("Duplicate function {p:?} while loading extension {x:?}.",
-                        p = prev, x = ext.name()))
-                    .into();
-            }
-        }
-        for (k, v) in ext.tests() {
-            if let Some(prev) = self.tests.insert(k, v) {
-                return err!(TwigErrorCode::Logic)
-                    .explain(format!("Duplicate test {p:?} while loading extension {x:?}.",
-                        p = prev, x = ext.name()))
-                    .into();
-            }
-        }
-        for (k, v) in ext.token_parsers() {
-            if let Some(prev) = self.token_parsers.insert(k, v) {
-                return err!(TwigErrorCode::Logic)
-                    .explain(format!("Duplicate token parser {p:?} while loading extension {x:?}.",
-                        p = prev, x = ext.name()))
-                    .into();
-            }
-        }
-
-        // TODO: `vec.append()` is not yet stable ...
-        for x in ext.node_visitors() { self.node_visitors.push(x) }
-        for x in ext.operators_unary() { self.operators_unary.push(x) }
-        for x in ext.operators_binary() { self.operators_binary.push(x) }
-
-        // TODO register globals???
-        Ok(())
-    }
-
-    /**
-     * Registers a Node Visitor.
-     *
-     * #arguments
-     *  Twig_NodeVisitorInterface $visitor A Twig_NodeVisitorInterface instance
-     */
-    fn _add_node_visitor(&self, _visitor: ()) -> Result<(), TwigError> {
-        unimplemented!();
-        // return self.staging.add_node_visitor(visitor);
     }
 }
 

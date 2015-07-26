@@ -90,8 +90,7 @@ impl<'a> Job<'a> {
         // * check if the template can be disassembled into string-objects without
         //   copying - i.e. without calling to_string(&str)
 
-        let position = self.cursor.position();
-        self.tokens.push(token, position);
+        self.tokens.push(token, &self.cursor);
     }
 }
 
@@ -100,7 +99,7 @@ impl<'a> fmt::Debug for Job<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         write!(f, "[\n\
             Cursor: {cursor}\n\
-            Tokenstream: {tokens}\n\
+            Tokenstream: {tokens:?}\n\
             Brackets: {brackets:?}\n\
             ]",
             cursor = self.cursor,

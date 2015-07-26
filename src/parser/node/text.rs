@@ -17,6 +17,8 @@
 
 use super::GenericNode;
 use runtime::{Runtime, NodeOutput};
+use lexer::token::stream::Position;
+use std::clone::Clone;
 
 /////////////
 // exports //
@@ -28,6 +30,16 @@ pub type Text<'a> = GenericNode<Data<'a>>;
 #[derive(Debug, Default)]
 pub struct Data<'a> {
     text: &'a str,
+}
+
+impl<'a> Text<'a> {
+    pub fn new(text: &'a str, position: &Position) -> Box<Text<'a>> {
+        Box::new(Text {
+            data: Data { text: text },
+            position: (*position).clone(),
+            ..GenericNode::default()
+        })
+    }
 }
 
 impl<'a> NodeOutput for Text<'a> {

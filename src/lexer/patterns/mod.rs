@@ -21,8 +21,7 @@ use std::iter::Iterator;
 use std::rc::Rc;
 use regex;
 use regex::Error as regexError;
-use compiler::Compiler;
-use compiler::ext::{UnaryOperator, BinaryOperator};
+use compiler::{ExtensionRegistry};
 
 /////////////
 // exports //
@@ -73,18 +72,18 @@ pub struct Patterns {
 
 #[allow(unused_variables)]
 impl Patterns {
-    pub fn new(opt: Rc<Options>, unary: &Vec<UnaryOperator>, binary: &Vec<BinaryOperator>) -> Result<Patterns, regexError> {
+    pub fn new(opt: &Rc<Options>, ext: &Rc<ExtensionRegistry>) -> Result<Patterns, regexError> {
         Ok(Patterns {
-            expression_end: try!(expression_end::Pattern::new(opt.clone())),
-            verbatim_end: try!(verbatim_end::Pattern::new(opt.clone())),
-            operator: try!(operator::Pattern::new(unary, binary)),
-            block_end: try!(block_end::Pattern::new(opt.clone())),
-            comment_end: try!(comment_end::Pattern::new(opt.clone())),
-            verbatim_start: try!(verbatim_start::Pattern::new(opt.clone())),
-            block_line: try!(block_line::Pattern::new(opt.clone())),
-            token_start: try!(token_start::Pattern::new(opt.clone())),
-            interpolation_start: try!(interpolation_start::Pattern::new(opt.clone())),
-            interpolation_end: try!(interpolation_end::Pattern::new(opt.clone())),
+            expression_end: try!(expression_end::Pattern::new(opt)),
+            verbatim_end: try!(verbatim_end::Pattern::new(opt)),
+            operator: try!(operator::Pattern::new(ext)),
+            block_end: try!(block_end::Pattern::new(opt)),
+            comment_end: try!(comment_end::Pattern::new(opt)),
+            verbatim_start: try!(verbatim_start::Pattern::new(opt)),
+            block_line: try!(block_line::Pattern::new(opt)),
+            token_start: try!(token_start::Pattern::new(opt)),
+            interpolation_start: try!(interpolation_start::Pattern::new(opt)),
+            interpolation_end: try!(interpolation_end::Pattern::new(opt)),
             name: try!(name::Pattern::new()),
             number: try!(number::Pattern::new()),
             punctuation: punctuation::Pattern::instance(),
@@ -97,10 +96,10 @@ impl Patterns {
 
 impl<'a> Default for Patterns {
     fn default() -> Patterns {
-        let compiler = Rc::new(Compiler::default());
-        let opt = Rc::new(Options::default());
+        let ref ext = Rc::new(ExtensionRegistry::default());
+        let ref opt = Rc::new(Options::default());
 
-        Patterns::new(opt, compiler.operators_unary(), compiler.operators_binary()).unwrap()
+        Patterns::new(opt, ext).unwrap()
     }
 }
 

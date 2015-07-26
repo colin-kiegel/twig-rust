@@ -22,8 +22,8 @@ pub type BinaryOperator = Binary;
 #[derive(Debug, PartialEq)]
 pub struct Extension(String); // might switch to ID for faster lookups
 
-#[derive(Debug, PartialEq)]
-pub struct Precedence(usize);
+#[derive(Debug, PartialEq, PartialOrd)]
+pub struct Precedence(pub usize);
 
 #[derive(Debug, PartialEq)]
 pub enum Operation {

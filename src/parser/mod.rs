@@ -15,10 +15,13 @@
 // imports  //
 //////////////
 
-use compiler::Compiler;
+use compiler::{Compiler, ExtensionRegistry};
 use lexer::token;
 use self::job::Job;
-//use compiler::ext::NodeVisitor;
+use compiler::ext::TokenParser;
+use compiler::ext::operator::Precedence;
+use self::expression_parser::Expression;
+use std::rc::Rc;
 
 /////////////
 // exports //
@@ -27,23 +30,33 @@ use self::job::Job;
 pub mod error;
 pub mod job;
 pub mod node;
+pub mod expression_parser;
 pub use self::error::*;
 pub use self::node::Node;
+pub use self::expression_parser::ExpressionParser;
 
 
 #[derive(Debug)]
-pub struct Parser;
-    //_compiler: &'a Compiler, // TODO: rm circular reference(!)
-
+pub struct Parser {
+    ext: Rc<ExtensionRegistry>,
+    expression_parser: ExpressionParser,
+} // avoid a circular reference to the compiler!
 
 impl Parser {
-    pub fn new(_compiler: &Compiler) -> Parser {
-        Parser
-    }
+    pub fn new(cp: &Compiler) -> Result<Parser, ParserError> {
+        let ext = match cp.extensions() {
+            Err(e) => return err!(ParserErrorCode::Logic)
+                .explain(format!("Could not initialize parser due to missing compiler extensions"))
+                .caused_by(e)
+                .into(),
+            Ok(ext) => ext
+        };
 
-    // pub fn _compiler(&self) -> &Compiler {
-    //     &*self._compiler
-    // }
+        Ok(Parser {
+            ext: (*ext).clone(),
+            expression_parser: ExpressionParser::new(ext),
+        })
+    }
 
     #[allow(dead_code)] // TODO testcase
     pub fn parse<'a, 't> (&'a self, stream: &'t token::Stream<'t>) -> Result<(), ParserError>
@@ -51,14 +64,27 @@ impl Parser {
     {
         let job = Job::new(stream, &self);
 
-        job.parse()
+        let test = "test".to_string(); // TODO wtf
+        let drop_needle = false; // TODO wtf
+
+        job.parse(test, drop_needle) // TODO move params to constructor??
+    }
+
+    pub fn parse_expression (
+        &self,
+        job: &mut Job,
+        precedence: Precedence
+    ) -> Result<Expression, ParserError>
+    {
+        self.expression_parser.parse(job, precedence)
     }
 }
 
 impl Default for Parser {
     fn default() -> Parser {
-        let compiler = Compiler::default();
+        let mut compiler = Compiler::default();
+        compiler.set_extensions(ExtensionRegistry::default());
 
-        Parser::new(&compiler)
+        Parser::new(&compiler).unwrap()
     }
 }

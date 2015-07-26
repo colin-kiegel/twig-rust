@@ -40,12 +40,12 @@ pub struct ItemData {
 }
 
 impl Pattern {
-    pub fn new(opt: Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new(opt: &Rc<Options>) -> Result<Pattern, regexError> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A\s*(?:{ws}{v1}\s*|{v1})",
                 ws = opt.whitespace_trim.quoted(),
                 v1 = opt.tag_variable_end.quoted())),
-            options: opt,
+            options: opt.clone(),
         })
     }
 }   // orig: '/\s*'.$whitespace_trim.$tag_variable[1].'\s*|\s*'.$tag_variable[1].'/A'
@@ -83,7 +83,7 @@ mod test {
 
     #[test]
     pub fn as_str() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(
@@ -94,7 +94,7 @@ mod test {
 
     #[test]
     pub fn extract() {
-        let options = Rc::<Options>::default();
+        let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
         assert_eq!(

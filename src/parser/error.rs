@@ -29,7 +29,11 @@ pub type ParserError = error::Exception<ParserErrorCode>;
 #[derive(Debug, PartialEq)]
 pub enum ParserErrorCode {
     Logic,
-    NodeError
+    InvalidState,
+    NodeError,
+    Eof,
+    SemanticError,
+    UnexpectedToken,
 }
 
 #[allow(dead_code)]
@@ -54,7 +58,11 @@ impl ToString for ParserErrorCode {
     fn to_string(&self) -> String {
         match *self {
             ParserErrorCode::Logic => "Logic",
+            ParserErrorCode::InvalidState => "InvalidState",
             ParserErrorCode::NodeError => "NodeError",
+            ParserErrorCode::SemanticError => "SemanticError",
+            ParserErrorCode::UnexpectedToken => "UnexpectedToken",
+            ParserErrorCode::Eof => "Eof",
         }.to_string()
     }
 }

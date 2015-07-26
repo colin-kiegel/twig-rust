@@ -30,7 +30,7 @@ pub type Line = usize;
 pub struct Cursor<'a> {
     pos: Position,   // 0,..
     end: Position,   // 0,..
-    lineno: Line,    // 1,..
+    line: Line,    // 1,..
     template: &'a super::Raw, // TODO switch to pointer or slice
 }
 
@@ -41,11 +41,11 @@ impl<'a> Cursor<'a> {
             end: template.code.chars().count(),
             template: template,
             pos: 0,
-            lineno: 1,
+            line: 1,
         }
     }
 
-    /// move the cursor `position` by `increment` and keep track of the `lineno`
+    /// move the cursor `position` by `increment` and keep track of the `line`
     ///
     /// `increment` in bytes (not chars)
     ///
@@ -61,7 +61,7 @@ impl<'a> Cursor<'a> {
         if pos > self.end {
             panic!("cursor is out of range");
         }
-        self.lineno += self.template.code[self.pos..pos].chars().filter(|c| *c == '\n').count();
+        self.line += self.template.code[self.pos..pos].chars().filter(|c| *c == '\n').count();
         self.pos = pos;
     }
 
@@ -74,9 +74,9 @@ impl<'a> Cursor<'a> {
             // if pos > self.end {
             //     panic!("Cursor::move_to() is out of range")
             // }
-            self.lineno += self.template.code[self.pos..pos].chars().filter(|c| *c == '\n').count();
+            self.line += self.template.code[self.pos..pos].chars().filter(|c| *c == '\n').count();
         } else if pos < self.pos {
-            self.lineno -= self.template.code[pos..self.pos].chars().filter(|c| *c == '\n').count();
+            self.line -= self.template.code[pos..self.pos].chars().filter(|c| *c == '\n').count();
         }
         self.pos = pos;
     }
@@ -95,7 +95,7 @@ impl<'a> Cursor<'a> {
 
     pub fn slice_to(&mut self, pos: usize) -> &'a str  {
         let ref slice = &self.template.code[self.pos..pos];
-        self.lineno += slice.chars().filter(|c| *c == '\n').count();
+        self.line += slice.chars().filter(|c| *c == '\n').count();
         self.pos = pos;
 
         slice
@@ -118,7 +118,7 @@ impl<'a> Cursor<'a> {
     }
 
     pub fn line(&self) -> usize {
-        self.lineno
+        self.line
         // Alternative: self.template.code[0..self.pos].chars().filter(|c| c == '\n').count() + 1;
         // - might be better if called seldomly!
     }
@@ -128,7 +128,7 @@ impl<'a> Cursor<'a> {
     }
 
     pub fn set_line(&mut self, line: usize) {
-        self.lineno = line;
+        self.line = line;
     }
 }
 

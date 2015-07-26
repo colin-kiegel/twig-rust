@@ -49,103 +49,92 @@ pub trait LexExpression where
                 .into();
         }
 
-        // operators - TODO
-        //
-        // unimplemented!()
+        // operators
+        if let Some(x) = job.patterns.operator.extract(job.cursor.tail()) {
+            // TODO overwrite extract() in operator pattern: preg_replace('/\s+/', ' ', x)
+            job.push_token(Token::Operator(x.operator.to_string()));
+            job.cursor.move_by(x.position.1);
+            return Self::tokenize(job);
+        }
 
         // names
-        match job.patterns.name.extract(job.cursor.tail()) {
-            Some(x) => {
-                job.push_token(Token::Name(x.name.to_string()));
-                job.cursor.move_by(x.position.1);
-                return Self::tokenize(job);
-            },
-            None => {},
+        if let Some(x) = job.patterns.name.extract(job.cursor.tail()) {
+            job.push_token(Token::Name(x.name.to_string()));
+            job.cursor.move_by(x.position.1);
+            return Self::tokenize(job);
         };
 
         // numbers
-        match job.patterns.number.extract(job.cursor.tail()) {
-            Some(x) => {
-                let x = try!(x);
-                let token = match x.number {
-                    number::Number::Integer(u) => Token::IntegerNumber(u),
-                    number::Number::Floating(f) => Token::FloatingNumber(f),
-                };
-                job.push_token(token);
-                job.cursor.move_by(x.position.1);
-                return Self::tokenize(job);
-            },
-            None => {},
+        if let Some(x) = job.patterns.number.extract(job.cursor.tail()) {
+            let x = try!(x);
+            let token = match x.number {
+                number::Number::Integer(u) => Token::IntegerNumber(u),
+                number::Number::Floating(f) => Token::FloatingNumber(f),
+            };
+            job.push_token(token);
+            job.cursor.move_by(x.position.1);
+            return Self::tokenize(job);
         };
 
         // punctuation
-        match job.patterns.punctuation.extract(job.cursor.tail()) {
-            Some(punctuation) => {
-                match punctuation { // check brackets ..
-                    Punctuation::ClosingBracket(ref b) => match job.pop_bracket() {
-                        None => {
-                            return err!(SyntaxErrorCode::UnexpectedBracket)
-                                .explain(format!("Unexpected {b:?} at {cursor}",
+        if let Some(punctuation) = job.patterns.punctuation.extract(job.cursor.tail()) {
+            match punctuation { // check brackets ..
+                Punctuation::ClosingBracket(ref b) => match job.pop_bracket() {
+                    None => {
+                        return err!(SyntaxErrorCode::UnexpectedBracket)
+                            .explain(format!("Unexpected {b:?} at {cursor}",
+                                b = b,
+                                cursor = job.cursor))
+                            .causes(err!(LexerErrorCode::SyntaxError))
+                            .into();
+                    },
+                    Some((b_expected, line)) => {
+                        if *b != b_expected {
+                            return err!(SyntaxErrorCode::UnclosedBracket)
+                                .explain(format!("Unclosed {b_before:?} from line\
+                                                {line_before} but found {b:?} at {cursor}",
+                                    b_before = b_expected,
+                                    line_before = line,
                                     b = b,
                                     cursor = job.cursor))
                                 .causes(err!(LexerErrorCode::SyntaxError))
                                 .into();
-                        },
-                        Some((b_expected, line)) => {
-                            if *b != b_expected {
-                                return err!(SyntaxErrorCode::UnclosedBracket)
-                                    .explain(format!("Unclosed {b_before:?} from line\
-                                                    {line_before} but found {b:?} at {cursor}",
-                                        b_before = b_expected,
-                                        line_before = line,
-                                        b = b,
-                                        cursor = job.cursor))
-                                    .causes(err!(LexerErrorCode::SyntaxError))
-                                    .into();
-                            }
+                        }
 
-                            let bracket = (b.clone(), job.cursor.line());
-                            job.push_bracket(bracket);
-                        },
-                    },
-                    Punctuation::OpeningBracket(ref b) => {
                         let bracket = (b.clone(), job.cursor.line());
                         job.push_bracket(bracket);
                     },
-                    _ => {},
-                };
+                },
+                Punctuation::OpeningBracket(ref b) => {
+                    let bracket = (b.clone(), job.cursor.line());
+                    job.push_bracket(bracket);
+                },
+                _ => {},
+            };
 
-                // .. then ..
-                job.push_token(Token::Punctuation(punctuation));
-                job.cursor.move_by(1);
-                return Self::tokenize(job);
-            },
-            None => {},
+            // .. then ..
+            job.push_token(Token::Punctuation(punctuation));
+            job.cursor.move_by(1);
+            return Self::tokenize(job);
         }
 
         // strings
-        match job.patterns.string.extract(job.cursor.tail()) {
-            Some(x) => {
-                job.push_token(Token::String(x.unescape_string()));
-                job.cursor.move_by(x.position.1);
-                return Self::tokenize(job);
-            },
-            None => {},
+        if let Some(x) = job.patterns.string.extract(job.cursor.tail()) {
+            job.push_token(Token::String(x.unescape_string()));
+            job.cursor.move_by(x.position.1);
+            return Self::tokenize(job);
         }
 
         // opening double quoted string
         // TODO switch to more simple pattern?
         //      Alternatively get all data generically from the match
-        match job.patterns.string_dq_delim.extract(job.cursor.tail()) {
-            Some(_) => {
-                let bracket = (BracketType::DoubleQuote, job.cursor.line());
-                job.push_bracket(bracket);
-                job.cursor.move_by(1);
-                try!(state::String::tokenize(job));
+        if let Some(_) = job.patterns.string_dq_delim.extract(job.cursor.tail()) {
+            let bracket = (BracketType::DoubleQuote, job.cursor.line());
+            job.push_bracket(bracket);
+            job.cursor.move_by(1);
+            try!(state::String::tokenize(job));
 
-                return Self::tokenize(job);
-            },
-            None => {},
+            return Self::tokenize(job);
         }
 
         // unlexable

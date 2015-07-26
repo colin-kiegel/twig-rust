@@ -62,7 +62,7 @@ impl TokenizeState for Final {
         ));
 
         if !self.brackets.is_empty() {
-            //let (bracket, lineno) : (&str, usize) = self.brackets.pop().expect("fatal");
+            //let (bracket, line) : (&str, usize) = self.brackets.pop().expect("fatal");
 
             //let a = error::syntax::Code::UnclosedBracket::new();
 
@@ -70,7 +70,7 @@ impl TokenizeState for Final {
             //return Error::new(
               //  a,
                 //format!("Unclosed {}", bracket),
-                // ($lineno, $this->filename);
+                // ($line, $this->filename);
         //    );
         }*/
     }

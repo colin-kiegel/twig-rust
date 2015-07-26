@@ -27,5 +27,6 @@ extern crate regex;
 mod template;
 
 
+// TODO http://keepachangelog.com
 // TODO switch to `if let` pattern https://github.com/rust-lang/rfcs/pull/160
 // TODO switch to `while let` pattern https://github.com/rust-lang/rfcs/pull/214

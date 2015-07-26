@@ -20,6 +20,9 @@
 use regex;
 use regex::Error as regexError;
 use compiler::ext::{UnaryOperator, BinaryOperator};
+use compiler::ExtensionRegistry;
+use std::collections::HashMap;
+use std::rc::Rc;
 
 /////////////
 // exports //
@@ -35,17 +38,9 @@ pub struct Pattern {
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]
-pub struct ItemData {
+pub struct ItemData<'a> {
     pub position: (usize, usize),
-    pub tag: Tag,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, PartialEq)]
-pub enum Tag {
-    // Block,
-    // Comment,
-    // Variable,
+    pub operator: &'a str
 }
 
 struct Builder {
@@ -59,16 +54,16 @@ impl Builder {
         })
     }
 
-    fn operators_to_regex(&self, unary: &Vec<UnaryOperator>, binary: &Vec<BinaryOperator>) -> String {
+    fn operators_to_regex(&self, unary: &HashMap<String, UnaryOperator>, binary: &HashMap<String, BinaryOperator>) -> String {
         let mut operators : Vec<(usize, &str)> = Vec::with_capacity(1 + unary.len() + binary.len());
 
         operators.push(("=".len(), "="));
 
-        for x in unary.iter()  { operators.push((x.repr.len(), &x.repr)) }
-        for x in binary.iter() { operators.push((x.repr.len(), &x.repr)) }
+        for (ref op_repr, _) in unary.iter()  { operators.push((op_repr.len(), op_repr)) }
+        for (ref op_repr, _) in binary.iter() { operators.push((op_repr.len(), op_repr)) }
 
-        // sort in reverse order (i.e. descending): 10,9,8,7,6 ..
-        // -> not sure why we do this(!)
+        // sort operators by length in reverse order (i.e. descending): 10,9,8,7,6 ..
+        // -> such that a pattern `abc` is dominant over a subpattern `a`
         operators.sort_by(|&(ref len_a,_),&(ref len_b,_)| len_b.cmp(len_a));
 
         // collect regex "patternA|patternB|.."
@@ -79,15 +74,17 @@ impl Builder {
     fn operator_to_regex(&self, operator: &str) -> String {
         // an operator that ends with a character must be followed by
         // a whitespace or a parenthesis
-        let mut rx : String = regex::quote(operator);
+        let mut rx : String = format!(r"\A{}", regex::quote(operator));
 
+        // whitespaces shall match *any* whitespace
         rx = self.whitespace.replace_all(&rx, r"\s+");
-        // orig: r = preg_replace('/\s+/', '\s+', r);
 
         if let Some(c) = operator.chars().last() {
-            if c.is_alphabetic() { // TODO:  regex does not support lookahead(!)
+            if c.is_alphabetic() {
                 panic!("operator_to_regex(): operator ends in alphanumeric character (!)");
-                // r.push(r"(?=[\s()])");
+                // NOTE:  regex does not support lookahead(!)
+                //  -> orig: r.push(r"(?=[\s()])");
+                //  -> TODO: overwrite extract() in operator pattern and do aftermath
             }
         }
 
@@ -97,7 +94,10 @@ impl Builder {
 
 #[allow(dead_code, unused_variables)]
 impl Pattern {
-    pub fn new(unary: &Vec<UnaryOperator>, binary: &Vec<BinaryOperator>) -> Result<Pattern, regexError> {
+    pub fn new(ext: &Rc<ExtensionRegistry>) -> Result<Pattern, regexError> {
+        let unary = ext.operators_unary();
+        let binary = ext.operators_binary();
+
         Ok(Pattern {
             regex: {
                 let regex = try!(Builder::new()).operators_to_regex(unary, binary);
@@ -109,21 +109,22 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = ItemData;
+    type Item = ItemData<'t>;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> ItemData {
+    fn item_from_captures(&self, captures: &regex::Captures<'t>) -> ItemData<'t> {
         ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
             },
-            tag: match captures.at(1) {
+            operator: match captures.at(0) {
+                Some(name) => name,
                 _ => unreachable!(),
-            },
+            }
         }
     }
 }
