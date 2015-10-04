@@ -16,8 +16,8 @@
 /////////////
 
 use std::path::{Path, PathBuf};
-use compiler::ext::escaper;
-use compiler::ext::optimizer;
+use compiler::extension::escaper;
+use compiler::extension::optimizer;
 
 /////////////
 // exports //

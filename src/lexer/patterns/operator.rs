@@ -19,7 +19,7 @@
 
 use regex;
 use regex::Error as regexError;
-use compiler::ext::{UnaryOperator, BinaryOperator};
+use compiler::extension::api::{UnaryOperator, BinaryOperator};
 use compiler::ExtensionRegistry;
 use std::collections::HashMap;
 use std::rc::Rc;

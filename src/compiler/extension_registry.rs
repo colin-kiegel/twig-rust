@@ -11,7 +11,7 @@
 // imports //
 /////////////
 
-use compiler::ext::{self, Extension};
+use compiler::extension::api::{self, Extension};
 use std::collections::HashMap;
 use compiler::{Compiler, TwigError, TwigErrorCode};
 
@@ -24,17 +24,17 @@ pub type Iter<'a> = ::std::collections::hash_map::Values<'a, String, Box<Extensi
 
 #[derive(Debug, Default)]
 pub struct ExtensionRegistry {
-    ext: HashMap<String, Box<ext::Extension>>, // TODO check for alternative Map-Types
+    ext: HashMap<String, Box<api::Extension>>, // TODO check for alternative Map-Types
     initialized: bool,
-    filters: HashMap<String, Box<ext::Filter>>,
-    functions: HashMap<String, Box<ext::Function>>,
-    tests: HashMap<String, Box<ext::Test>>,
-    token_parsers: HashMap<String, Box<ext::TokenParser>>,
-    //_token_parser_by_tags: HashMap<String, Box<ext::TokenParser>>,
-    node_visitors: Vec<Box<ext::NodeVisitor>>,
-    operators_unary: HashMap<String, ext::UnaryOperator>,
-    operators_binary: HashMap<String, ext::BinaryOperator>,
-    _globals: Vec<Box<ext::Global>>,
+    filters: HashMap<String, Box<api::Filter>>,
+    functions: HashMap<String, Box<api::Function>>,
+    tests: HashMap<String, Box<api::Test>>,
+    token_parsers: HashMap<String, Box<api::TokenParser>>,
+    //_token_parser_by_tags: HashMap<String, Box<api::TokenParser>>,
+    node_visitors: Vec<Box<api::NodeVisitor>>,
+    operators_unary: HashMap<String, api::UnaryOperator>,
+    operators_binary: HashMap<String, api::BinaryOperator>,
+    _globals: Vec<Box<api::Global>>,
 }
 
 impl ExtensionRegistry {
@@ -169,47 +169,47 @@ impl ExtensionRegistry {
     }
 
     /// Get the token parser instances to register with the compiler.
-    pub fn token_parsers(&self) -> &HashMap<String, Box<ext::TokenParser>> {
+    pub fn token_parsers(&self) -> &HashMap<String, Box<api::TokenParser>> {
         &self.token_parsers
     }
 
     // /// Get token parsers by registered tag
-    // pub fn _token_parser_by_tags(&self) -> &HashMap<String, Box<ext::TokenParser>> {
+    // pub fn _token_parser_by_tags(&self) -> &HashMap<String, Box<api::TokenParser>> {
     //     &self._token_parser_by_tags
     // }
 
     /// Get the node visitor instances to register with the compiler.
-    pub fn node_visitors(&self) -> &Vec<Box<ext::NodeVisitor>> {
+    pub fn node_visitors(&self) -> &Vec<Box<api::NodeVisitor>> {
         &self.node_visitors
     }
 
     /// Get the filters to register with the compiler.
-    pub fn filters(&self) -> &HashMap<String, Box<ext::Filter>> {
+    pub fn filters(&self) -> &HashMap<String, Box<api::Filter>> {
         &self.filters
     }
 
     /// Get the tests to register with the compiler.
-    pub fn tests(&self) -> &HashMap<String, Box<ext::Test>> {
+    pub fn tests(&self) -> &HashMap<String, Box<api::Test>> {
         &self.tests
     }
 
     /// Get the functions to register with the compiler.
-    pub fn functions(&self) -> &HashMap<String, Box<ext::Function>> {
+    pub fn functions(&self) -> &HashMap<String, Box<api::Function>> {
         &self.functions
     }
 
     /// Get the unary operators to register with the compiler.
-    pub fn operators_unary(&self) -> &HashMap<String, ext::UnaryOperator> {
+    pub fn operators_unary(&self) -> &HashMap<String, api::UnaryOperator> {
         &self.operators_unary
     }
 
     /// Get the binary operators to register with the compiler.
-    pub fn operators_binary(&self) -> &HashMap<String, ext::BinaryOperator> {
+    pub fn operators_binary(&self) -> &HashMap<String, api::BinaryOperator> {
         &self.operators_binary
     }
 
     /// Get the global variables to register with the compiler.
-    pub fn _globals(&self) -> &Vec<Box<ext::Global>> {
+    pub fn _globals(&self) -> &Vec<Box<api::Global>> {
         &self._globals
     }
 }

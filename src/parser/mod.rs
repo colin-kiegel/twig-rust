@@ -18,8 +18,8 @@
 use compiler::{Compiler, ExtensionRegistry};
 use lexer::token;
 use self::job::Job;
-use compiler::ext::TokenParser;
-use compiler::ext::operator::Precedence;
+use compiler::extension::api::TokenParser;
+use compiler::extension::api::operator::Precedence;
 use self::expression_parser::Expression;
 use std::rc::Rc;
 

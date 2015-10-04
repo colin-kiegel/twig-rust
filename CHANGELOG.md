@@ -1,6 +1,10 @@
 # Planned
 
 * `core` extension
+  * static text
+  * variable expression + dictionary
+  * if conditional
+  * for-each-loop + arrays
 * runtime
 
 # Unreleased

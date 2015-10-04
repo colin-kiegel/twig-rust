@@ -19,7 +19,7 @@ use std::fmt;
 use lexer::{token, Token};
 use parser::error::*;
 use parser::{node, Parser};
-use compiler::ext::operator::Precedence;
+use compiler::extension::api::operator::Precedence;
 use std::iter;
 
 /////////////

@@ -61,11 +61,11 @@ The **Parser**
   * converts a token stream into an abstract syntax tree
   * all nodes in the syntax tree are defined via extensions - even the most basic ones like static text. This allows for a very high degree of extensibility
 
-**Extensions**
+**Extensions** (work in progress)
 * define new behavior during the compilation process
   * **token parser**: transforms a sub-sequence from the token stream (=lexed template) to nodes in the abstract syntax tree. E.g. the `TokenParserIf` parses complex if-statements (if, elseif, else, endif) and creates the if-node with according child nodes for each test and conditional branch.
   * **node visitor**: modifies the abstract syntax tree immediately after parsing. E.g. the `optimizer` extension defines the `optimizeRawFilter` node visitor which strips all "raw" filters from the syntax tree.
-* extensions define specific new *node types* in the abstract syntax tree - falling into the following generic classes. Note that all *examples* are defined in the `core` extension, if not stated otherwise.
+* extensions define specific new *node types* in the abstract syntax tree - falling into the following generic classes. Note that all *examples* are defined in the `core` extension, if not stated otherwise. The core extension is not yet fully implemented (see CHANGELOG).
   * **test**: can be used in conditional statements. E.g. the `defined` test checks if a variable is defined in the current context.
   * **unary operator**: can be used in variable expressions to process results. E.g. the `-` (neg) operator inverts the sign of a numeric result.
   * **binary operator**: can be used in variable expressions to combine two results. E.g. the `**` (power) operator takes one number to the power of another number.

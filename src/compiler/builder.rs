@@ -17,7 +17,7 @@
 
 use std::path::Path;
 use std::rc::Rc;
-use compiler::{Compiler, options, Options, ext, Extension, extension_registry, ExtensionRegistry};
+use compiler::{Compiler, options, Options, extension, Extension, extension_registry, ExtensionRegistry};
 use compiler::error::{TwigError};
 
 /////////////
@@ -37,7 +37,7 @@ pub struct Builder {
 impl Default for Builder {
     fn default() -> Builder {
         let mut ext = ExtensionRegistry::default();
-        ext.push(ext::Core::new()).unwrap(); // core extension
+        ext.push(extension::Core::new()).unwrap(); // core extension
 
         Builder {
             opt: Options::default(),
@@ -151,8 +151,8 @@ impl Builder {
         let o = self.opt;
 
         // add default extensions
-        try!(self.ext.push(ext::Escaper::new(o.autoescape)));
-        try!(self.ext.push(ext::Optimizer::new(o.optimizations)));
+        try!(self.ext.push(extension::Escaper::new(o.autoescape)));
+        try!(self.ext.push(extension::Optimizer::new(o.optimizations)));
 
         // init extensions
         try!(self.ext.init(&mut c));

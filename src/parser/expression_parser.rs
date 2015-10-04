@@ -13,8 +13,8 @@
 
 use parser::job::Job;
 use parser::{ParserError, ParserErrorCode};
-use compiler::ext::BinaryOperator;
-use compiler::ext::operator::Precedence;
+use compiler::extension::api::BinaryOperator;
+use compiler::extension::api::operator::Precedence;
 use compiler::ExtensionRegistry;
 use lexer::Token;
 use std::rc::Rc;
