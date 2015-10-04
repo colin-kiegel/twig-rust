@@ -12,6 +12,7 @@ This library is derived from [Twig (for PHP)](http://twig.sensiolabs.org/documen
 ## Current Status
 
 > **EARLY ALPHA** - This library is still in development and not yet ready for use.
+Take a look at the CHANGELOG for more details.
 
 ## License
 
