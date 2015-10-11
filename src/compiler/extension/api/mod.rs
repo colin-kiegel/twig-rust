@@ -22,7 +22,7 @@ use compiler;
 // exports //
 /////////////
 
-// Abstract extension traits + structs // TODO check what needs to be trait / can be struct
+// Abstract extension traits + structs // #TODO:120 check what needs to be trait / can be struct
 pub mod filter;
 pub mod function;
 pub mod global;
@@ -45,10 +45,10 @@ pub trait Extension : ::std::fmt::Debug {
 
     /// Initialize the compiler.
     /// This is where you can load some file that contains filter functions for instance.
-    fn init(&self, _compiler: &mut compiler::Compiler) {} // TODO add error handling ???
+    fn init(&self, _compiler: &mut compiler::Compiler) {} // #TODO:80 add error handling ???
 
     /// Get the token parser instances to register with the compiler.
-    fn token_parsers(&self) -> HashMap<String, Box<TokenParser>> { // TODO switch to iterators or Option<Vec<...>> ???
+    fn token_parsers(&self) -> HashMap<String, Box<TokenParser>> { // #TODO:620 switch to iterators or Option<Vec<...>> ???
         HashMap::new()
     }
 

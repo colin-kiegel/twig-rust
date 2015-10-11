@@ -64,7 +64,7 @@ pub enum BracketType {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum Type { // TODO - remove ?
+pub enum Type { // #TODO:10 - remove ?
     Eof                = -1,
     Text               = 0,
     BlockStart         = 1,
@@ -121,7 +121,7 @@ impl Token {
         }
     }
 
-    #[allow(dead_code)] // TODO testcase
+    #[allow(dead_code)] // #TODO:690 testcase
     pub fn is_type(&self, typ: Type) -> bool {
         self.get_type() == typ
     }

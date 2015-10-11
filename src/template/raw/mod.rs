@@ -28,7 +28,7 @@ pub struct Raw {
 
 #[allow(unused_variables)]
 impl Raw {
-    #[allow(dead_code)] // TODO testcase
+    #[allow(dead_code)] // #TODO:730 testcase
     pub fn new(code: &str, filename: &str) -> Raw {
         let mut x = Raw {
             filename: filename.to_string(),

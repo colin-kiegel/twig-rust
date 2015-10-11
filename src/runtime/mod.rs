@@ -31,7 +31,7 @@ pub use self::node::NodeOutput;
 #[derive(Debug)]
 pub struct Runtime {
     data: HashMap<String, String>,
-    writer: String, // TODO switch to a 'more generic' string writer
+    writer: String, // #TODO:560 switch to a 'more generic' string writer
                     // - maybe the writer should not be part of the runtime?
 }
 
@@ -66,7 +66,7 @@ impl Runtime {
     }
 
     pub fn _get(&self, key: &str) -> Option<&str> {
-        use std::ops::Deref; // TODO replace with as_str() - as soon as this API is stable
+        use std::ops::Deref; // #TODO:390 replace with as_str() - as soon as this API is stable
         self.data.get(key).map(|x| x.deref())
     }
 

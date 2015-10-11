@@ -17,4 +17,4 @@ use std::fmt::Debug;
 // exports //
 /////////////
 
-pub trait NodeVisitor : Debug {} // TODO switch from trait to struct?
+pub trait NodeVisitor : Debug {} // #TODO:480 switch from trait to struct?

@@ -26,7 +26,7 @@ use std::any::Any;
 pub mod macros;
 pub use std::error::Error;
 
-// TODO Read more about error handling in rust
+// #TODO:50 Read more about error handling in rust
 //http://doc.rust-lang.org/std/error/index.html
 
 pub struct Exception<T> {
@@ -45,7 +45,7 @@ pub struct Details {
     pub column : u32,
 }
 
-// TODO read more about Any trait
+// #TODO:340 read more about Any trait
 impl<T> Exception<T>
     where T: Any + fmt::Debug {
     pub fn new(details: Details, code: T) -> Exception<T> {
@@ -132,7 +132,7 @@ impl<T> Error for Exception<T>
 
     fn cause<'a>(&'a self) -> Option<&'a Error> {
         use std::borrow::Borrow;
-        // TODO is there a simpler way to go from Option<Box<T>> to Option<&T>? Ask this on SO...
+        // #TODO:230 is there a simpler way to go from Option<Box<T>> to Option<&T>? Ask this on SO...
         match self.cause {
             Some(ref cause) => Some(cause.borrow()),
             None            => None
@@ -153,7 +153,7 @@ impl<T> fmt::Debug for Exception<T>
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         let recursive_desc = self.iter().map(|e| e.description())
-             .collect::<Vec<&str>>().connect(" caused by\n - ");
+             .collect::<Vec<&str>>().join(" caused by\n - ");
         write!(f, "\n - {}\n", recursive_desc)
     }
 }

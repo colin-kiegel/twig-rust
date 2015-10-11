@@ -41,7 +41,7 @@ pub trait Template {
      *
      * @return string The rendered template
      */
-    fn render(&self, context: Vec<()>) -> String; // TODO error handling
+    fn render(&self, context: Vec<()>) -> String; // #TODO:200 error handling
 
     /**
      * Displays the template with the given context.
@@ -49,7 +49,7 @@ pub trait Template {
      * @param array $context An array of parameters to pass to the template
      * @param array $blocks  An array of blocks to pass to the template
      */
-    fn display(&self, context: Vec<()>, blocks: Option<Vec<()>>); // TODO error handling
+    fn display(&self, context: Vec<()>, blocks: Option<Vec<()>>); // #TODO:210 error handling
 
     /**
      * Get the bound compiler for this template.

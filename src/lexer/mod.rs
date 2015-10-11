@@ -44,7 +44,7 @@ pub struct Lexer {
 
 impl Lexer {
     pub fn new(cp: &Compiler, opt: Options) -> Result<Lexer, LexerError> {
-        let ref opt = Rc::new(opt); // TODO -> switch to &Options (!?)
+        let ref opt = Rc::new(opt); // #TODO:20 -> switch to &Options (!?)
         let ext = match cp.extensions() {
             Err(e) => return err!(LexerErrorCode::Logic)
                 .explain(format!("Could not initialize parser due to missing compiler extensions"))
@@ -63,7 +63,7 @@ impl Lexer {
         })
     }
 
-    #[allow(dead_code)] // TODO testcase
+    #[allow(dead_code)] // #TODO:680 testcase
     pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream, LexerError>
         where 't: 'a // the template must outlive the Lexer
     {

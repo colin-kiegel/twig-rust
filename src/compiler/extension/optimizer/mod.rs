@@ -30,7 +30,7 @@ pub struct Optimizer {
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Mode {
     Enabled,
-    Disabled,
+    _Disabled,
 }
 
 impl Default for Mode {

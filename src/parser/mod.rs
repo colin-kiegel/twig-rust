@@ -58,16 +58,16 @@ impl Parser {
         })
     }
 
-    #[allow(dead_code)] // TODO testcase
+    #[allow(dead_code)] // #TODO:720 testcase
     pub fn parse<'a, 't> (&'a self, stream: &'t token::Stream<'t>) -> Result<(), ParserError>
         where 't: 'a // the token stream must outlive the Parser
     {
         let job = Job::new(stream, &self);
 
-        let test = "test".to_string(); // TODO wtf
-        let drop_needle = false; // TODO wtf
+        let test = "test".to_string(); // #TODO:780 wtf
+        let drop_needle = false; // #TODO:790 wtf
 
-        job.parse(test, drop_needle) // TODO move params to constructor??
+        job.parse(test, drop_needle) // #TODO:260 move params to constructor??
     }
 
     pub fn parse_expression (

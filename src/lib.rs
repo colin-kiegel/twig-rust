@@ -17,6 +17,7 @@ pub mod compiler;
 pub mod lexer;
 pub mod parser;
 pub mod runtime;
+pub mod loader;
 
 /////////////
 // imports //
@@ -27,6 +28,7 @@ extern crate regex;
 mod template;
 
 
-// TODO http://keepachangelog.com
-// TODO switch to `if let` pattern https://github.com/rust-lang/rfcs/pull/160
-// TODO switch to `while let` pattern https://github.com/rust-lang/rfcs/pull/214
+
+// #TODO:220 http://keepachangelog.com
+// #TODO:540 switch to `if let` pattern https://github.com/rust-lang/rfcs/pull/160
+// #TODO:550 switch to `while let` pattern https://github.com/rust-lang/rfcs/pull/214

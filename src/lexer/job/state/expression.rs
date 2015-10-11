@@ -23,7 +23,7 @@ use lexer::error::{LexerError};
 use super::shared_traits::LexExpression;
 
 
-#[allow(dead_code)] // TODO dummy
+#[allow(dead_code)] // #TODO:190 dummy
 pub struct Expression;
 
 impl TokenizeState for Expression {

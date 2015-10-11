@@ -46,7 +46,7 @@ impl<'a> ItemData<'a> {
 impl Pattern {
     pub fn new() -> Result<Pattern, regexError> {
         Ok(Pattern {
-            // NOTE: Rusts regexes don't support lookarounds like `(?!\{)`,
+            // #NOTE:0 Rusts regexes don't support lookarounds like `(?!\{)`,
             //       so we need to change behaviour slightly:
             //       - `#` must not be followed by `"` or `\\` which was legal before
             regex: try_new_regex!(r##"(?s)\A[^#"\\]*(?:(?:\\.|#)[^#"\\]*)*"##),

@@ -54,7 +54,7 @@ pub struct State {
 }
 
 impl<'a> Job<'a> {
-    #[allow(dead_code)] // TODO testcase
+    #[allow(dead_code)] // #TODO:700 testcase
     pub fn new(tokens: &'a token::Stream, parser: &'a Parser) -> Job<'a> {
         let mut _j = Job {
             stream: tokens.iter().peekable(),
@@ -69,7 +69,7 @@ impl<'a> Job<'a> {
     }
 
     #[allow(unused_mut)]
-    #[allow(dead_code)] // TODO testcase
+    #[allow(dead_code)] // #TODO:710 testcase
     pub fn parse(mut self: Job<'a>, test: String, drop_needle: bool) -> Result<(), ParserError> {
 
         self.stack.push(self.state);
@@ -155,7 +155,7 @@ impl<'a> Job<'a> {
     }
 }
 
-// TODO switch to Debug-Builder once stable
+// #TODO:500 switch to Debug-Builder once stable
 impl<'a> fmt::Debug for Job<'a> {
     fn fmt(&self, _f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         unimplemented!()

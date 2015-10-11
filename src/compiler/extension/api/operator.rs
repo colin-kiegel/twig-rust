@@ -50,7 +50,7 @@ pub struct Class {
 
 /// Unary operator
 #[derive(Debug, PartialEq)]
-pub struct Unary { // TODO switch from struct to trait?
+pub struct Unary { // #TODO:430 switch from struct to trait?
     pub repr: String, // token representation like "-"
     pub ext: Extension,
     pub prec: Precedence,
@@ -59,7 +59,7 @@ pub struct Unary { // TODO switch from struct to trait?
 
 /// Binary operator
 #[derive(Debug, PartialEq)]
-pub struct Binary { // TODO switch from struct to trait?
+pub struct Binary { // #TODO:440 switch from struct to trait?
     pub repr: String, // token representation like "!="
     pub ext: Extension,
     pub prec: Precedence,

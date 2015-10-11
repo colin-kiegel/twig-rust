@@ -34,7 +34,7 @@ pub fn tokenize_err<'a>(code: &'a str) -> LexerError {
     lxr.tokenize(&tpl).unwrap_err()
 }
 
-// TODO read tokens from file too
+// #TODO:350 read tokens from file too
 /// #panics
 /// when the tokenstream does not equal `tokens`
 pub fn assert_tokenize(code: &str, tokens: Vec<Token>) {

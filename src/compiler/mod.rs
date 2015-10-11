@@ -87,7 +87,7 @@ impl Compiler {
 
     /// Sets the compiler extensions.
     pub fn set_extensions(&mut self, ext: ExtensionRegistry) -> &mut Compiler {
-        self.ext = Some(Rc::new(ext)); // TODO switch to callback pattern to provide arguments
+        self.ext = Some(Rc::new(ext)); // #TODO:570 switch to callback pattern to provide arguments
 
         self
     }
@@ -143,9 +143,9 @@ impl Compiler {
         }
     }
 
-    /// Sets the Lexer instance.
+    /// Sets the parser instance.
     pub fn set_parser(&mut self, parser: Parser) -> &mut Compiler {
-        self.parser = Some(parser); // TODO switch to callback pattern to provide arguments
+        self.parser = Some(parser); // #TODO:600 switch to callback pattern to provide arguments
 
         self
     }
@@ -164,9 +164,9 @@ impl Compiler {
         }
     }
 
-    /// Sets the Lexer instance.
+    /// Sets the runtime instance.
     pub fn set_runtime(&mut self, runtime: Runtime) -> &mut Compiler {
-        self.runtime = Some(runtime); // TODO switch to callback pattern to provide arguments
+        self.runtime = Some(runtime); // #TODO:610 switch to callback pattern to provide arguments
 
         self
     }

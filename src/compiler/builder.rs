@@ -158,7 +158,7 @@ impl Builder {
         try!(self.ext.init(&mut c));
         c.ext = Some(Rc::new(self.ext));
 
-        // TODO register staging extension (!)
+        // #TODO:360 register staging extension (!)
         // // init staging extension
         // let staging = ext::Staging::new();
         // try!(c.init_extension(&*staging));

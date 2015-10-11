@@ -25,7 +25,7 @@ macro_rules! err {
 
     ( $code:expr, $message:expr ) => ({
             ::error::Exception::new(err_details!(Some($message.to_string())), $code)
-            // TODO: treat Strings differently
+            // #TODO:750 treat Strings differently
         });
 }
 

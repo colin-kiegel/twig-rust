@@ -76,7 +76,7 @@ impl ExpressionParser {
         unimplemented!()
     }
 
-    pub fn is_binary(&self, _token: &Token) -> bool { // TODO move this to token??
+    pub fn is_binary(&self, _token: &Token) -> bool { // #TODO:280 move this to token??
         unimplemented!()
     }
 

@@ -95,7 +95,7 @@ impl<'a> Stream<'a> {
     pub fn new(template: &'a template::Raw) -> Stream<'a> {
         Stream {
             items: Vec::new(),
-            _template: Some(template), // TODO rename path??
+            _template: Some(template), // #TODO:380 rename path??
         }
     }
 
@@ -140,18 +140,18 @@ impl<'a> Stream<'a> {
 impl<'a> fmt::Display for Stream<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         let v: Vec<String> = self.items.iter().map(|i| format!("{}", i.token)).collect();
-        write!(f, "[\n\t{}\n]", v.connect("\n\t"))
+        write!(f, "[\n\t{}\n]", v.join("\n\t"))
     }
 }
 
 impl<'a> fmt::Debug for Stream<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         let v: Vec<String> = self.items.iter().map(|i| format!("{:?}", i.token)).collect();
-        write!(f, "[\n\t{}\n]", v.connect("\n\t"))
+        write!(f, "[\n\t{}\n]", v.join("\n\t"))
     }
 }
 
-// TODO add another token_iter() to the main implementation [using .map(|i| i.into()) as MapIterator]
+// #TODO:70 add another token_iter() to the main implementation [using .map(|i| i.into()) as MapIterator]
 impl<'a> IntoIterator for Stream<'a> {
     type Item = self::Item;
     type IntoIter = <Vec<self::Item> as IntoIterator>::IntoIter;

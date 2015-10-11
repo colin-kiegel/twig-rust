@@ -68,7 +68,7 @@ impl Builder {
 
         // collect regex "patternA|patternB|.."
         return operators.iter().map(|&(_, op)| self.operator_to_regex(op))
-             .collect::<Vec<String>>().connect("|");
+             .collect::<Vec<String>>().join("|");
     }
 
     fn operator_to_regex(&self, operator: &str) -> String {
@@ -82,9 +82,9 @@ impl Builder {
         if let Some(c) = operator.chars().last() {
             if c.is_alphabetic() {
                 panic!("operator_to_regex(): operator ends in alphanumeric character (!)");
-                // NOTE:  regex does not support lookahead(!)
+                // #NOTE:70 regex does not support lookahead(!)
                 //  -> orig: r.push(r"(?=[\s()])");
-                //  -> TODO: overwrite extract() in operator pattern and do aftermath
+                //  -> #TODO:320 overwrite extract() in operator pattern and do aftermath
             }
         }
 
@@ -136,7 +136,7 @@ impl PartialEq for Pattern {
 }
 
 
-// TODO: test-cases?
+// #TODO:650 test-cases?
 
 // #[cfg(test)]
 // mod test {
