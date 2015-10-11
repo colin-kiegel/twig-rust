@@ -1,8 +1,10 @@
 # Planned
 
 * `core` extension
+  * template loader and cache
   * static text
   * variable expression + dictionary
+  * {Mustache}-Extension :-)
   * if conditional
   * for-each-loop + arrays
 * runtime

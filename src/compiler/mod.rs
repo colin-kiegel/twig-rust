@@ -13,6 +13,8 @@
 
 #[cfg(test)]
 mod test;
+mod template_cache;
+use loader::api::Loader;
 use std::path::Path;
 use std::rc::Rc;
 use template::Template;
@@ -36,16 +38,12 @@ pub use parser::{self, Parser};
 pub use runtime::{self, Runtime};
 
 
-#[derive(Debug)]
-pub struct Loader; // TODO: dummy
-impl Loader { pub fn new() -> Loader { Loader } }
-
-#[derive(Default, Debug)] // TODO - provide a different constructor
+#[derive(Default, Debug)] // #TODO:0 - provide a different constructor
 pub struct Compiler {
     options: Options,
     ext: Option<Rc<ExtensionRegistry>>,
     //ext_staging: Option<Box<ext::Staging>>,
-    loader: Option<Loader>,
+    loader: Option<Box<Loader>>,
     lexer: Option<Lexer>,
     parser: Option<Parser>,
     runtime: Option<Runtime>,
@@ -106,32 +104,32 @@ impl Compiler {
         }
     }
 
-    /// Sets the Lexer instance.
-    pub fn set_loader(&mut self, loader: Loader) -> &mut Compiler {
-        self.loader = Some(loader); // TODO switch to callback pattern to provide arguments
+    /// Sets the loader instance.
+    pub fn set_loader(&mut self, loader: Box<Loader>) -> &mut Compiler {
+        self.loader = Some(loader); // #TODO:580 switch to callback pattern to provide arguments
 
         self
     }
 
-    /// Gets the parser instance.
+    /// Gets the loader instance.
     pub fn loader(&mut self) -> &Loader {
         match self.loader {
-            Some(ref loader) => return loader,
+            Some(ref mut loader) => return ::std::ops::Deref::deref(loader), // #TODO:310 nicer way to deref??
             None => {
-                self.loader = Some(Loader::new());
+                self.loader = unimplemented!();
                 return self.loader();
             }
         }
     }
 
-    /// Sets the Lexer instance.
+    /// Sets the lexer instance.
     pub fn set_lexer(&mut self, lexer: Lexer) -> &mut Compiler {
-        self.lexer = Some(lexer); // TODO switch to callback pattern to provide arguments
+        self.lexer = Some(lexer); // #TODO:590 switch to callback pattern to provide arguments
 
         self
     }
 
-    /// Gets the Lexer instance.
+    /// Gets the lexer instance.
     pub fn lexer(&mut self) -> Result<&Lexer, TwigError> {
         match self.lexer {
             Some(ref lexer) => return Ok(lexer),
