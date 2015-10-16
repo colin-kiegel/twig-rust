@@ -33,20 +33,20 @@ pub mod state;
 // Finite State Machine loosely inspired by
 // * http://www.huffingtonpost.com/damien-radtke/rustic-state-machines-for_b_4466566.html
 
-pub struct Job<'a> {
-    patterns: &'a Patterns,
-    _template: &'a template::Raw,
+pub struct Job<'c, 't> {
+    patterns: &'c Patterns,
+    _template: &'t template::Raw,
     current_exp_block_line: usize,
-    tokens: token::Stream<'a>,
-    cursor: template::raw::Cursor<'a>,
+    tokens: token::Stream<'t>,
+    cursor: template::raw::Cursor<'t>,
     _position: usize,
-    token_start_iter: token_start::ExtractIter<'a, 'a>, // orig: positions
+    token_start_iter: token_start::ExtractIter<'c, 't>, // orig: positions
     brackets: Vec<(BracketType, usize/*TODO LineNo*/)>,
 }
 
-impl<'a> Job<'a> {
+impl<'c, 't> Job<'c, 't> {
     #[allow(dead_code)] // #TODO:660 testcase
-    pub fn new(template: &'a template::Raw, patterns: &'a Patterns) -> Box<Job<'a>> {
+    pub fn new(template: &'t template::Raw, patterns: &'c Patterns) -> Box<Job<'c, 't>> {
         let token_start_iter = patterns.token_start.extract_iter(&template.code);
         let cursor = template::raw::Cursor::new(&template);
         let tokens = token::Stream::new(&template);
@@ -64,7 +64,7 @@ impl<'a> Job<'a> {
     }
 
     #[allow(dead_code)] // #TODO:670 testcase
-    pub fn tokenize(mut self: Job<'a>) -> Result<token::Stream<'a>, LexerError> {
+    pub fn tokenize(mut self: Job<'c, 't>) -> Result<token::Stream<'t>, LexerError> {
         // The TokenizeStates call each other *recursively* to avoid dynamic dispatch
         // for better performance. However, we loose debugging information about the
         // nesting of lexer states.
@@ -95,7 +95,7 @@ impl<'a> Job<'a> {
 }
 
 // #TODO:490 switch to Debug-Builder once stable
-impl<'a> fmt::Debug for Job<'a> {
+impl<'c, 't> fmt::Debug for Job<'c, 't> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         write!(f, "[\n\
             Cursor: {cursor}\n\

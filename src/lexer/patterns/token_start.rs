@@ -26,7 +26,7 @@ use std::rc::Rc;
 // exports //
 /////////////
 
-pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
+pub type ExtractIter<'pattern, 'tpl> = super::ExtractIter<'pattern, 'tpl, Pattern>;
 
 #[derive(Debug, PartialEq)]
 pub struct Pattern {

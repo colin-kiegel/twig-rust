@@ -14,7 +14,7 @@
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use std::fs;
-use loader::{LoaderError, LoaderErrorCode}; // #TODO:520 switch to LoaderErrorCodes
+use loader::{LoaderError, LoaderErrorCode};
 
 /////////////
 // exports //

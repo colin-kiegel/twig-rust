@@ -134,8 +134,8 @@ impl<'a> Cursor<'a> {
 
 impl<'a> fmt::Display for Cursor<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "`{filename}` line {line} column {column}",
-            filename = self.template.filename(),
+        write!(f, "`{template_name}` line {line} column {column}",
+            template_name = self.template.name(),
             line = self.line(),
             column = self.column())
     }

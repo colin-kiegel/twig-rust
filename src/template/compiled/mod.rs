@@ -12,8 +12,26 @@
  */
 
 /////////////
+// imports //
+/////////////
+
+use super::api::Template;
+use compiler::Compiler;
+use compiler::TwigError;
+
+/////////////
 // exports //
 /////////////
 
 #[allow(dead_code)]
 pub struct Compiled;
+
+impl Template for Compiled {
+    fn render(&self, _compiler: &mut Compiler, _context: Vec<()>) -> Result<String, TwigError> {
+        unimplemented!()
+    }
+
+    fn display(&self, _compiler: &mut Compiler, _context: Vec<()>, _blocks: Option<Vec<()>>) {
+        unimplemented!()
+    }
+}

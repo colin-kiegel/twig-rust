@@ -30,16 +30,19 @@ pub use self::cursor::Cursor as Cursor;
 #[derive(Default)]
 #[derive(Debug)]
 pub struct Raw {
-    filename: String,
+    name: String, // twig template name, e.g. "@namespace/path/to/template"
     pub code: String,
 }
 
 #[allow(unused_variables)]
 impl Raw {
     #[allow(dead_code)] // #TODO:730 testcase
-    pub fn new(code: &str, filename: &str) -> Raw {
+    pub fn new<C,N>(code: C, name: N) -> Raw where
+        C: ToString,
+        N: ToString,
+    {
         let mut x = Raw {
-            filename: filename.to_string(),
+            name: name.to_string(),
             code: code.to_string(),
         };
         x.fix_linebreaks();
@@ -51,8 +54,27 @@ impl Raw {
         self.code = self.code.replace("\r\n","\n").replace("\r","\n");
     }
 
-    pub fn filename(&self) -> &str {
-        &self.filename
+    pub fn name(&self) -> &str {
+        &self.name
+    }
+
+    pub fn tokenize<'a, 't> (&'t self, lexer: &'a Lexer) -> Result<token::Stream<'t>, LexerError>
+        where 't: 'a // the template must outlive the Lexer
+    {
+        lexer.tokenize(self)
+    }
+}
+
+// NOTE: probably no need to implement this for template::Raw?
+impl Template for Raw {
+    fn render(&self, compiler: &mut Compiler, _context: Vec<()>) -> Result<String, TwigError> {
+        let _tokenstream = try!(self.tokenize(try!(compiler.lexer())));
+
+        unimplemented!()
+    }
+
+    fn display(&self, _compiler: &mut Compiler, _context: Vec<()>, _blocks: Option<Vec<()>>) {
+        unimplemented!()
     }
 }
 
@@ -65,7 +87,7 @@ mod test {
         let t = Raw::new("A", "B");
 
         assert_eq!(t.code, "A");
-        assert_eq!(t.filename, "B");
+        assert_eq!(t.name, "B");
     }
 
     #[test]

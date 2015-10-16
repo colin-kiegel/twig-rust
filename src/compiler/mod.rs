@@ -15,9 +15,8 @@
 mod test;
 mod template_cache;
 use loader::api::Loader;
-use std::path::Path;
 use std::rc::Rc;
-use template::Template;
+use template;
 
 /////////////
 // exports //
@@ -62,8 +61,9 @@ impl Compiler {
     /// * When the template cannot be found
     /// * When an error occurred during compilation
     /// * When an error occurred during rendering
-    pub fn render(&self, path: &Path, context: Vec<()>) -> Result<String, TwigError> {
-        return Ok(try!(self.load_template(path, None)).render(context));
+    pub fn render(&mut self, _path: &str, _context: Vec<()>) -> Result<String, TwigError> {
+        unimplemented!()
+        //return Ok(try!(self.load_template(path, None)).render(context));
     }
 
     /// Displays a template.
@@ -72,8 +72,9 @@ impl Compiler {
     /// * When the template cannot be found
     /// * When an error occurred during compilation
     /// * When an error occurred during rendering
-    pub fn display(&self, path: &Path, context: Vec<()>) -> Result<(), TwigError> {
-       return Ok(try!(self.load_template(path, None)).display(context, None));
+    pub fn display(&mut self, _path: &str, _context: Vec<()>) -> Result<(), TwigError> {
+       unimplemented!()
+       // return Ok(try!(self.load_template(path, None)).display(context, None));
     }
 
     /// Loads and compiles a template.
@@ -81,8 +82,42 @@ impl Compiler {
     /// # Failures
     /// * When the template cannot be found
     /// * When an error occurred during compilation
-    pub fn load_template(&self, _path: &Path, _index: Option<u32>) -> Result<Box<Template>, TwigError> {
-        unimplemented!()
+    pub fn load_template(&mut self, path: &str, _index: Option<u32>) -> Result<template::Compiled, TwigError> {
+        // TODO: Cache compiled templates
+        //  * cache lookup
+        //  * check if cache is fresh
+        //  * store in cache
+
+        let template_raw = try!(self.load_template_raw(path));
+        return self.compile_template(&template_raw);
+    }
+
+    /// Loads raw template.
+    ///
+    /// # Failures
+    /// * When the template cannot be found
+    fn load_template_raw(&mut self, path: &str) -> Result<template::Raw, TwigError> {
+        let loader = try!(self.loader());
+        let source = try!(loader.source(path));
+        Ok(template::Raw::new(source, path))
+    }
+
+    /// Compiles a template.
+    ///
+    /// # Failures
+    /// * When an error occurred during lexing or parsing.
+    fn compile_template(&mut self, template: &template::Raw) -> Result<template::Compiled, TwigError> {
+        let tokenstream = {
+            let lexer = try!(self.lexer());
+            try!(lexer.tokenize(template))
+        };
+
+        let compiled = {
+            let parser = try!(self.parser());
+            try!(parser.parse(&tokenstream))
+        };
+
+        Ok(compiled)
     }
 
     /// Sets the compiler extensions.

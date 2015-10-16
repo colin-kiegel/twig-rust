@@ -64,7 +64,7 @@ impl Lexer {
     }
 
     #[allow(dead_code)] // #TODO:680 testcase
-    pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream, LexerError>
+    pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream<'t>, LexerError>
         where 't: 'a // the template must outlive the Lexer
     {
         let job = Job::new(template, &self.patterns);

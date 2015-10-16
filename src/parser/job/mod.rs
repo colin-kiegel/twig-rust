@@ -21,6 +21,7 @@ use parser::error::*;
 use parser::{node, Parser};
 use compiler::extension::api::operator::Precedence;
 use std::iter;
+use template;
 
 /////////////
 // exports //
