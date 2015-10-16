@@ -20,8 +20,7 @@
 
 use std::collections::HashMap;
 use std::borrow::Cow;
-use compiler::{TwigError, TwigErrorCode};
-use super::api;
+use super::{api, LoaderError, LoaderErrorCode};
 
 /////////////
 // exports //
@@ -34,11 +33,11 @@ pub struct Array {
 }
 
 impl api::Loader for Array {
-    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, TwigError> {
+    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
 
         return match self.templates.get(name) {
             None => {
-                err!(TwigErrorCode::Loader)
+                err!(LoaderErrorCode::TemplateNotFound)
                     .explain(format!("Entry not present {:?}.", name))
                     .into()
             }
@@ -48,7 +47,7 @@ impl api::Loader for Array {
         }
     }
 
-    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, TwigError> {
+    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
         self.source(name)
     }
 

@@ -12,8 +12,8 @@
 /////////////
 
 use std::path::{Path, PathBuf, Component};
-use compiler::{TwigError, TwigErrorCode}; // #TODO:530 switch to LoaderErrorCodes
 use super::namespace;
+use loader::{LoaderError, LoaderErrorCode};
 
 /////////////
 // exports //
@@ -34,14 +34,14 @@ impl TemplatePath {
     //
     //     return template_path;
     // }
-    pub fn parse(template_path: &str) -> Result<TemplatePath, TwigError> {
+    pub fn parse(template_path: &str) -> Result<TemplatePath, LoaderError> {
         let normalized_path = TemplatePath::normalize(template_path);
         let namespace: &str;
         let raw_path: &str;
 
         if normalized_path.chars().nth(1) == Some('@') {
             match normalized_path.find('/') {
-                None => return err!(TwigErrorCode::Logic)
+                None => return err!(LoaderErrorCode::InvalidPath)
                     .explain(format!("Malformed namespaced template path {template} (expecting '@namespace/path_to_file').",
                     template = normalized_path))
                     .into(),
@@ -90,7 +90,7 @@ impl TemplatePath {
         normalized_path
     }
 
-    pub fn validate(&self) -> Result<(), TwigError> {
+    pub fn validate(&self) -> Result<(), LoaderError> {
         let mut level = 0;
         for component in self.raw_path.components() {
             match component {
@@ -103,7 +103,7 @@ impl TemplatePath {
         }
 
         if level < 0 {
-            return err!(TwigErrorCode::Logic)
+            return err!(LoaderErrorCode::InvalidPath)
                 .explain(format!("Looks like you try to load a template outside configured directories ({template:?}).",
                 template = self.raw_path))
                 .into()

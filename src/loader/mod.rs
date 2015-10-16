@@ -24,3 +24,5 @@
 pub mod api;
 pub mod array;
 pub mod filesystem;
+pub mod error;
+pub use self::error::{LoaderError, LoaderErrorCode};

@@ -12,6 +12,14 @@
  */
 
 /////////////
+// imports //
+/////////////
+
+use super::api::Template;
+use compiler::{Compiler, TwigError};
+use lexer::{Lexer, token, LexerError};
+
+/////////////
 // exports //
 /////////////
 

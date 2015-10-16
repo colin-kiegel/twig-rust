@@ -17,6 +17,7 @@
 
 use std::fmt;
 use std::any::Any;
+use std::convert;
 
 /////////////
 // exports //
@@ -118,7 +119,7 @@ impl<'a> Iterator for ErrorIter<'a> {
     }
 }
 
-impl<T, V> ::std::convert::Into<Result<V, Exception<T>>> for Exception<T> {
+impl<T, V> convert::Into<Result<V, Exception<T>>> for Exception<T> {
     fn into (self) -> Result<V, Exception<T>> {
         Err(self)
     }

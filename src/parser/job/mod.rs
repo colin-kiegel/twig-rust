@@ -70,7 +70,7 @@ impl<'a> Job<'a> {
 
     #[allow(unused_mut)]
     #[allow(dead_code)] // #TODO:710 testcase
-    pub fn parse(mut self: Job<'a>, test: String, drop_needle: bool) -> Result<(), ParserError> {
+    pub fn parse(mut self: Job<'a>, test: String, drop_needle: bool) -> Result<template::Compiled, ParserError> {
 
         self.stack.push(self.state);
         self.state = State::default();

@@ -17,7 +17,7 @@
 
 use std::fmt::Debug;
 use std::borrow::Cow;
-use compiler::TwigError;
+use super::LoaderError;
 
 /////////////
 // exports //
@@ -26,17 +26,17 @@ use compiler::TwigError;
 pub trait Loader : Debug {
     /// Gets the source code of a template, given its name
     ///
-    /// # Failures
+    /// Returns a Cow<str> to allow for efficient caching mechanisms.
     ///
+    /// # Failures
     /// * When `name` is not found
-    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, TwigError>;  // #TODO:240 more meaningful errors
+    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<str>, LoaderError>;
 
     /// Gets the cache key to use for the cache for a given template
     ///
     /// # Failures
-    ///
     /// * When `name` is not found
-    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, TwigError>;  // #TODO:250 more meaningful errors
+    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError>;
 
     /// returns true if the template is still fresh
     fn is_fresh(&mut self, name: &str, time: i64) -> bool;

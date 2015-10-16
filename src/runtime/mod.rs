@@ -25,7 +25,9 @@ use std::collections::HashMap;
 /////////////
 
 pub mod node;
+pub mod error;
 pub use self::node::NodeOutput;
+pub use self::error::{RuntimeError, RuntimeErrorCode};
 
 #[allow(dead_code)]
 #[derive(Debug)]

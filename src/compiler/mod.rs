@@ -112,12 +112,13 @@ impl Compiler {
     }
 
     /// Gets the loader instance.
-    pub fn loader(&mut self) -> &Loader {
+    pub fn loader(&mut self) -> Result<&mut Loader, TwigError> {
         match self.loader {
-            Some(ref mut loader) => return ::std::ops::Deref::deref(loader), // #TODO:310 nicer way to deref??
+            Some(ref mut loader) => return Ok(&mut **loader), // dereferencing the Box<>
             None => {
-                self.loader = unimplemented!();
-                return self.loader();
+                return err!(TwigErrorCode::Loader)
+                    .explain(format!("The template loader must be initializied prior usage"))
+                    .into()
             }
         }
     }

@@ -17,9 +17,8 @@ use std::fs::{self, File};
 use std::os::unix::fs::MetadataExt;
 use std::io::Read;
 use std::borrow::Cow;
-use super::api;
+use super::{api, LoaderError, LoaderErrorCode};
 use self::namespace::Namespace;
-use compiler::{TwigError, TwigErrorCode}; // #TODO:510 switch to LoaderErrorCodes
 
 /////////////
 // exports //
@@ -35,7 +34,7 @@ pub struct Filesystem {
 }
 
 impl api::Loader for Filesystem {
-    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, TwigError> {
+    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<str>, LoaderError> {
         let path = try!(self.find_template(name));
 
         return match Self::read(&path) {
@@ -46,7 +45,7 @@ impl api::Loader for Filesystem {
                 // seamless fallback to other template directories
                 // - but should avoid infinite loops (one retry only)
 
-                return err!(TwigErrorCode::Loader)
+                return err!(LoaderErrorCode::TemplateNotFound)
                 .explain(format!("Could not read file {path:?} while loading template {id:?}",
                     path = path,
                     id = name))
@@ -57,7 +56,7 @@ impl api::Loader for Filesystem {
         }
     }
 
-    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, TwigError> {
+    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
         self.find_template(name).map(|x| Cow::Borrowed(x.to_str().unwrap())) // #TODO:370 remove unwrap!
     }
 
@@ -142,7 +141,7 @@ impl Filesystem {
     }
 
     /// Find template.
-    fn find_template(&mut self, template_path: &str) -> Result<&Path, TwigError> {
+    fn find_template(&mut self, template_path: &str) -> Result<&Path, LoaderError> {
         if let Some(cached) = self.path_cache.get(template_path) {
             // #TODO:140 clear cache if file vanished - else return
 
@@ -161,7 +160,7 @@ impl Filesystem {
         let raw_path = path.raw_path();
 
         match self.namespaces.get_mut(namespace_id) {
-            None => return err!(TwigErrorCode::Loader)
+            None => return err!(LoaderErrorCode::NotInitialized)
                 .explain(format!("The template namespace {id:?} is not initialized.",
                 id = namespace_id))
                 .into(),

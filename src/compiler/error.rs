@@ -16,6 +16,11 @@
 /////////////
 
 use error;
+use std::convert;
+use loader::LoaderErrorCode;
+use lexer::LexerErrorCode;
+use parser::ParserErrorCode;
+use runtime::RuntimeErrorCode;
 
 /////////////
 // exports //
@@ -31,6 +36,11 @@ pub enum TwigErrorCode {
     Parser,
     Runtime,
 }
+
+impl_convert_exception!(LoaderErrorCode, TwigErrorCode, TwigErrorCode::Loader);
+impl_convert_exception!(LexerErrorCode, TwigErrorCode, TwigErrorCode::Lexer);
+impl_convert_exception!(ParserErrorCode, TwigErrorCode, TwigErrorCode::Parser);
+impl_convert_exception!(RuntimeErrorCode, TwigErrorCode, TwigErrorCode::Runtime);
 
 impl ToString for TwigErrorCode {
     fn to_string(&self) -> String {

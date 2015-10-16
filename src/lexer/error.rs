@@ -16,6 +16,7 @@
 /////////////
 
 use error;
+use std::convert;
 
 /////////////
 // exports //
@@ -53,16 +54,7 @@ pub enum TokenErrorCode {
     _NoValue,
 }
 
-impl ::std::convert::From<SyntaxError> for LexerError {
-    fn from(cause: SyntaxError) -> LexerError {
-        let details = ::error::Details {
-            message: None,
-            .. *cause.details()
-        };
-        ::error::Exception::new(details, LexerErrorCode::SyntaxError)
-            .caused_by(cause)
-    }
-}
+impl_convert_exception!(SyntaxErrorCode, LexerErrorCode, LexerErrorCode::SyntaxError);
 
 impl ToString for SyntaxErrorCode {
     fn to_string(&self) -> String {

@@ -14,7 +14,7 @@
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use std::fs;
-use compiler::{TwigError, TwigErrorCode}; // #TODO:520 switch to LoaderErrorCodes
+use loader::{LoaderError, LoaderErrorCode}; // #TODO:520 switch to LoaderErrorCodes
 
 /////////////
 // exports //
@@ -72,7 +72,7 @@ impl Namespace {
         self.dirs.insert(index, dir);
     }
 
-    pub fn find_template(&mut self, raw_path: &Path) -> Result<&Path, TwigError> {
+    pub fn find_template(&mut self, raw_path: &Path) -> Result<&Path, LoaderError> {
         if let Some(cached) = self.path_cache.get(raw_path) {
             // #TODO:150 clear cache if file vanished - else return
 
@@ -87,7 +87,7 @@ impl Namespace {
         }
 
         if self.dirs.len() == 0 {
-            return err!(TwigErrorCode::Loader)
+            return err!(LoaderErrorCode::NotInitialized)
             .explain(format!("There are no registered directories for template namespace {id:?}",
             id = self.id))
             .into()
@@ -104,7 +104,7 @@ impl Namespace {
             }
         }
 
-        return err!(TwigErrorCode::Loader)
+        return err!(LoaderErrorCode::TemplateNotFound)
             .explain(format!(
                 "Unable to find template {path:?} in namespace {id:?} (looked into: {dirs:?})",
                 path = raw_path,
