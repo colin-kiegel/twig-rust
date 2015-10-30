@@ -15,8 +15,6 @@
 // imports //
 /////////////
 
-use super::api::Template;
-use compiler::{Compiler, TwigError};
 use lexer::{Lexer, token, LexerError};
 
 /////////////
@@ -58,23 +56,11 @@ impl Raw {
         &self.name
     }
 
+    #[allow(dead_code)]
     pub fn tokenize<'a, 't> (&'t self, lexer: &'a Lexer) -> Result<token::Stream<'t>, LexerError>
         where 't: 'a // the template must outlive the Lexer
     {
         lexer.tokenize(self)
-    }
-}
-
-// NOTE: probably no need to implement this for template::Raw?
-impl Template for Raw {
-    fn render(&self, compiler: &mut Compiler, _context: Vec<()>) -> Result<String, TwigError> {
-        let _tokenstream = try!(self.tokenize(try!(compiler.lexer())));
-
-        unimplemented!()
-    }
-
-    fn display(&self, _compiler: &mut Compiler, _context: Vec<()>, _blocks: Option<Vec<()>>) {
-        unimplemented!()
     }
 }
 

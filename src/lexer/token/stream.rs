@@ -55,10 +55,10 @@ impl Item {
     }
 }
 
-#[derive(Default)]
+//#[derive(Default)]
 pub struct Stream<'a> {
     items: Vec<Item>,
-    _template: Option<&'a template::Raw>,
+    template: &'a template::Raw,
 }
 
 impl Into<Token> for Item {
@@ -95,7 +95,7 @@ impl<'a> Stream<'a> {
     pub fn new(template: &'a template::Raw) -> Stream<'a> {
         Stream {
             items: Vec::new(),
-            _template: Some(template), // #TODO:380 rename path??
+            template: template, // #TODO:380 rename path??
         }
     }
 
@@ -109,8 +109,8 @@ impl<'a> Stream<'a> {
         });
     }
 
-    pub fn template(&self) -> Option<&template::Raw> {
-        self._template
+    pub fn template(&self) -> &template::Raw {
+        self.template
     }
 
     pub fn _is_eof(&self) -> bool {
@@ -120,7 +120,7 @@ impl<'a> Stream<'a> {
         }
     }
 
-    pub fn _len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.items.len()
     }
 

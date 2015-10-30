@@ -71,7 +71,7 @@ impl<'t> super::Extract<'t> for Pattern {
                 Ok(float)
                     => Number::Floating(float),
                 Err(e)
-                    => return err!(LexerErrorCode::InvalidValue, number_string)
+                    => return err!(LexerErrorCode::InvalidValue, "{}", number_string)
                         .caused_by(e)
                         .into(),
             },
@@ -79,7 +79,7 @@ impl<'t> super::Extract<'t> for Pattern {
                 Ok(int)
                     => Number::Integer(int),
                 Err(e)
-                    => return err!(LexerErrorCode::InvalidValue, number_string)
+                    => return err!(LexerErrorCode::InvalidValue, "{}", number_string)
                         .caused_by(e)
                         .into(),
             },

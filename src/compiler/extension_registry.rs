@@ -168,7 +168,7 @@ impl ExtensionRegistry {
         Ok(())
     }
 
-    /// Get the token parser instances to register with the compiler.
+    /// Get the token parser instances defined by compiler extensions.
     pub fn token_parsers(&self) -> &HashMap<String, Box<api::TokenParser>> {
         &self.token_parsers
     }
@@ -178,37 +178,37 @@ impl ExtensionRegistry {
     //     &self._token_parser_by_tags
     // }
 
-    /// Get the node visitor instances to register with the compiler.
+    /// Get the node visitor instances defined by compiler extensions.
     pub fn node_visitors(&self) -> &Vec<Box<api::NodeVisitor>> {
         &self.node_visitors
     }
 
-    /// Get the filters to register with the compiler.
+    /// Get the filters defined by compiler extensions.
     pub fn filters(&self) -> &HashMap<String, Box<api::Filter>> {
         &self.filters
     }
 
-    /// Get the tests to register with the compiler.
+    /// Get the tests defined by compiler extensions.
     pub fn tests(&self) -> &HashMap<String, Box<api::Test>> {
         &self.tests
     }
 
-    /// Get the functions to register with the compiler.
+    /// Get the functions defined by compiler extensions.
     pub fn functions(&self) -> &HashMap<String, Box<api::Function>> {
         &self.functions
     }
 
-    /// Get the unary operators to register with the compiler.
+    /// Get the unary operators defined by compiler extensions.
     pub fn operators_unary(&self) -> &HashMap<String, api::UnaryOperator> {
         &self.operators_unary
     }
 
-    /// Get the binary operators to register with the compiler.
+    /// Get the binary operators defined by compiler extensions.
     pub fn operators_binary(&self) -> &HashMap<String, api::BinaryOperator> {
         &self.operators_binary
     }
 
-    /// Get the global variables to register with the compiler.
+    /// Get the global variables defined by compiler extensions.
     pub fn _globals(&self) -> &Vec<Box<api::Global>> {
         &self._globals
     }

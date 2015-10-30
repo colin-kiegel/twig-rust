@@ -63,8 +63,11 @@ impl Array {
         }
     }
 
-    pub fn set_template(&mut self, name: String, template: String) {
-        self.templates.insert(name, template);
+    pub fn set_template<N, T>(&mut self, name: N, template: T) where
+        N: ToString,
+        T: ToString
+    {
+        self.templates.insert(name.to_string(), template.to_string());
     }
 
     pub fn exists(&self, name: &str) -> bool {

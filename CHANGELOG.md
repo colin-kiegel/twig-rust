@@ -1,13 +1,21 @@
 # Planned
 
 * `core` extension
-  * template loader and cache
-  * static text
-  * variable expression + dictionary
-  * {Mustache}-Extension :-)
+  * parse/render variable expression
+  * test fileloader
+  * template cache
+  * more (unit) tests
+  * {Mutstache}-Extension :-)
+  * Pear Templates?
   * if conditional
   * for-each-loop + arrays
 * runtime
+  * split off jobs to separate data and writer
+* TODOs + unimplemented!
+
+*
+* move template/raw/cursor to lexer/job/cursor
+* rename _virtual _final, etc. virtual_, final_ etc.
 
 # Unreleased
 
@@ -15,7 +23,15 @@
 
 * lexer: 100%
 * extension API: 90%
-* parser: 20%
+* loader: 80%
+* parser: 25%
+* runtime: 20%
+
+* load Templates from
+ * array
+ * filesystem
+* parse/render
+ * static text
 
 # 0.0.0 first commit (2015-06-16)
 

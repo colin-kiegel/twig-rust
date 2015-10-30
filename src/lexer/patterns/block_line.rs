@@ -71,7 +71,7 @@ impl<'t> super::Extract<'t> for Pattern {
                 Some(x) => match x.parse::<usize>() {
                         Ok(line) => line,
                         Err(e) => {
-                            return err!(LexerErrorCode::InvalidValue, x).caused_by(e).into()
+                            return err!(LexerErrorCode::InvalidValue, "{}", x).caused_by(e).into()
                         },
                     },
                 _ => unreachable!(),

@@ -6,7 +6,7 @@
  */
 
 /**
- * Twig library for rust
+ * Twig filecache for compiled templates.
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */

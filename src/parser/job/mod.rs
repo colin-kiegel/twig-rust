@@ -22,23 +22,29 @@ use parser::{node, Parser};
 use compiler::extension::api::operator::Precedence;
 use std::iter;
 use template;
+use parser::api::Node;
 
 /////////////
 // exports //
 /////////////
 
+pub mod cursor;
+pub use self::cursor::Cursor;
 
 type PeekableTokenStreamIterator<'a> = iter::Peekable<::std::slice::Iter<'a, token::stream::Item>>;
 
 #[allow(dead_code)]
 //#[derive(Debug)]
-pub struct Job<'a> {
-    parser: &'a Parser,    // orig: env
+pub struct Job<'p, 'stream> {
+    parser: &'p Parser,    // orig: env
+    tokens: &'stream token::Stream<'stream>,
 
     // state:
-    stream: PeekableTokenStreamIterator<'a>,
+    // stream: PeekableTokenStreamIterator<'stream>,
+    cursor: Cursor<'stream>,
     state: State,
     stack: Vec<State>,
+    template: &'stream template::Raw,
 }
 
 #[allow(dead_code)]
@@ -54,73 +60,75 @@ pub struct State {
     embedded_templates: Vec<()>,
 }
 
-impl<'a> Job<'a> {
+impl<'p, 'stream> Job<'p, 'stream> {
     #[allow(dead_code)] // #TODO:700 testcase
-    pub fn new(tokens: &'a token::Stream, parser: &'a Parser) -> Job<'a> {
-        let mut _j = Job {
-            stream: tokens.iter().peekable(),
+    pub fn new(tokens: &'stream token::Stream, parser: &'p Parser) -> Job<'p, 'stream> {
+        Job {
+            tokens: tokens,
+            //stream: tokens.iter().peekable(),
+            cursor: Cursor::new(tokens),
             parser: parser,
             state: State::default(),
             stack: Vec::new(),
-        };
-
-        unimplemented!();
-        // j.handlers.set_parser(j); // TODO
-        //return _j;
+            template: tokens.template(),
+        }
     }
 
     #[allow(unused_mut)]
     #[allow(dead_code)] // #TODO:710 testcase
-    pub fn parse(mut self: Job<'a>, test: String, drop_needle: bool) -> Result<template::Compiled, ParserError> {
+    pub fn parse(mut self: Job<'p, 'stream>, test: String, drop_needle: bool) -> Result<template::Compiled, ParserError> {
 
+        // NOTE: try to move this to other point
+        //  - to avoid very first redundant push?
+        //  - Better have unit tests forst
         self.stack.push(self.state);
         self.state = State::default();
 
-        let _body = match self.sub_parse(test, drop_needle) {
+        let nodes = match self.sub_parse(test, drop_needle) {
             Err(e) => return Err(e),
-            _ => unimplemented!()
-            // Some(body) => {
-            //     if self.state.parent.is_some() {
-            //         self.filter_body_nodes(body).unwrap_or_else(|| Node::new())
-            //     } else {
-            //         body
-            //     }
-            // }
+            Ok(nodes) => {
+                if self.state.parent.is_some() {
+                    unimplemented!()
+                    // self.filter_body_nodes(body).unwrap_or_else(|| node::Virtual::boxed())
+                } else {
+                    nodes
+                }
+            }
         };
 
-        unimplemented!()
-        // let node = NodeModule::new(
-        //     NodeBody::new(
-        //         body,
-        //         self.state.parent,
-        //         Node::new(self.state.blocks),
-        //         Node::new(self.state.macros),
-        //         Node::new(self.state.traits),
-        //         self.state.embedded_templates,
-        //         self.filename()));
-        // self.state = self.stack.pop.unwrap();
-        //
+        let module = node::Module::new(
+            node::Body::boxed(nodes),
+            self.state.parent,
+            self.state.blocks, // as nodes?
+            self.state.macros, // as nodes?
+            self.state.traits, // as nodes?
+            self.state.embedded_templates,
+            self.template.name());
+        self.state = self.stack.pop().unwrap();
+
+        // *IMPORTANT TODO*: move initialisation somewhere else(!)
         // let traverser = NodeTraverser::new(compiler, self.visitors);
-        // node = traverser.traverse(node);
-        //
-        // return node;
+        // module = traverser.traverse(module);
+
+        let compiled = template::Compiled::new(module);
+
+        return Ok(compiled);
     }
 
-    pub fn sub_parse(&mut self, _test: String, _drop_needle: bool) -> Result<(), ParserError> {
+    pub fn sub_parse(&mut self, _test: String, _drop_needle: bool) -> Result<Vec<Box<Node>>, ParserError> {
         // let line = self.current_token().line();
-        let mut rv : Vec<Box<node::Node>> = Vec::new();
+        let mut nodes : Vec<Box<Node>> = Vec::new();
 
-        while let Some(item) = self.stream.next() {
+        while let Some(item) = self.cursor.next() {
             match *item.token() {
                 Token::Text(ref value) => {
-                    rv.push(node::Text::new(value, item.position()));
+                    nodes.push(node::Text::boxed(value.to_string(), item.position()));
                 },
                 Token::ExpressionStart => {
-                    let _expr = self.parser.parse_expression(self, Precedence(0));
-                    try!(self.expect_token(Token::ExpressionEnd));
+                    let node = try!(self.parser.parse_expression(self, Precedence(0)));
+                    try!(self.cursor().expect_token(Token::ExpressionEnd));
 
-                    // rv.push(node::Print::new(expr, item.position()));
-                    unimplemented!() // TODO
+                    nodes.push(node::Print::boxed(node, item.position()));
                 },
                 Token::BlockStart => {
                     unimplemented!() // TODO
@@ -132,32 +140,39 @@ impl<'a> Job<'a> {
             }
         }
 
-        unimplemented!()
-    }
-
-    pub fn current_token(&self) -> &Token {
-        unimplemented!()
-    }
-
-    pub fn expect_token(&mut self, token: Token) -> Result<(), ParserError> {
-        match self.stream.peek() {
-            None => return err!(ParserErrorCode::Eof)
-                .explain(format!("Expected token {:?}.", token))
-                .into(),
-            Some(item) => {
-                if *item.token() == token { return Ok(()) };
-
-                return err!(ParserErrorCode::UnexpectedToken)
-                    .explain(format!("Expected token {t:?} but found item {x:?} at {p:?}",
-                        t = token, x = item.token(), p = item.position()))
-                    .into();
-            }
+        if nodes.is_empty() {
+            return err!(ParserErrorCode::Logic)
+                .explain(format!("Parser could not extract node from token stream."))
+                .into()
         }
+
+        return Ok(nodes);
+
+        // ALTERNATIVELY SOME STRANGE NESTING (!)
+        // if nodes.len() > 1 {
+        //     let position = nodes[0].position();
+        //     let virtual_node = node::Virtual::boxed(position);
+        //
+        //     return Ok(virtual_node);
+        // }
+        //
+        // return match nodes.pop() {
+        //     Some(node) => {
+        //         Ok(node)
+        //     },
+        //     None => err!(ParserErrorCode::Logic)
+        //         .explain(format!("Parser could not extract node from token stream."))
+        //         .into(),
+        // }
+    }
+
+    pub fn cursor(&mut self) -> &mut Cursor<'stream> {
+        &mut self.cursor
     }
 }
 
 // #TODO:500 switch to Debug-Builder once stable
-impl<'a> fmt::Debug for Job<'a> {
+impl<'p, 'tpl> fmt::Debug for Job<'p, 'tpl> {
     fn fmt(&self, _f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         unimplemented!()
         // write!(f, "[\n\

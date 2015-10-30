@@ -6,7 +6,7 @@
  */
 
 /**
- * Text Node
+ * Name Expression Node.
  *
  * @author Colin Kiegel <kiegel@gmx.de>
  */
@@ -15,37 +15,40 @@
 // imports  //
 //////////////
 
-use super::GenericNode;
-use runtime::{Runtime, NodeOutput};
+use parser::node::GenericNode;
+use runtime::{Runtime, NodeOutput, DataProvider};
 use lexer::token::stream::Position;
-use std::clone::Clone;
 use std::collections::HashMap;
+use std::clone::Clone;
 
 /////////////
 // exports //
 /////////////
 
 
-pub type Text = GenericNode<Data>;
+pub type Name = GenericNode<Data>;
 
 #[derive(Debug, Default)]
 pub struct Data {
-    text: String,
+    key: String,
 }
 
-impl Text {
-    pub fn boxed(text: String, position: &Position) -> Box<Text> {
-        Box::new(Text {
-            data: Data { text: text },
+impl Name {
+    pub fn boxed(key: String, position: &Position) -> Box<Name> {
+        Box::new(Name {
+            data: Data { key: key },
             position: (*position).clone(),
             ..GenericNode::default()
         })
     }
 }
 
-impl NodeOutput for Text {
-    fn output(&self, runtime: &mut Runtime, _data: &HashMap<String, String>) {
-        runtime.write(&self.data.text)
+impl NodeOutput for Name {
+    fn output(&self, runtime: &mut Runtime, data: &HashMap<String, String>) {
+        // TODO: Add some logging if lookup failed
+        //      -> might make sense to do that locally
+        let text: &str = data.get(&self.data.key).map_or("", |x| x.as_ref());
+        runtime.write(text)
     }
 }
 
@@ -59,12 +62,13 @@ mod test {
 
     #[test]
     fn run() {
-        let text = "Hello World";
-        let data = HashMap::<String, String>::default();
+        let key = "message";
+        let mut data = HashMap::<String, String>::default();
+        data.insert("message".to_string(), "Hello World".to_string());
         let mut rt = Runtime::default();
 
-        let node = Text { data: Data {
-                text: text.to_string()
+        let node = Name { data: Data {
+                key: key.to_string()
             }, ..Default::default() };
 
         node.run(&mut rt, &data);

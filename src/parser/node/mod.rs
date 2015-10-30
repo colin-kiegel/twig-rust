@@ -18,27 +18,29 @@
 use std::fmt::Debug;
 use std::collections::HashMap;
 use parser::error::{NodeError, NodeErrorCode};
-use runtime::NodeOutput;
+use super::api::Node;
+use runtime::api::{NodeOutput};
+use runtime::Runtime;
+use lexer::token::stream::Position;
 
 /////////////
 // exports //
 /////////////
 
+pub mod module;
+pub mod body;
+pub mod _virtual;
 pub mod text;
+pub mod print;
+pub mod expression;
+pub use self::module::Module;
+pub use self::body::Body;
 pub use self::text::Text;
-pub use lexer::token::stream::Position;
+pub use self::_virtual::Virtual;
+pub use self::print::Print;
+
 
 type NodeDataAttibutes = HashMap<String, String>;
-
-pub trait Node : Debug {
-    fn tag(&self) -> &str;
-    fn position(&self) -> &Position;
-    fn children(&self) -> &Vec<Box<Node>>;
-    fn has_attribute(&self, key: &str) -> bool;
-    fn get_attribute(&self, key: &str) -> Result<&str, NodeError>;
-    fn set_attribute(&mut self, key: &str, value: &str) -> Option<String>;
-    fn rm_attribute(&mut self, key: &str) -> Option<String>;
-}
 
 #[allow(dead_code)]
 #[derive(Debug, Default)]
@@ -67,7 +69,7 @@ impl<T> Node for GenericNode<T> where
         self.attributes.contains_key(key)
     }
 
-    fn get_attribute(&self, key: &str) -> Result<&str, NodeError> {
+    fn attribute(&self, key: &str) -> Result<&str, NodeError> {
         match self.attributes.get(key) {
             None => {
                 err!(NodeErrorCode::Logic)
@@ -90,5 +92,13 @@ impl<T> Node for GenericNode<T> where
 
     fn children(&self) -> &Vec<Box<Node>> {
         &self.nodes
+    }
+
+    fn children_mut(&mut self) -> &mut Vec<Box<Node>> {
+        &mut self.nodes
+    }
+
+    fn run(&self, runtime: &mut Runtime, data: &HashMap<String, String>) {
+        <GenericNode<T> as NodeOutput>::output(self, runtime, data)
     }
 }

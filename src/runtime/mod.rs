@@ -24,27 +24,26 @@ use std::collections::HashMap;
 // exports //
 /////////////
 
-pub mod node;
+pub mod api;
 pub mod error;
-pub use self::node::NodeOutput;
+pub use self::api::{NodeOutput, DataProvider};
 pub use self::error::{RuntimeError, RuntimeErrorCode};
 
 #[allow(dead_code)]
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Runtime {
-    data: HashMap<String, String>,
     writer: String, // #TODO:560 switch to a 'more generic' string writer
                     // - maybe the writer should not be part of the runtime?
+                    // - the writer could be part of a runtime job instead.
 }
 
 #[allow(dead_code)]
 impl Runtime {
-    pub fn new() -> Runtime {
-        Runtime {
-            data: HashMap::new(),
-            writer: String::new(),
-        }
-    }
+    // pub fn new() -> Runtime {
+    //     Runtime {
+    //         writer: String::new(),
+    //     }
+    // }
 
     pub fn reserve_writer(&mut self, additional: usize) -> &mut Runtime {
         self.writer.reserve(additional);
@@ -52,28 +51,15 @@ impl Runtime {
         self
     }
 
-    pub fn reserve_data(&mut self, additional: usize) -> &mut Runtime {
-        self.data.reserve(additional);
-
-        self
-    }
-
-    pub fn run(&mut self, node: &NodeOutput) {
+    pub fn run(&mut self, node: &NodeOutput, data: &HashMap<String, String>) {
         // debug-switch
-        node.run(self)
+        node.run(self, data)
     }
 
-    pub fn _has(&self, key: &str) -> bool {
-        self.data.contains_key(key)
-    }
-
-    pub fn _get(&self, key: &str) -> Option<&str> {
-        use std::ops::Deref; // #TODO:390 replace with as_str() - as soon as this API is stable
-        self.data.get(key).map(|x| x.deref())
-    }
-
-    pub fn write(&mut self, text: &str) {
-        self.writer.push_str(text)
+    pub fn write<T>(&mut self, text: T) where
+        T: AsRef<str>
+    {
+        self.writer.push_str(text.as_ref())
     }
 
     pub fn get_result(&self) -> &str {
@@ -84,7 +70,13 @@ impl Runtime {
         self.writer.clear()
     }
 
-    pub fn _clear_data(&mut self) {
-        self.data.clear()
+    // pub fn _clear_data(&mut self) {
+    //     self.data.clear()
+    // }
+}
+
+impl ::std::convert::From<Runtime> for String {
+    fn from(rt: Runtime) -> String {
+        rt.writer
     }
 }

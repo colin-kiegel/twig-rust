@@ -27,6 +27,8 @@ extern crate regex;
 
 mod template;
 
+#[cfg(test)]
+pub mod test;
 
 
 // #TODO:220 http://keepachangelog.com

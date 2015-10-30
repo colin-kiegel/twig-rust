@@ -15,25 +15,26 @@
 // imports  //
 //////////////
 
-use compiler::{Compiler, ExtensionRegistry};
+use compiler::{Compiler, ExtensionRegistry, extension};
 use lexer::token;
 use self::job::Job;
 use compiler::extension::api::TokenParser;
 use compiler::extension::api::operator::Precedence;
-use self::expression_parser::Expression;
 use std::rc::Rc;
 use template;
+use std::collections::HashMap;
 
 /////////////
 // exports //
 /////////////
 
+pub mod api;
 pub mod error;
 pub mod job;
 pub mod node;
 pub mod expression_parser;
 pub use self::error::*;
-pub use self::node::Node;
+pub use self::api::Node;
 pub use self::expression_parser::ExpressionParser;
 
 
@@ -75,9 +76,26 @@ impl Parser {
         &self,
         job: &mut Job,
         precedence: Precedence
-    ) -> Result<Expression, ParserError>
+    ) -> Result<Box<Node>, ParserError>
     {
         self.expression_parser.parse(job, precedence)
+    }
+
+    /// Returns the compiler extensions.
+    pub fn extensions(&self) -> &ExtensionRegistry {
+        &*self.ext
+    }
+
+    /// Returns the token parsers defined by compiler extensions.
+    ///
+    /// Note: Tag handlers and token parsers are *identical*.
+    pub fn tag_handlers(&self) -> &HashMap<String, Box<extension::api::TokenParser>> {
+        self.ext.token_parsers()
+    }
+
+    /// Returns the visitors defined by compiler extensions.
+    pub fn visitors(&self) -> &Vec<Box<extension::api::NodeVisitor>> {
+        self.ext.node_visitors()
     }
 }
 

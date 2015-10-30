@@ -16,22 +16,46 @@
 /////////////
 
 use super::api::Template;
-use compiler::Compiler;
 use compiler::TwigError;
+use std::collections::HashMap;
+use runtime::Runtime;
+use parser::node;
 
 /////////////
 // exports //
 /////////////
 
 #[allow(dead_code)]
-pub struct Compiled;
+#[derive(Debug)]
+pub struct Compiled {
+    root: node::Module,
+    // TODO move *some* information from node::Module to template::Compiled
+    //  -> easier accessible for runtime
+    //  -> less accessible for node traverser (optimizer?) ...
+}
 
-impl Template for Compiled {
-    fn render(&self, _compiler: &mut Compiler, _context: Vec<()>) -> Result<String, TwigError> {
-        unimplemented!()
+impl Compiled {
+    pub fn new(root: node::Module) -> Compiled {
+        Compiled {
+            root: root,
+        }
     }
 
-    fn display(&self, _compiler: &mut Compiler, _context: Vec<()>, _blocks: Option<Vec<()>>) {
+    #[allow(dead_code)]
+    pub fn module(&self) -> &node::Module {
+        &self.root
+    }
+}
+
+impl Template for Compiled {
+    fn render(&self, data: &HashMap<String, String>) -> Result<String, TwigError> {
+        let mut runtime = Runtime::default();
+        runtime.run(&self.root, data);
+
+        Ok(runtime.into())
+    }
+
+    fn display(&self, _context: &HashMap<String, String>, _blocks: Option<Vec<()>>) {
         unimplemented!()
     }
 }

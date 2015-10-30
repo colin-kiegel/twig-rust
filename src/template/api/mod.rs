@@ -15,8 +15,8 @@
 // imports //
 /////////////
 
-use compiler::Compiler;
 use compiler::TwigError;
+use std::collections::HashMap;
 
 /////////////
 // exports //
@@ -28,13 +28,13 @@ pub const _METHOD_CALL : &'static str = "method";
 
 pub trait Template {
     /// Renders the template with the given context and returns it as string.
-    fn render(&self, compiler: &mut Compiler, context: Vec<()>) -> Result<String, TwigError>;
+    fn render(&self, context: &HashMap<String, String>) -> Result<String, TwigError>;
 
     /// Displays the template with the given context.
     ///
     /// context is an array of parameters to pass to the template
     /// blocks is an array of blocks to pass to the template
-    fn display(&self, compiler: &mut Compiler, context: Vec<()>, blocks: Option<Vec<()>>); // #TODO:210 error handling
+    fn display(&self, context: &HashMap<String, String>, blocks: Option<Vec<()>>); // #TODO:210 error handling
 
     // /**
     //  * Get the bound compiler for this template.

@@ -45,7 +45,7 @@ pub struct Compiler {
     loader: Option<Box<Loader>>,
     lexer: Option<Lexer>,
     parser: Option<Parser>,
-    runtime: Option<Runtime>,
+    //runtime: Option<Runtime>,
 
     _function_callbacks: Vec<()>,
     _filter_callbacks: Vec<()>,
@@ -200,21 +200,21 @@ impl Compiler {
         }
     }
 
-    /// Sets the runtime instance.
-    pub fn set_runtime(&mut self, runtime: Runtime) -> &mut Compiler {
-        self.runtime = Some(runtime); // #TODO:610 switch to callback pattern to provide arguments
-
-        self
-    }
-
-    /// Gets the runtime instance.
-    pub fn runtime(&mut self) -> Result<&Runtime, TwigError> {
-        match self.runtime {
-            Some(ref runtime) => return Ok(runtime),
-            None => {
-                self.runtime = Some(Runtime::new());
-                return self.runtime();
-            }
-        }
-    }
+    // /// Sets the runtime instance.
+    // pub fn set_runtime(&mut self, runtime: Runtime) -> &mut Compiler {
+    //     self.runtime = Some(runtime); // #TODO:610 switch to callback pattern to provide arguments
+    //
+    //     self
+    // }
+    //
+    // /// Gets the runtime instance.
+    // pub fn runtime(&mut self) -> Result<&Runtime, TwigError> {
+    //     match self.runtime {
+    //         Some(ref runtime) => return Ok(runtime),
+    //         None => {
+    //             self.runtime = Some(Runtime::default());
+    //             return self.runtime();
+    //         }
+    //     }
+    // }
 }

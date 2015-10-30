@@ -22,9 +22,16 @@ macro_rules! err {
     ( $code:expr ) => ({
             ::error::Exception::new(err_details!(None), $code)
         });
+    //
+    // ( $code:expr, $message:expr ) => ({
+    //         ::error::Exception::new(err_details!(Some($message.to_string())), $code)
+    //         // #TODO:750 treat Strings differently
+    //     });
 
-    ( $code:expr, $message:expr ) => ({
-            ::error::Exception::new(err_details!(Some($message.to_string())), $code)
+    // Use the syntax described in std::fmt.
+    ( $code:expr, $ ( $ arg : tt ) * ) => ({
+            let message: String = format ! ( $ ( $ arg ) * );
+            ::error::Exception::new(err_details!(Some(message)), $code)
             // #TODO:750 treat Strings differently
         });
 }
