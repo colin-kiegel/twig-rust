@@ -13,7 +13,7 @@
 //////////////
 
 use super::GenericNode;
-use runtime::{Runtime, NodeOutput, Job};
+use runtime::{Runtime, Execute, Job};
 use lexer::token::stream::Position;
 use std::clone::Clone;
 
@@ -39,8 +39,8 @@ impl Text {
     }
 }
 
-impl NodeOutput for Text {
-    fn output(&self, _runtime: &Runtime, job: &mut Job) {
+impl Execute for Text {
+    fn execute(&self, _runtime: &Runtime, job: &mut Job) {
         job.write(&self.data.text)
     }
 }

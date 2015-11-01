@@ -31,9 +31,6 @@ pub trait Node : Debug {
     fn attribute(&self, key: &str) -> Result<&str, NodeError>;
     fn set_attribute(&mut self, key: &str, value: &str) -> Option<String>;
     fn rm_attribute(&mut self, key: &str) -> Option<String>;
-    // NOTE: Can't use generic trait `runtime::api::DataProvider`
-    //      because a generic function would not be object safe.
-    //      Thus we restrict to HashMap first.
     fn run(&self, runtime: &Runtime, job: &mut Job);
 }
 

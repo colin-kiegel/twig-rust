@@ -13,7 +13,7 @@
 //////////////
 
 use super::GenericNode;
-use runtime::{Runtime, NodeOutput, Job};
+use runtime::{Runtime, Execute, Job};
 use parser::api::Node;
 
 /////////////
@@ -34,8 +34,8 @@ impl Body {
     }
 }
 
-impl NodeOutput for Body {
-    fn output(&self, runtime: &Runtime, job: &mut Job) {
+impl Execute for Body {
+    fn execute(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
              node.run(runtime, job)
         }

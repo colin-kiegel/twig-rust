@@ -13,7 +13,7 @@
 //////////////
 
 use parser::node::GenericNode;
-use runtime::{Runtime, NodeOutput, DataProvider, Job};
+use runtime::{Runtime, Execute, Job};
 use lexer::token::stream::Position;
 use std::clone::Clone;
 
@@ -39,8 +39,8 @@ impl Name {
     }
 }
 
-impl NodeOutput for Name {
-    fn output(&self, runtime: &Runtime, job: &mut Job) {
+impl Execute for Name {
+    fn execute(&self, runtime: &Runtime, job: &mut Job) {
         // TODO: Add some logging if lookup failed
         //      -> might make sense to do that locally
         let text: &str = runtime.get(&self.data.key).unwrap_or("");

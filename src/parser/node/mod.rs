@@ -16,7 +16,7 @@ use std::fmt::Debug;
 use std::collections::HashMap;
 use parser::error::{NodeError, NodeErrorCode};
 use parser::api::Node;
-use runtime::{Runtime, NodeOutput, Job};
+use runtime::{Runtime, Execute, Job};
 use lexer::token::stream::Position;
 
 /////////////
@@ -51,7 +51,7 @@ pub struct GenericNode<T> {
 #[allow(dead_code)]
 impl<T> Node for GenericNode<T> where
     T: Debug,
-    GenericNode<T>: NodeOutput
+    GenericNode<T>: Execute
 {
     fn position(&self) -> &Position {
         &self.position
@@ -95,6 +95,6 @@ impl<T> Node for GenericNode<T> where
     }
 
     fn run(&self, runtime: &Runtime, job: &mut Job) {
-        <GenericNode<T> as NodeOutput>::output(self, runtime, job)
+        <GenericNode<T> as Execute>::execute(self, runtime, job)
     }
 }

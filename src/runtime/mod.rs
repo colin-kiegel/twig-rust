@@ -24,7 +24,7 @@ use std::collections::HashMap;
 pub mod api;
 pub mod job;
 pub mod error;
-pub use self::api::{NodeOutput, DataProvider};
+pub use self::api::Execute;
 pub use self::job::Job;
 pub use self::error::{RuntimeError, RuntimeErrorCode};
 
@@ -42,11 +42,10 @@ impl Runtime {
         }
     }
 
-    pub fn run(&self, node: &NodeOutput) -> String {
+    pub fn run(&self, node: &Execute) -> String {
         // TODO debug-switch
         Job::new().run(self, node)
     }
-
 
     pub fn data(&self) -> &HashMap<String, String> {
         &self.data
@@ -56,8 +55,16 @@ impl Runtime {
         &mut self.data
     }
 
+    pub fn clear_data(&mut self) {
+        self.data.clear()
+    }
+
     pub fn get(&self, key: &str) -> Option<&str> {
         self.data.get(key).map(|x| x.as_ref())
+    }
+
+    pub fn has(&self, key: &str) -> bool {
+        self.data.contains_key(key)
     }
 
     pub fn set<K,V>(&mut self, key: K, value: V) -> Option<String> where
@@ -66,8 +73,4 @@ impl Runtime {
     {
         self.data.insert(key.into(), value.into())
     }
-
-    // pub fn _clear_data(&mut self) {
-    //     self.data.clear()
-    // }
 }

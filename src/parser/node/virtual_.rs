@@ -13,7 +13,7 @@
 //////////////
 
 use super::GenericNode;
-use runtime::{Runtime, NodeOutput, Job};
+use runtime::{Runtime, Execute, Job};
 use lexer::token::stream::Position;
 use std::clone::Clone;
 
@@ -35,8 +35,8 @@ impl Virtual {
     }
 }
 
-impl NodeOutput for Virtual {
-    fn output(&self, runtime: &Runtime, job: &mut Job) {
+impl Execute for Virtual {
+    fn execute(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
              node.run(runtime, job)
         }

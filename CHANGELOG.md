@@ -9,6 +9,7 @@
   * if conditional
   * for-each-loop + arrays
 * TODOs + unimplemented!
+  * impl runtime::api::Execute for template::Compiled
 
 # Unreleased
 

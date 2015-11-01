@@ -12,7 +12,7 @@
 /////////////
 
 use runtime::Runtime;
-use runtime::api::NodeOutput;
+use runtime::api::Execute;
 
 /////////////
 // exports //
@@ -38,8 +38,8 @@ impl Job {
         self
     }
 
-    pub fn run(mut self, runtime: &Runtime, node: &NodeOutput) -> String {
-        node.run(runtime, &mut self);
+    pub fn run(mut self, runtime: &Runtime, node: &Execute) -> String {
+        node.execute(runtime, &mut self);
 
         self.writer
     }
