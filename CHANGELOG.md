@@ -13,7 +13,6 @@
 * TODOs + unimplemented!
 
 * move template/raw/cursor to lexer/job/cursor
-* rename _virtual _final, etc. virtual_, final_ etc.
 
 # Unreleased
 

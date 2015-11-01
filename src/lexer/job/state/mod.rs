@@ -29,14 +29,14 @@ pub mod block;
 pub mod expression;
 pub mod string;
 pub mod interpolation;
-pub mod _final;
+pub mod final_;
 pub use self::initial::Initial;
 pub use self::data::Data;
 pub use self::block::Block;
 pub use self::expression::Expression;
 pub use self::string::String;
 pub use self::interpolation::Interpolation;
-pub use self::_final::Final;
+pub use self::final_::Final;
 
 
 pub trait TokenizeState {

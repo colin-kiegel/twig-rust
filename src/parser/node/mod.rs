@@ -29,14 +29,14 @@ use lexer::token::stream::Position;
 
 pub mod module;
 pub mod body;
-pub mod _virtual;
+pub mod virtual_;
 pub mod text;
 pub mod print;
 pub mod expression;
 pub use self::module::Module;
 pub use self::body::Body;
 pub use self::text::Text;
-pub use self::_virtual::Virtual;
+pub use self::virtual_::Virtual;
 pub use self::print::Print;
 
 
