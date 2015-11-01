@@ -19,8 +19,9 @@ use std::fmt;
 use std::convert::Into;
 use std::ops::Deref;
 use super::{Token, Type};
-use template::{self, Cursor};
+use template;
 use lexer::error::{TokenError, TokenErrorCode};
+use lexer::job::Cursor;
 
 /////////////
 // exports //

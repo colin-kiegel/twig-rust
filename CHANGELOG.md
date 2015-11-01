@@ -12,8 +12,6 @@
   * split off jobs to separate data and writer
 * TODOs + unimplemented!
 
-* move template/raw/cursor to lexer/job/cursor
-
 # Unreleased
 
 ## Added

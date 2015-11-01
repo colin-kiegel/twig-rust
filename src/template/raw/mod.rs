@@ -21,10 +21,6 @@ use lexer::{Lexer, token, LexerError};
 // exports //
 /////////////
 
-pub mod cursor;
-pub use self::cursor::Cursor as Cursor;
-
-
 #[derive(Default)]
 #[derive(Debug)]
 pub struct Raw {

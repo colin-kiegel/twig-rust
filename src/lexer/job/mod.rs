@@ -28,7 +28,8 @@ use self::state::TokenizeState;
 /////////////
 
 pub mod state;
-
+pub mod cursor;
+pub use self::cursor::Cursor;
 
 // Finite State Machine loosely inspired by
 // * http://www.huffingtonpost.com/damien-radtke/rustic-state-machines-for_b_4466566.html
@@ -38,7 +39,7 @@ pub struct Job<'c, 't> {
     _template: &'t template::Raw,
     current_exp_block_line: usize,
     tokens: token::Stream<'t>,
-    cursor: template::raw::Cursor<'t>,
+    cursor: Cursor<'t>,
     _position: usize,
     token_start_iter: token_start::ExtractIter<'c, 't>, // orig: positions
     brackets: Vec<(BracketType, usize/*TODO LineNo*/)>,
@@ -48,7 +49,7 @@ impl<'c, 't> Job<'c, 't> {
     #[allow(dead_code)] // #TODO:660 testcase
     pub fn new(template: &'t template::Raw, patterns: &'c Patterns) -> Box<Job<'c, 't>> {
         let token_start_iter = patterns.token_start.extract_iter(&template.code);
-        let cursor = template::raw::Cursor::new(&template);
+        let cursor = Cursor::new(&template);
         let tokens = token::Stream::new(&template);
 
         Box::new(Job {

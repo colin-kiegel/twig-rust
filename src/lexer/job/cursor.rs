@@ -16,8 +16,7 @@
 /////////////
 
 use std::fmt;
-//use lexer::error::LexerError;
-//use lexer::SyntaxErrorCode;
+use template;
 
 /////////////
 // exports //
@@ -31,12 +30,12 @@ pub struct Cursor<'a> {
     pos: Position,   // 0,..
     end: Position,   // 0,..
     line: Line,    // 1,..
-    template: &'a super::Raw, // #TODO:640 switch to pointer or slice
+    template: &'a template::Raw, // #TODO:640 switch to pointer or slice
 }
 
 impl<'a> Cursor<'a> {
     #[allow(dead_code)] // only used in test and elsewhere
-    pub fn new(template: &'a super::Raw) -> Cursor<'a> {
+    pub fn new(template: &'a template::Raw) -> Cursor<'a> {
         Cursor {
             end: template.code.chars().count(),
             template: template,
@@ -101,7 +100,7 @@ impl<'a> Cursor<'a> {
         slice
     }
 
-    pub fn _template(&self) -> &super::Raw {
+    pub fn _template(&self) -> &template::Raw {
         &self.template
     }
 
@@ -144,7 +143,7 @@ impl<'a> fmt::Display for Cursor<'a> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use super::super::Raw;
+    use template::Raw;
 
     #[test]
     pub fn new() {

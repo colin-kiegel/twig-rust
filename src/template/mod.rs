@@ -23,5 +23,4 @@ pub mod compiled;
 pub mod raw;
 pub mod api;
 pub use self::compiled::Compiled;
-pub use self::raw::{Raw, Cursor};
-pub use self::raw::cursor;
+pub use self::raw::Raw;
