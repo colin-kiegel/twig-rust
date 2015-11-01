@@ -1,15 +1,25 @@
 # Planned
 
-* `core` extension
-  * test fileloader
-  * template cache
-  * more (unit) tests
+## `core` extension
+
+* features in order of appearance in Twig tutorials
+* test fileloader
+* template cache
+* more (unit) tests
+* if conditional
+* for-each-loop + arrays
+
+# mixed ideas
+
+* TODOs + unimplemented!
+* other extensions
   * {Mutstache}-Extension :-)
   * Pear Templates?
-  * if conditional
-  * for-each-loop + arrays
-* TODOs + unimplemented!
-  * impl runtime::api::Execute for template::Compiled
+
+## long-term
+
+* compile to JS
+* compile to Rust
 
 # Unreleased
 

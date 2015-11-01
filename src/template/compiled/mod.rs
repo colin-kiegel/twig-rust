@@ -14,7 +14,8 @@
 
 use template::api::Template;
 use compiler::TwigError;
-use runtime::Runtime;
+use runtime::{Runtime, Job};
+use runtime::api::Execute;
 use parser::node;
 
 /////////////
@@ -50,5 +51,11 @@ impl Template for Compiled {
 
     fn display(&self, _runtime: &Runtime, _blocks: Option<Vec<()>>) {
         unimplemented!()
+    }
+}
+
+impl Execute for Compiled {
+    fn execute(&self, runtime: &Runtime, job: &mut Job) {
+        self.root.execute(runtime, job);
     }
 }

@@ -53,7 +53,6 @@ mod test {
     use super::*;
     use runtime::Runtime;
     use std::default::Default;
-    use parser::api::Node;
 
     #[test]
     fn run() {

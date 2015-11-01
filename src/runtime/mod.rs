@@ -42,9 +42,9 @@ impl Runtime {
         }
     }
 
-    pub fn run(&self, node: &Execute) -> String {
+    pub fn run(&self, template: &Execute) -> String {
         // TODO debug-switch
-        Job::new().run(self, node)
+        Job::new().run(self, template)
     }
 
     pub fn data(&self) -> &HashMap<String, String> {

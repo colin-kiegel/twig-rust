@@ -38,8 +38,8 @@ impl Job {
         self
     }
 
-    pub fn run(mut self, runtime: &Runtime, node: &Execute) -> String {
-        node.execute(runtime, &mut self);
+    pub fn run(mut self, runtime: &Runtime, template: &Execute) -> String {
+        template.execute(runtime, &mut self);
 
         self.writer
     }

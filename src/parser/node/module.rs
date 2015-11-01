@@ -62,7 +62,7 @@ impl Module {
 impl Execute for Module {
     fn execute(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.run(runtime, job)
+             node.execute(runtime, job)
         }
     }
 }

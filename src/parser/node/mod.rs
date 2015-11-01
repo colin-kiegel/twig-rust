@@ -16,7 +16,7 @@ use std::fmt::Debug;
 use std::collections::HashMap;
 use parser::error::{NodeError, NodeErrorCode};
 use parser::api::Node;
-use runtime::{Runtime, Execute, Job};
+use runtime::Execute;
 use lexer::token::stream::Position;
 
 /////////////
@@ -92,9 +92,5 @@ impl<T> Node for GenericNode<T> where
 
     fn children_mut(&mut self) -> &mut Vec<Box<Node>> {
         &mut self.nodes
-    }
-
-    fn run(&self, runtime: &Runtime, job: &mut Job) {
-        <GenericNode<T> as Execute>::execute(self, runtime, job)
     }
 }
