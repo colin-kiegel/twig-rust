@@ -16,9 +16,8 @@
 //////////////
 
 use parser::node::GenericNode;
-use runtime::{Runtime, NodeOutput, DataProvider};
+use runtime::{Runtime, NodeOutput, DataProvider, Job};
 use lexer::token::stream::Position;
-use std::collections::HashMap;
 use std::clone::Clone;
 
 /////////////
@@ -44,11 +43,11 @@ impl Name {
 }
 
 impl NodeOutput for Name {
-    fn output(&self, runtime: &mut Runtime, data: &HashMap<String, String>) {
+    fn output(&self, runtime: &Runtime, job: &mut Job) {
         // TODO: Add some logging if lookup failed
         //      -> might make sense to do that locally
-        let text: &str = data.get(&self.data.key).map_or("", |x| x.as_ref());
-        runtime.write(text)
+        let text: &str = runtime.get(&self.data.key).unwrap_or("");
+        job.write(text)
     }
 }
 
@@ -57,24 +56,20 @@ mod test {
     use super::*;
     use runtime::Runtime;
     use std::default::Default;
-    use std::collections::HashMap;
     use parser::api::Node;
 
     #[test]
     fn run() {
         let key = "message";
-        let mut data = HashMap::<String, String>::default();
-        data.insert("message".to_string(), "Hello World".to_string());
         let mut rt = Runtime::default();
+        rt.set("message".to_string(), "Hello World".to_string());
 
         let node = Name { data: Data {
                 key: key.to_string()
             }, ..Default::default() };
 
-        node.run(&mut rt, &data);
-
         assert_eq!(
-            rt.get_result(),
+            rt.run(&node),
             "Hello World"
         );
     }

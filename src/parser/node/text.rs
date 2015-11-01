@@ -16,10 +16,9 @@
 //////////////
 
 use super::GenericNode;
-use runtime::{Runtime, NodeOutput};
+use runtime::{Runtime, NodeOutput, Job};
 use lexer::token::stream::Position;
 use std::clone::Clone;
-use std::collections::HashMap;
 
 /////////////
 // exports //
@@ -44,8 +43,8 @@ impl Text {
 }
 
 impl NodeOutput for Text {
-    fn output(&self, runtime: &mut Runtime, _data: &HashMap<String, String>) {
-        runtime.write(&self.data.text)
+    fn output(&self, _runtime: &Runtime, job: &mut Job) {
+        job.write(&self.data.text)
     }
 }
 
@@ -54,23 +53,19 @@ mod test {
     use super::*;
     use runtime::Runtime;
     use std::default::Default;
-    use std::collections::HashMap;
     use parser::api::Node;
 
     #[test]
     fn run() {
         let text = "Hello World";
-        let data = HashMap::<String, String>::default();
-        let mut rt = Runtime::default();
+        let rt = Runtime::default();
 
         let node = Text { data: Data {
                 text: text.to_string()
             }, ..Default::default() };
 
-        node.run(&mut rt, &data);
-
         assert_eq!(
-            rt.get_result(),
+            rt.run(&node),
             "Hello World"
         );
     }

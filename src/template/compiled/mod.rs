@@ -15,9 +15,8 @@
 // imports //
 /////////////
 
-use super::api::Template;
+use template::api::Template;
 use compiler::TwigError;
-use std::collections::HashMap;
 use runtime::Runtime;
 use parser::node;
 
@@ -48,14 +47,11 @@ impl Compiled {
 }
 
 impl Template for Compiled {
-    fn render(&self, data: &HashMap<String, String>) -> Result<String, TwigError> {
-        let mut runtime = Runtime::default();
-        runtime.run(&self.root, data);
-
-        Ok(runtime.into())
+    fn render(&self, runtime: &Runtime) -> Result<String, TwigError> {
+        Ok(runtime.run(&self.root))
     }
 
-    fn display(&self, _context: &HashMap<String, String>, _blocks: Option<Vec<()>>) {
+    fn display(&self, _runtime: &Runtime, _blocks: Option<Vec<()>>) {
         unimplemented!()
     }
 }

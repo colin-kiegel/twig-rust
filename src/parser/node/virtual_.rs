@@ -16,10 +16,9 @@
 //////////////
 
 use super::GenericNode;
-use runtime::{Runtime, NodeOutput};
+use runtime::{Runtime, NodeOutput, Job};
 use lexer::token::stream::Position;
 use std::clone::Clone;
-use std::collections::HashMap;
 
 /////////////
 // exports //
@@ -40,9 +39,9 @@ impl Virtual {
 }
 
 impl NodeOutput for Virtual {
-    fn output(&self, runtime: &mut Runtime, data: &HashMap<String, String>) {
+    fn output(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.run(runtime, data)
+             node.run(runtime, job)
         }
     }
 }
@@ -53,13 +52,11 @@ mod test {
     use parser::node::text::Text;
     use runtime::Runtime;
     use std::default::Default;
-    use std::collections::HashMap;
     use parser::api::Node;
 
     #[test]
     fn run() {
-        let data = HashMap::<String, String>::default();
-        let mut rt = Runtime::default();
+        let rt = Runtime::default();
 
         let mut node_virtual = Virtual::default();
 
@@ -71,10 +68,8 @@ mod test {
             children.push(node_world);
         }
 
-        node_virtual.run(&mut rt, &data);
-
         assert_eq!(
-            rt.get_result(),
+            rt.run(&node_virtual),
             "Hello world!"
         );
     }

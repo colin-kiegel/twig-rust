@@ -18,8 +18,7 @@
 use super::error::NodeError;
 use std::fmt::Debug;
 use lexer::token::stream::Position;
-use runtime::Runtime;
-use std::collections::HashMap;
+use runtime::{Runtime, Job};
 
 /////////////
 // exports //
@@ -38,7 +37,7 @@ pub trait Node : Debug {
     // NOTE: Can't use generic trait `runtime::api::DataProvider`
     //      because a generic function would not be object safe.
     //      Thus we restrict to HashMap first.
-    fn run(&self, runtime: &mut Runtime, data: &HashMap<String, String>);
+    fn run(&self, runtime: &Runtime, job: &mut Job);
 }
 
 // // TODO: check if this is really necessary??

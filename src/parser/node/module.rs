@@ -16,9 +16,8 @@
 //////////////
 
 use super::GenericNode;
-use runtime::{Runtime, NodeOutput};
+use runtime::{Runtime, NodeOutput, Job};
 use parser::node;
-use std::collections::HashMap;
 
 /////////////
 // exports //
@@ -64,9 +63,9 @@ impl Module {
 }
 
 impl NodeOutput for Module {
-    fn output(&self, runtime: &mut Runtime, data: &HashMap<String, String>) {
+    fn output(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.run(runtime, data)
+             node.run(runtime, job)
         }
     }
 }

@@ -15,7 +15,7 @@
 // imports  //
 //////////////
 
-use runtime::Runtime;
+use runtime::{Runtime, Job};
 use std::fmt::Debug;
 use parser::api::Node;
 use std::collections::HashMap;
@@ -30,7 +30,7 @@ pub trait NodeOutput : Debug + Node {
     // NOTE: Can't use generic trait `runtime::api::DataProvider`
     //      because a generic function would not be object safe.
     //      Thus we restrict to HashMap first.
-    fn output(&self, runtime: &mut Runtime, data: &HashMap<String, String>);
+    fn output(&self, runtime: &Runtime, job: &mut Job);
 }
 
 pub trait DataProvider : Debug {

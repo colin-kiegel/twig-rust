@@ -18,9 +18,8 @@
 use std::fmt::Debug;
 use std::collections::HashMap;
 use parser::error::{NodeError, NodeErrorCode};
-use super::api::Node;
-use runtime::api::{NodeOutput};
-use runtime::Runtime;
+use parser::api::Node;
+use runtime::{Runtime, NodeOutput, Job};
 use lexer::token::stream::Position;
 
 /////////////
@@ -98,7 +97,7 @@ impl<T> Node for GenericNode<T> where
         &mut self.nodes
     }
 
-    fn run(&self, runtime: &mut Runtime, data: &HashMap<String, String>) {
-        <GenericNode<T> as NodeOutput>::output(self, runtime, data)
+    fn run(&self, runtime: &Runtime, job: &mut Job) {
+        <GenericNode<T> as NodeOutput>::output(self, runtime, job)
     }
 }

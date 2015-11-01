@@ -8,9 +8,8 @@
   * Pear Templates?
   * if conditional
   * for-each-loop + arrays
-* runtime
-  * split off jobs to separate data and writer
 * TODOs + unimplemented!
+* normalize file headers (multi-line -> single-line-comments)
 
 # Unreleased
 

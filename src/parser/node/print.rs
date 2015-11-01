@@ -16,11 +16,10 @@
 //////////////
 
 use super::GenericNode;
-use runtime::{Runtime, NodeOutput};
+use runtime::{Runtime, NodeOutput, Job};
 use lexer::token::stream::Position;
 use parser::api::Node;
 use std::clone::Clone;
-use std::collections::HashMap;
 
 /////////////
 // exports //
@@ -42,9 +41,9 @@ impl Print {
 }
 
 impl NodeOutput for Print {
-    fn output(&self, runtime: &mut Runtime, data: &HashMap<String, String>) {
+    fn output(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.run(runtime, data)
+             node.run(runtime, job)
         }
     }
 }

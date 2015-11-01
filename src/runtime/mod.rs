@@ -25,58 +25,52 @@ use std::collections::HashMap;
 /////////////
 
 pub mod api;
+pub mod job;
 pub mod error;
 pub use self::api::{NodeOutput, DataProvider};
+pub use self::job::Job;
 pub use self::error::{RuntimeError, RuntimeErrorCode};
 
 #[allow(dead_code)]
 #[derive(Debug, Default)]
 pub struct Runtime {
-    writer: String, // #TODO:560 switch to a 'more generic' string writer
-                    // - maybe the writer should not be part of the runtime?
-                    // - the writer could be part of a runtime job instead.
+    data: HashMap<String, String>
 }
 
 #[allow(dead_code)]
 impl Runtime {
-    // pub fn new() -> Runtime {
-    //     Runtime {
-    //         writer: String::new(),
-    //     }
-    // }
-
-    pub fn reserve_writer(&mut self, additional: usize) -> &mut Runtime {
-        self.writer.reserve(additional);
-
-        self
+    pub fn new(data: HashMap<String, String>) -> Runtime {
+        Runtime {
+            data: data,
+        }
     }
 
-    pub fn run(&mut self, node: &NodeOutput, data: &HashMap<String, String>) {
-        // debug-switch
-        node.run(self, data)
+    pub fn run(&self, node: &NodeOutput) -> String {
+        // TODO debug-switch
+        Job::new().run(self, node)
     }
 
-    pub fn write<T>(&mut self, text: T) where
-        T: AsRef<str>
+
+    pub fn data(&self) -> &HashMap<String, String> {
+        &self.data
+    }
+
+    pub fn data_mut(&mut self) -> &mut HashMap<String, String> {
+        &mut self.data
+    }
+
+    pub fn get(&self, key: &str) -> Option<&str> {
+        self.data.get(key).map(|x| x.as_ref())
+    }
+
+    pub fn set<K,V>(&mut self, key: K, value: V) -> Option<String> where
+        K: Into<String>,
+        V: Into<String>
     {
-        self.writer.push_str(text.as_ref())
-    }
-
-    pub fn get_result(&self) -> &str {
-        &self.writer
-    }
-
-    pub fn _clear_result(&mut self) {
-        self.writer.clear()
+        self.data.insert(key.into(), value.into())
     }
 
     // pub fn _clear_data(&mut self) {
     //     self.data.clear()
     // }
-}
-
-impl ::std::convert::From<Runtime> for String {
-    fn from(rt: Runtime) -> String {
-        rt.writer
-    }
 }
