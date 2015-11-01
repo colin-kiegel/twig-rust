@@ -1,18 +1,15 @@
-/*
- * This file is part of Twig (ported to Rust).
- *
- * For the copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+// This file is part of Twig (ported to Rust).
+//
+// For the copyright and license information, please view the LICENSE
+// file that was distributed with this source code.
 
-/**
- * Runtime for compiled templates
- * - it holds all data
- * - defines all necessary interfaces
- * - manages i/o for the compiled templates
- *
- * @author Colin Kiegel <kiegel@gmx.de>
- */
+/// Runtime for compiled templates
+/// - it holds all data
+/// - defines all necessary interfaces
+/// - manages i/o for the compiled templates
+///
+/// @author Colin Kiegel <kiegel@gmx.de>
+
 
 //////////////
 // imports  //

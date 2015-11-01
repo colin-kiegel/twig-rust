@@ -1,17 +1,14 @@
-/*
- * This file is part of Twig (ported to Rust).
- *
- * For the copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+// This file is part of Twig (ported to Rust).
+//
+// For the copyright and license information, please view the LICENSE
+// file that was distributed with this source code.
 
-/**
- * The `block` pattern used by the lexer to tokenize the templates.
- *
- * Written as regular expressions (perl-style).
- *
- * @author Colin Kiegel <kiegel@gmx.de>
- */
+/// The `block` pattern used by the lexer to tokenize the templates.
+///
+/// Written as regular expressions (perl-style).
+///
+/// @author Colin Kiegel <kiegel@gmx.de>
+
 
 /////////////
 // imports //

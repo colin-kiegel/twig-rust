@@ -1,15 +1,12 @@
-/*
- * This file is part of Twig (ported to Rust).
- *
- * For the copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
+// This file is part of Twig (ported to Rust).
+//
+// For the copyright and license information, please view the LICENSE
+// file that was distributed with this source code.
 
-/**
- * RegExes of the lexer.
- *
- * @author Colin Kiegel <kiegel@gmx.de>
- */
+/// RegExes of the lexer.
+///
+/// @author Colin Kiegel <kiegel@gmx.de>
+
 
 /////////////
 // imports //
@@ -34,6 +31,9 @@ impl Raw {
     pub fn new<C,N>(code: C, name: N) -> Raw where
         C: ToString,
         N: ToString,
+        // NOTE: Into<String> would be more efficient
+        //      but Cow<'_, str> does not implement Into<String>
+        //      -> suggest this as new std lib feature?
     {
         let mut x = Raw {
             name: name.to_string(),
