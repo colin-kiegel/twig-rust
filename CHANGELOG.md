@@ -3,21 +3,23 @@
 ## `core` extension
 
 * features in order of appearance in Twig tutorials
-* test fileloader
-* template cache
-* more (unit) tests
-* if conditional
-* for-each-loop + arrays
+  * if conditional
+  * for-each-loop + arrays
 
 # mixed ideas
 
 * TODOs + unimplemented!
+* more (unit) tests
+  * fileloader
+  * parser
+* template cache
 * other extensions
-  * {Mutstache}-Extension :-)
+  * {Mustache}-Extension :-)
   * Pear Templates?
 
 ## long-term
 
+* improve documentation
 * compile to JS
 * compile to Rust
 
@@ -30,6 +32,7 @@
 * loader: 80%
 * parser: 25%
 * runtime: 20%
+* core-extension: 5%
 
 * load Templates from
  * array
