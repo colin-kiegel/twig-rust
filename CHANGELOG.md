@@ -1,7 +1,6 @@
 # Planned
 
 * `core` extension
-  * parse/render variable expression
   * test fileloader
   * template cache
   * more (unit) tests
@@ -13,7 +12,6 @@
   * split off jobs to separate data and writer
 * TODOs + unimplemented!
 
-*
 * move template/raw/cursor to lexer/job/cursor
 * rename _virtual _final, etc. virtual_, final_ etc.
 
@@ -32,6 +30,7 @@
  * filesystem
 * parse/render
  * static text
+ * variable expression
 
 # 0.0.0 first commit (2015-06-16)
 

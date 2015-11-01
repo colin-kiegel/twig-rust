@@ -72,6 +72,16 @@ impl<'stream> Cursor<'stream> {
         self.next().map(|item| item.position())
     }
 
+    pub fn next_expect(&mut self, token: Token) -> Result<(), ParserError> {
+        match self.next() {
+            Some(item) => Ok(try!(item.expect(token))),
+            None => err!(ParserErrorCode::Eof,
+                "Expected token {t:?} but found end of stream",
+                t = token)
+                .into()
+        }
+    }
+
     pub fn peek(&self) -> Option<&'stream Item> {
         self.stream.as_vec().get(self.pos)
     }
@@ -84,20 +94,13 @@ impl<'stream> Cursor<'stream> {
         self.peek().map(|item| item.position())
     }
 
-    pub fn expect_token(&self, token: Token) -> Result<(), ParserError> {
-        let item = try!(self.peek().ok_or_else(|| {
-            return err!(ParserErrorCode::Eof,
-                "Expected token {:?}.",
-                token)
-        }));
-
-        if token == *item.token() {
-            Ok(())
-        } else {
-            err!(ParserErrorCode::UnexpectedToken,
-                "Expected token {t:?} but found item {x:?} at {p:?}",
-                t = token, x = item.token(), p = item.position())
-            .into()
+    pub fn peek_expect(&self, token: Token) -> Result<(), ParserError> {
+        match self.peek() {
+            Some(item) => Ok(try!(item.expect(token))),
+            None => err!(ParserErrorCode::Eof,
+                "Expected token {t:?} but found end of stream",
+                t = token)
+                .into()
         }
     }
 }

@@ -20,6 +20,7 @@ use std::convert::Into;
 use std::ops::Deref;
 use super::{Token, Type};
 use template::{self, Cursor};
+use lexer::error::{TokenError, TokenErrorCode};
 
 /////////////
 // exports //
@@ -52,6 +53,17 @@ impl Item {
 
     pub fn position(&self) -> &Position {
         &self.position
+    }
+
+    pub fn expect(&self, token: Token) -> Result<(), TokenError> {
+        if token == *self.token() {
+            Ok(())
+        } else {
+            err!(TokenErrorCode::UnexpectedToken,
+                "Expected token {t:?} but found item {x:?} at {p:?}",
+                t = token, x = self.token(), p = self.position())
+            .into()
+        }
     }
 }
 

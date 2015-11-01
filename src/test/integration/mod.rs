@@ -39,18 +39,18 @@ fn hello_world_static() {
     assert_eq!(&compiled.render(&data).unwrap(), "Hello world!")
 }
 
-// #[test]
-// fn hello_world_variable() {
-//     let mut loader = loader::array::Array::default();
-//     let mut compiler : Compiler = Builder::default().compiler().unwrap();
-//     let mut data = HashMap::<String, String>::default();
-// 
-//     loader.set_template("test","Hello {{name}}!");
-//     compiler.set_loader(Box::new(loader));
-//     data.insert("name".to_string(), "world".to_string());
-//
-//     let compiled = compiler.load_template("test", None).unwrap();
-//     println!("{:?}", compiled);
-//
-//     assert_eq!(&compiled.render(&data).unwrap(), "Hello world!")
-// }
+#[test]
+fn hello_world_variable() {
+    let mut loader = loader::array::Array::default();
+    let mut compiler : Compiler = Builder::default().compiler().unwrap();
+    let mut data = HashMap::<String, String>::default();
+
+    loader.set_template("test","Hello {{name}}!");
+    compiler.set_loader(Box::new(loader));
+    data.insert("name".to_string(), "world".to_string());
+
+    let compiled = compiler.load_template("test", None).unwrap();
+    println!("{:?}", compiled);
+
+    assert_eq!(&compiled.render(&data).unwrap(), "Hello world!")
+}

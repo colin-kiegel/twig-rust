@@ -56,7 +56,7 @@ macro_rules! err_details {
 #[macro_export]
 macro_rules! impl_convert_exception {
     ( $source_type:ty, $target_type:ty, $target_error_code:expr ) => (
-        impl convert::From<::error::Exception<$source_type>> for ::error::Exception<$target_type> {
+        impl ::std::convert::From<::error::Exception<$source_type>> for ::error::Exception<$target_type> {
             fn from(cause: ::error::Exception<$source_type>) -> ::error::Exception<$target_type> {
                 let details = ::error::Details {
                     message: None,

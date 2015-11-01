@@ -16,7 +16,6 @@
 /////////////
 
 use error;
-use std::convert;
 
 /////////////
 // exports //
@@ -52,6 +51,7 @@ pub enum LexerErrorCode {
 #[derive(Debug, PartialEq)]
 pub enum TokenErrorCode {
     _NoValue,
+    UnexpectedToken
 }
 
 impl_convert_exception!(SyntaxErrorCode, LexerErrorCode, LexerErrorCode::SyntaxError);
@@ -86,6 +86,7 @@ impl ToString for TokenErrorCode {
     fn to_string(&self) -> String {
         match *self {
             TokenErrorCode::_NoValue => "NoValue",
+            TokenErrorCode::UnexpectedToken => "UnexpectedToken",
         }.to_string()
     }
 }

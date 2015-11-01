@@ -157,9 +157,9 @@ impl Type {
             Type::Eof => "EOF",
             Type::Text => "TEXT",
             Type::BlockStart => "BLOCK_START",
-            Type::ExpressionStart => "EXPRESSION_START",
+            Type::ExpressionStart => "EXPRESSION_START", // orig VAR_START
             Type::BlockEnd => "BLOCK_END",
-            Type::ExpressionEnd => "EXPRESSION_END",
+            Type::ExpressionEnd => "EXPRESSION_END", // orig VAR_END
             Type::Name => "NAME",
             Type::Number => "NUMBER",
             Type::String => "STRING",

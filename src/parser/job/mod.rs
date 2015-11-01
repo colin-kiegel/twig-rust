@@ -126,17 +126,21 @@ impl<'p, 'stream> Job<'p, 'stream> {
                 },
                 Token::ExpressionStart => {
                     let node = try!(self.parser.parse_expression(self, Precedence(0)));
-                    try!(self.cursor().expect_token(Token::ExpressionEnd));
+                    try!(self.cursor().next_expect(Token::ExpressionEnd));
 
                     nodes.push(node::Print::boxed(node, item.position()));
                 },
                 Token::BlockStart => {
                     unimplemented!() // TODO
                 },
-                _ => return err!(ParserErrorCode::InvalidState)
-                    .explain(format!("Parser ended up in unsupported state with token {token:?} at {pos}.",
-                        token = item.token(), pos = item.position()))
-                    .into()
+                _ => return err!(ParserErrorCode::InvalidState,
+                        "Parser ended up in unsupported state with token {token:?} at {pos} \
+                        in {template:?} with tokens {tokens:?}.",
+                        token = item.token(),
+                        pos = item.position(),
+                        template = self.template,
+                        tokens = self.tokens)
+                        .into()
             }
         }
 

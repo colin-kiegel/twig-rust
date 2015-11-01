@@ -16,6 +16,7 @@
 /////////////
 
 use error;
+use lexer::error::TokenErrorCode;
 
 /////////////
 // exports //
@@ -24,6 +25,7 @@ use error;
 pub type NodeError = error::Exception<NodeErrorCode>;
 pub type ParserError = error::Exception<ParserErrorCode>;
 
+impl_convert_exception!(TokenErrorCode, ParserErrorCode, ParserErrorCode::UnexpectedToken);
 
 #[allow(dead_code)]
 #[derive(Debug, PartialEq)]

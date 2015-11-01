@@ -16,7 +16,6 @@
 /////////////
 
 use error;
-use std::convert;
 use loader::LoaderErrorCode;
 use lexer::LexerErrorCode;
 use parser::ParserErrorCode;
