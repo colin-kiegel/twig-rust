@@ -9,7 +9,6 @@
   * if conditional
   * for-each-loop + arrays
 * TODOs + unimplemented!
-* normalize file headers (multi-line -> single-line-comments)
 
 # Unreleased
 
