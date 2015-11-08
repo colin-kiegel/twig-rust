@@ -79,7 +79,8 @@ pub enum Type { // #TODO:10 - remove ?
 
 #[allow(unused_variables)]
 impl Token {
-    // Because of Number Types we need to return `String` copys instead of `&'a str`
+    // TODO store String representation for numbers and Punctuation?
+    // NOTE: Because of Number Types we need to return `String` copys instead of `&'a str`
     pub fn value<'a>(&'a self) -> Option<String> {
         match *self {
             Token::_Eof => None,
@@ -94,6 +95,26 @@ impl Token {
             Token::String(ref x) => Some(x.to_string()),
             Token::Operator(ref x) => Some(x.to_string()),
             Token::Punctuation(ref x) => Some(format!("{:?}",x)),
+            Token::_InterpolationStart => None,
+            Token::_InterpolationEnd => None,
+        }
+    }
+
+    // NOTE: Does *not* yield number types - use value() instead.
+    pub fn value_as_str<'a>(&'a self) -> Option<&str> {
+        match *self {
+            Token::_Eof => None,
+            Token::Text(ref x) => Some(x),
+            Token::BlockStart => None,
+            Token::ExpressionStart => None,
+            Token::BlockEnd => None,
+            Token::ExpressionEnd => None,
+            Token::Name(ref x) => Some(x),
+            Token::IntegerNumber(ref x) => None, // see above
+            Token::FloatingNumber(ref x) => None, // see above
+            Token::String(ref x) => Some(x),
+            Token::Operator(ref x) => Some(x),
+            Token::Punctuation(ref x) => None, // see above
             Token::_InterpolationStart => None,
             Token::_InterpolationEnd => None,
         }
@@ -197,6 +218,22 @@ impl Type {
 impl ToString for Type {
     fn to_string(&self) -> String {
          self.name(true)
+    }
+}
+
+pub trait Pattern : ::std::fmt::Debug {
+    fn matches(&self, &Token) -> bool;
+}
+
+impl Pattern for Token {
+    fn matches(&self, token: &Token) -> bool {
+        *self == *token
+    }
+}
+
+impl Pattern for Type {
+    fn matches(&self, token: &Token) -> bool {
+        *self == token.get_type()
     }
 }
 

@@ -18,3 +18,5 @@ use std::fmt::Debug;
 /////////////
 
 pub trait Test : Debug {}
+
+// TODO: move token_parser::{Test, TestResult} here?

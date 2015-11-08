@@ -13,8 +13,9 @@
 /////////////
 
 use lexer::token::stream::{self, Stream, Item};
-use lexer::Token;
+use lexer::token::{self, Token};
 use parser::{ParserError, ParserErrorCode};
+use std::fmt;
 
 /////////////
 // exports //
@@ -24,7 +25,7 @@ pub type Position = usize;
 
 #[derive(Debug)]
 pub struct Cursor<'stream> {
-    pos: Position,   // 0,..
+    next: Position,   // 0,..
     end: Position,   // 0,..
     stream: &'stream Stream<'stream>, // inner lifetime: 'template
 }
@@ -35,11 +36,11 @@ impl<'stream> Cursor<'stream> {
         Cursor {
             end: stream.len(),
             stream: stream, // read-only, so `end` will always be valid
-            pos: 0,
+            next: 0,
         }
     }
 
-    pub fn _stream(&self) -> &Stream {
+    pub fn stream(&self) -> &Stream {
         self.stream
     }
 
@@ -48,14 +49,14 @@ impl<'stream> Cursor<'stream> {
     /// # panics
     /// when the `increment` would move the cursor `position` out of range
     pub fn move_by(&mut self, increment: usize) {
-        self.pos = self.pos + increment;
-        assert!(self.pos <= self.end, "cursor is out of range");
+        self.next = self.next + increment;
+        assert!(self.next <= self.end, "cursor is out of range");
     }
 
     pub fn next(&mut self) -> Option<&'stream stream::Item> {
         let next = self.peek();
         if next.is_some() {
-            self.pos += 1;
+            self.next += 1;
         }
 
         next
@@ -69,18 +70,14 @@ impl<'stream> Cursor<'stream> {
         self.next().map(|item| item.position())
     }
 
-    pub fn next_expect(&mut self, token: Token) -> Result<(), ParserError> {
-        match self.next() {
-            Some(item) => Ok(try!(item.expect(token))),
-            None => err!(ParserErrorCode::Eof,
-                "Expected token {t:?} but found end of stream",
-                t = token)
-                .into()
-        }
+    pub fn next_expect<T>(&mut self, pattern: T, reason: Option<&str>) -> Result<&'stream Item, ParserError>
+        where T: token::Pattern
+    {
+        Cursor::expect(pattern, self.next(), reason)
     }
 
     pub fn peek(&self) -> Option<&'stream Item> {
-        self.stream.as_vec().get(self.pos)
+        self.stream.as_vec().get(self.next)
     }
 
     pub fn peek_token(&self) -> Option<&'stream Token> {
@@ -91,13 +88,35 @@ impl<'stream> Cursor<'stream> {
         self.peek().map(|item| item.position())
     }
 
-    pub fn peek_expect(&self, token: Token) -> Result<(), ParserError> {
-        match self.peek() {
-            Some(item) => Ok(try!(item.expect(token))),
-            None => err!(ParserErrorCode::Eof,
-                "Expected token {t:?} but found end of stream",
-                t = token)
-                .into()
+    pub fn peek_expect<T>(&self, pattern: T, reason: Option<&str>) -> Result<&'stream Item, ParserError>
+        where T: token::Pattern
+    {
+        Cursor::expect(pattern, self.peek(), reason)
+    }
+
+    fn expect<T>(pattern: T, value: Option<&'stream Item>, reason: Option<&str>) -> Result<&'stream Item, ParserError>
+        where T: token::Pattern
+    {
+        match value {
+            Some(item) => Ok(try!(item.expect(pattern, reason))),
+            None => {
+                let mut error = err!(ParserErrorCode::Eof,
+                    "Expected token {t:?} but found end of stream",
+                    t = pattern);
+                if let Some(x) = reason {
+                    error = error.explain(x.to_string());
+                }
+                error.into()
+            }
         }
+    }
+}
+
+impl<'stream> fmt::Display for Cursor<'stream> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "cursor (next: {next}/{end}) {tokens:?}",
+            next = self.next,
+            end = self.end,
+            tokens = self.stream)
     }
 }

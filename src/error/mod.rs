@@ -73,7 +73,10 @@ impl<T> Exception<T>
     }
 
     pub fn explain(mut self, message: String) -> Self {
-        self.details.message = Some(message);
+        self.details.message = Some(match self.details.message {
+            Some(x) => x + " " + &message,
+            None => message
+        });
         self.description = Self::description_string(&self.code, &self.details);
 
         self

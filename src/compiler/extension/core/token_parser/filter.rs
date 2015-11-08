@@ -12,8 +12,8 @@
 /////////////
 
 use compiler::extension::api::TokenParser;
-use parser::{self, Parser};
-use lexer;
+use parser::{self, Job, ParserError};
+use lexer::token::stream::Item;
 
 /////////////
 // exports //
@@ -27,7 +27,7 @@ impl TokenParser for Filter  {
         "filter"
     }
 
-    fn parse(&self, _parser: Parser, _token: lexer::Token) -> Box<parser::Node> {
+    fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<parser::Node>, ParserError> {
         unimplemented!()
     }
 }

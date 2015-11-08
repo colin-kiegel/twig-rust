@@ -15,7 +15,7 @@
 use std::fmt;
 use std::convert::Into;
 use std::ops::Deref;
-use super::{Token, Type};
+use lexer::token::{self, Token, Type};
 use template;
 use lexer::error::{TokenError, TokenErrorCode};
 use lexer::job::Cursor;
@@ -32,7 +32,7 @@ pub struct Position {
 
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "line {line} column {column}",
+        write!(f, "{line}:{column}",
             line = self.line,
             column = self.column)
     }
@@ -53,14 +53,19 @@ impl Item {
         &self.position
     }
 
-    pub fn expect(&self, token: Token) -> Result<(), TokenError> {
-        if token == *self.token() {
-            Ok(())
+    pub fn expect<T>(&self, pattern: T, reason: Option<&str>) -> Result<&Item, TokenError>
+        where T: token::Pattern
+    {
+        if pattern.matches(self.token()) {
+            Ok(&self)
         } else {
-            err!(TokenErrorCode::UnexpectedToken,
+            let mut error = err!(TokenErrorCode::UnexpectedToken,
                 "Expected token {t:?} but found item {x:?} at {p:?}",
-                t = token, x = self.token(), p = self.position())
-            .into()
+                t = pattern, x = self.token(), p = self.position());
+            if let Some(x) = reason {
+                error = error.explain(x.to_string());
+            }
+            error.into()
         }
     }
 }

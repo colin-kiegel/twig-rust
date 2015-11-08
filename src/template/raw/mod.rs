@@ -13,6 +13,7 @@
 /////////////
 
 use lexer::{Lexer, token, LexerError};
+use std::fmt;
 
 /////////////
 // exports //
@@ -59,6 +60,15 @@ impl Raw {
         lexer.tokenize(self)
     }
 }
+
+impl fmt::Display for Raw {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "template ({name:?}): {code:?}",
+            name = self.name(),
+            code = self.code)
+    }
+}
+
 
 #[cfg(test)]
 mod test {

@@ -13,10 +13,11 @@
 /////////////
 
 use std::fmt;
-use lexer::{token, Token};
+use lexer::token::{self, Token, Type};
 use parser::error::*;
 use parser::{node, Parser};
 use compiler::extension::api::operator::Precedence;
+use compiler::extension::api::token_parser::{Test, TestResult};
 use std::iter;
 use template;
 use parser::api::Node;
@@ -62,7 +63,6 @@ impl<'p, 'stream> Job<'p, 'stream> {
     pub fn new(tokens: &'stream token::Stream, parser: &'p Parser) -> Job<'p, 'stream> {
         Job {
             tokens: tokens,
-            //stream: tokens.iter().peekable(),
             cursor: Cursor::new(tokens),
             parser: parser,
             state: State::default(),
@@ -71,9 +71,17 @@ impl<'p, 'stream> Job<'p, 'stream> {
         }
     }
 
+    pub fn parse(self: Job<'p, 'stream>) -> Result<template::Compiled, ParserError> {
+        self.do_parse(None)
+    }
+
+    pub fn parse_until(self: Job<'p, 'stream>, test: &Test) -> Result<template::Compiled, ParserError> {
+        self.do_parse(Some(test))
+    }
+
     #[allow(unused_mut)]
     #[allow(dead_code)] // #TODO:710 testcase
-    pub fn parse(mut self: Job<'p, 'stream>, test: String, drop_needle: bool) -> Result<template::Compiled, ParserError> {
+    fn do_parse(mut self: Job<'p, 'stream>, test: Option<&Test>) -> Result<template::Compiled, ParserError> {
 
         // NOTE: try to move this to other point
         //  - to avoid very first redundant push?
@@ -81,7 +89,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
         self.stack.push(self.state);
         self.state = State::default();
 
-        let nodes = match self.sub_parse(test, drop_needle) {
+        let nodes = match self.do_sub_parse(test) {
             Err(e) => return Err(e),
             Ok(nodes) => {
                 if self.state.parent.is_some() {
@@ -112,7 +120,15 @@ impl<'p, 'stream> Job<'p, 'stream> {
         return Ok(compiled);
     }
 
-    pub fn sub_parse(&mut self, _test: String, _drop_needle: bool) -> Result<Vec<Box<Node>>, ParserError> {
+    pub fn sub_parse(&mut self) -> Result<Vec<Box<Node>>, ParserError> {
+        self.do_sub_parse(None)
+    }
+
+    pub fn sub_parse_until(&mut self, test: &Test) -> Result<Vec<Box<Node>>, ParserError> {
+        self.do_sub_parse(Some(test))
+    }
+
+    fn do_sub_parse(&mut self, test: Option<&Test>) -> Result<Vec<Box<Node>>, ParserError> {
         // let line = self.current_token().line();
         let mut nodes : Vec<Box<Node>> = Vec::new();
 
@@ -122,21 +138,60 @@ impl<'p, 'stream> Job<'p, 'stream> {
                     nodes.push(node::Text::boxed(value.to_string(), item.position()));
                 },
                 Token::ExpressionStart => {
-                    let node = try!(self.parser.parse_expression(self, Precedence(0)));
-                    try!(self.cursor().next_expect(Token::ExpressionEnd));
+                    let node = try!(self.parse_expression(Precedence(0)));
+                    try!(self.cursor().next_expect(Token::ExpressionEnd, None));
 
                     nodes.push(node::Print::boxed(node, item.position()));
                 },
                 Token::BlockStart => {
-                    unimplemented!() // TODO
+                    let item = {
+                        let item = try!(self.cursor().peek_expect(Type::Name,
+                            Some("A block must start with a tag name")));
+
+                        if let Some(ref test) = test { // TODO: rename `test` to something more meaningful
+                            match test(item) {
+                                TestResult::KeepToken => {
+                                    return Ok(nodes)
+                                },
+                                TestResult::DropToken => {
+                                    self.cursor().next();
+                                    return Ok(nodes)
+                                },
+                                TestResult::Error(e) => {
+                                    return Err(e)
+                                },
+                                TestResult::Continue => {}
+                            }
+                        }
+
+                        self.cursor().next(); // we only peeked before
+                        item
+                    };
+
+                    let subparser = {
+                        // we can always destructure due to previous peek_expect(Type::Name)
+                        let tag = if let Token::Name(ref tag) = *item.token() { tag }
+                            else { unreachable!() };
+
+                        try!(self.parser.tag_handler(tag)
+                            .ok_or_else(||{ return err!(ParserErrorCode::UnexpectedToken,
+                                "There is no registered tag handler for a block {t:?} \
+                                at {pos} in {job}.",
+                                t = tag,
+                                pos = item.position(),
+                                job = self)
+                        }))
+                    };
+
+                    let node = try!(subparser.parse(self, item));
+                    nodes.push(node);
                 },
                 _ => return err!(ParserErrorCode::InvalidState,
-                        "Parser ended up in unsupported state with token {token:?} at {pos} \
-                        in {template:?} with tokens {tokens:?}.",
+                        "Parser ended up in unsupported state with token {token:?} \
+                        at {pos} in {job}.",
                         token = item.token(),
                         pos = item.position(),
-                        template = self.template,
-                        tokens = self.tokens)
+                        job = self)
                         .into()
             }
         }
@@ -167,6 +222,18 @@ impl<'p, 'stream> Job<'p, 'stream> {
         // }
     }
 
+    pub fn parser(&self) -> &Parser {
+        self.parser
+    }
+
+    pub fn parse_expression (
+        &mut self,
+        precedence: Precedence
+    ) -> Result<Box<Node>, ParserError>
+    {
+        self.parser.expression_parser.parse(self, precedence)
+    }
+
     pub fn cursor(&mut self) -> &mut Cursor<'stream> {
         &mut self.cursor
     }
@@ -181,5 +248,13 @@ impl<'p, 'tpl> fmt::Debug for Job<'p, 'tpl> {
         //     ]",
         //     stream = self.stream
         // )
+    }
+}
+
+impl<'p, 'tpl> fmt::Display for Job<'p, 'tpl> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "{template} with {cursor}.",
+            template = self.template,
+            cursor = self.cursor)
     }
 }

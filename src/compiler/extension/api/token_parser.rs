@@ -12,8 +12,8 @@
 /////////////
 
 use std::fmt::Debug;
-use parser::{self, Parser};
-use lexer;
+use parser::{self, Job, ParserError};
+use lexer::token::stream::Item;
 
 /////////////
 // exports //
@@ -22,5 +22,16 @@ use lexer;
 pub trait TokenParser : Debug {
     fn tag(&self) -> &'static str;
 
-    fn parse(&self, parser: Parser, token: lexer::Token) -> Box<parser::Node>;
+    fn parse(&self, job: &mut Job, item: &Item) -> Result<Box<parser::Node>, ParserError>;
+}
+
+// TODO: move {Test, TestResult} to compiler::extension::api::test?
+pub type Test = Fn(&Item) -> TestResult;
+
+#[derive(Debug)]
+pub enum TestResult {
+    Continue,  // orig: no_match
+    KeepToken, // orig: is_match + dropNeedle == false
+    DropToken, // orig: is_match + dropNeedle == true
+    Error(ParserError) // *unstable* - not clear whether we need this
 }

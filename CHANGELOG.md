@@ -5,6 +5,7 @@
 * features in order of appearance in Twig tutorials
   * if conditional
   * for-each-loop + arrays
+  * escaping
 
 # mixed ideas
 

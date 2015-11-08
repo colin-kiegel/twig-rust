@@ -59,6 +59,15 @@ macro_rules! impl_convert_exception {
                     message: None,
                     .. *cause.details()
                 };
+
+                // NOTE can't use `err_details!(None)` here
+                //      because that would yield linenumbers from
+                //      calls to impl_convert_exception and not from
+                //      the implicit call-site of .into() ...
+                //
+                //      alternative: manual conversion via different macro
+                //          try_into!() or sth. like that?
+
                 ::error::Exception::new(details, $target_error_code)
                     .caused_by(cause)
             }
