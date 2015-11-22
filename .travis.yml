@@ -10,7 +10,7 @@ env:
   - LOCAL="~/.local"
   - secure: fo5BXmPycUvt1hActysQmWrgQgUJtiILcb7FohhQ0spucIVZSZ5DIPPfwYFH+J5ncZLiNOXfAgCpxjVstyV84yhStrsIWM/IYiDy4ddPNWMcwhlbFeNbDULWidk2Z02m3y9LSbLSJW13bx+qu0mJ+lGa6mL4LjWZzuQx15TX0wNw/BJBHpJ3IpArvdHd81gJeXePyZkV5hZM1K92nDFb7Eizp84YtqtuAJShx7CCeHCuq4UtIRSolR4q4VeRPUTVDZuHh/rkNWrJVzxeETUqiVPVftBuf/fx409nZnto1LnebA2yF3sqoPTEJwdlw3wWEsIJ38GvjoU55IxJqkfrw32C9gNw1bo4epIRGGrzyd2HyWmXcoOz6ktr3BDzPbqWdtBNVYwR3ZJVxW9DMOZLbW6u4BgJh7HO1zC4hB+PFJHWmufKTmGZ9FwIR5O8gQmCXgCRRI/RiIY5GYjqMmHevHPFMvM/nAnJCqgHH2+JtdMK5jguHX5OcNlNmJk8TO8dHsmVN4on2MEwq4cVQ1gQBrG5uVU9bqBdZlmGpCZnWtPfVWVycqLTNkUN6ZS4KiIKR6WxlG1O1kDDfNawTP5oQSyc5s9iGUmgQSeUbJVnHKu1RkCHS2o5w/At3UFrH6hR+j2CfNHOEVkEE1SGcx5e5kmn1LB/Ak06+MACVNkfXgs=
 before_script: |
-  pip install 'travis-cargo<0.2' --user
+  pip install 'travis-cargo<0.2' --user # https://github.com/huonw/travis-cargo
   export PATH=$LOCAL/bin:$PATH
 script: |
   travis-cargo build &&
@@ -25,7 +25,14 @@ addons:
     - libdw-dev
     - libbfd-dev
 after_success: |
-  travis-cargo doc-upload # possible to add flag like `--only master`
+  # `travis-cargo --only stable doc-upload` didn't work for me ...
+  [ $TRAVIS_BRANCH = master ] &&
+  [ $TRAVIS_PULL_REQUEST = false ] &&
+  cargo doc &&
+  echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2`/index.html>" > target/doc/index.html &&
+  pip install ghp-import --user &&
+  ghp-import -n target/doc &&
+  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
 
   # `travis-cargo coveralls` didn't work for me - so do it manually
   wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
