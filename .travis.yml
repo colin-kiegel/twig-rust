@@ -8,7 +8,7 @@ env:
   - RUST_BACKTRACE=1
   - PKGNAME=twig
   - LOCAL="~/.local"
-  - secure: fo5BXmPycUvt1hActysQmWrgQgUJtiILcb7FohhQ0spucIVZSZ5DIPPfwYFH+J5ncZLiNOXfAgCpxjVstyV84yhStrsIWM/IYiDy4ddPNWMcwhlbFeNbDULWidk2Z02m3y9LSbLSJW13bx+qu0mJ+lGa6mL4LjWZzuQx15TX0wNw/BJBHpJ3IpArvdHd81gJeXePyZkV5hZM1K92nDFb7Eizp84YtqtuAJShx7CCeHCuq4UtIRSolR4q4VeRPUTVDZuHh/rkNWrJVzxeETUqiVPVftBuf/fx409nZnto1LnebA2yF3sqoPTEJwdlw3wWEsIJ38GvjoU55IxJqkfrw32C9gNw1bo4epIRGGrzyd2HyWmXcoOz6ktr3BDzPbqWdtBNVYwR3ZJVxW9DMOZLbW6u4BgJh7HO1zC4hB+PFJHWmufKTmGZ9FwIR5O8gQmCXgCRRI/RiIY5GYjqMmHevHPFMvM/nAnJCqgHH2+JtdMK5jguHX5OcNlNmJk8TO8dHsmVN4on2MEwq4cVQ1gQBrG5uVU9bqBdZlmGpCZnWtPfVWVycqLTNkUN6ZS4KiIKR6WxlG1O1kDDfNawTP5oQSyc5s9iGUmgQSeUbJVnHKu1RkCHS2o5w/At3UFrH6hR+j2CfNHOEVkEE1SGcx5e5kmn1LB/Ak06+MACVNkfXgs=
+  - secure: "n4u/OAY9X6HtfgHP0rUQbBK+cY7tBj8dwEwduDBbZShsUY2LTo6xP7bypjP5ee13LlIAwZHXk1IusWYvVzwYmygPNtR+9SDbKvJDWpuHuvczyqWGRGIsYBLtveZr0i6Px48fJQ4lr7MbZMyTBaLhSzYI5CGo8ZmBU56NGYpAw0oXf2cgBRhbSNyPrFBzaeFluWbpD8UYDNVziMmmiSyivT7WZa+/e/QL66KplhUWxM/ed7cp8jrOsfOjG5H2/8+W4G2AVKmsyhuXBSanEeHo+ewVxxhSZDVfyeXh0LYMROGP5MFl2wtWrOOFYBIRQAa1F5vnC4sV/AaMeAe01cBtiCmgdLym2AGgh6E+jiZdUEPUBJ4rLUvEhb2gOEAlK0xjr10jJOLbsE5yfSnt94OQJyHZcDjj2a29rX5PJ0YLPzZ/FEBgQ16uCniCABNb+Koq/T+IBixrUxwvZ+KDCCcDv1ZC18SEd18jEqOqmBil/HA6AnUpndyZPPlvq5lEhlo/ZwdJTGOSOsRcrBwUEIqTi7m/PDRfgbdD2a/7zTbHWN3y7sD6wFw7iTCbjDMQQLJzwONUzUxbBP62OmWfj4NtKs3GwTAfOG/unn7YJmwsnaImuv3aHC7Bnbd5DzXlflZK5aTAK+W2JwTjZQludJjfJK8jGk4ekv1OqfIJokZE5bc="
 before_script: |
   pip install 'travis-cargo<0.2' --user # https://github.com/huonw/travis-cargo
   export PATH=$LOCAL/bin:$PATH
@@ -32,7 +32,7 @@ after_success: |
   echo "<meta http-equiv=refresh content=0;url=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 2`/index.html>" > target/doc/index.html &&
   pip install ghp-import --user &&
   ghp-import -n target/doc &&
-  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages
+  git push -fq https://${GH_TOKEN}@github.com/${TRAVIS_REPO_SLUG}.git gh-pages > /dev/null 2>&1
 
   # `travis-cargo coveralls` didn't work for me - so do it manually
   wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
