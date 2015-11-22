@@ -1,11 +1,13 @@
+sudo: false
 language: rust
 rust:
   - stable
   - beta
 #  - nightly
 before_script: |
-  pip install 'travis-cargo<0.2' --user &&
-  export PATH=$HOME/.local/bin:$PATH
+  NAME=twig
+  LOCAL="~/.local" # install here to avoid `sudo`
+  export PATH=$LOCAL/bin:$PATH
 addons:
   apt:
     packages:
@@ -13,4 +15,18 @@ addons:
     - libelf-dev
     - libdw-dev
 after_success: |
-  travis-cargo --only stable coveralls --no-sudo
+  wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
+  tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build &&
+  cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCAL .. && make &&
+  make install && cd ../.. &&
+
+  PKGID="$(cargo pkgid)"
+  [ -z "$PKGID" ] && echo "ERROR: Package not found ($PKGID)" && exit 1
+  ORIGIN="${PKGID%#*}"
+  ORIGIN="${ORIGIN:7}"
+  PKGNAME="${ORIGIN##*/}"
+
+  kcov --verify \
+       --coveralls-id=$TRAVIS_JOB_ID \
+       --exclude-pattern=/.cargo \
+       target/kcov target/debug/$PKGNAME-*

@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/colin-kiegel/twig-rust.svg)](https://travis-ci.org/colin-kiegel/twig-rust)
+[![Coverage Status](https://coveralls.io/repos/colin-kiegel/twig-rust/badge.svg?branch=master&service=github)](https://coveralls.io/github/colin-kiegel/twig-rust?branch=master)
 
 # Twig-Rust
 

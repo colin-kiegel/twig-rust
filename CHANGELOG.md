@@ -21,6 +21,7 @@
 ## long-term
 
 * improve documentation
+* benchmarks
 * compile to JS
 * compile to Rust
 
