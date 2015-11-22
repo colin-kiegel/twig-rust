@@ -12,7 +12,7 @@
 // imports //
 /////////////
 
-#[cfg(test)]
+extern crate twig;
 mod integration;
 
 /////////////

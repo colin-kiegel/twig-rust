@@ -12,10 +12,10 @@
 // imports //
 /////////////
 
-use compiler::{Compiler, Builder};
-use loader;
-use runtime::Runtime;
-use template::api::Template;
+use twig::compiler::{Compiler, Builder};
+use twig::loader;
+use twig::runtime::Runtime;
+use twig::template::api::Template;
 
 /////////////
 // exports //

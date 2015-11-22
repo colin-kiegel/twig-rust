@@ -8,6 +8,12 @@
 /// @author Colin Kiegel <kiegel@gmx.de>
 
 /////////////
+// imports //
+/////////////
+
+extern crate regex;
+
+/////////////
 // exports //
 /////////////
 
@@ -18,19 +24,4 @@ pub mod lexer;
 pub mod parser;
 pub mod runtime;
 pub mod loader;
-
-/////////////
-// imports //
-/////////////
-
-extern crate regex;
-
-mod template;
-
-#[cfg(test)]
-pub mod test;
-
-
-// #TODO:220 http://keepachangelog.com
-// #TODO:540 switch to `if let` pattern https://github.com/rust-lang/rfcs/pull/160
-// #TODO:550 switch to `while let` pattern https://github.com/rust-lang/rfcs/pull/214
+pub mod template;
