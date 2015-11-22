@@ -1,5 +1,11 @@
 # Planned
 
+* Merge
+** https://github.com/colin-kiegel/twig-rust
+** https://github.com/Nercury/twig-rs
+* examples
+* documentation
+
 ## `core` extension
 
 * features in order of appearance in Twig tutorials

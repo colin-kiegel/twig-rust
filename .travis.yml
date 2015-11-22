@@ -1,13 +1,22 @@
 sudo: false
 language: rust
 rust:
-  - stable
-  - beta
-#  - nightly
+- stable
+- beta
+env:
+  global:
+  - RUST_BACKTRACE=1
+  - PKGNAME=twig
+  - LOCAL="~/.local"
+  - secure: fo5BXmPycUvt1hActysQmWrgQgUJtiILcb7FohhQ0spucIVZSZ5DIPPfwYFH+J5ncZLiNOXfAgCpxjVstyV84yhStrsIWM/IYiDy4ddPNWMcwhlbFeNbDULWidk2Z02m3y9LSbLSJW13bx+qu0mJ+lGa6mL4LjWZzuQx15TX0wNw/BJBHpJ3IpArvdHd81gJeXePyZkV5hZM1K92nDFb7Eizp84YtqtuAJShx7CCeHCuq4UtIRSolR4q4VeRPUTVDZuHh/rkNWrJVzxeETUqiVPVftBuf/fx409nZnto1LnebA2yF3sqoPTEJwdlw3wWEsIJ38GvjoU55IxJqkfrw32C9gNw1bo4epIRGGrzyd2HyWmXcoOz6ktr3BDzPbqWdtBNVYwR3ZJVxW9DMOZLbW6u4BgJh7HO1zC4hB+PFJHWmufKTmGZ9FwIR5O8gQmCXgCRRI/RiIY5GYjqMmHevHPFMvM/nAnJCqgHH2+JtdMK5jguHX5OcNlNmJk8TO8dHsmVN4on2MEwq4cVQ1gQBrG5uVU9bqBdZlmGpCZnWtPfVWVycqLTNkUN6ZS4KiIKR6WxlG1O1kDDfNawTP5oQSyc5s9iGUmgQSeUbJVnHKu1RkCHS2o5w/At3UFrH6hR+j2CfNHOEVkEE1SGcx5e5kmn1LB/Ak06+MACVNkfXgs=
 before_script: |
-  PKGNAME=twig # must match with cargo.toml
-  LOCAL="~/.local" # install here to avoid `sudo`
+  pip install 'travis-cargo<0.2' --user
   export PATH=$LOCAL/bin:$PATH
+script: |
+  travis-cargo build &&
+  travis-cargo test &&
+  travis-cargo bench &&
+  travis-cargo doc
 addons:
   apt:
     packages:
@@ -16,6 +25,9 @@ addons:
     - libdw-dev
     - libbfd-dev
 after_success: |
+  travis-cargo doc-upload # possible to add flag like `--only master`
+
+  # `travis-cargo coveralls` didn't work for me - so do it manually
   wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
   tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build &&
   cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCAL .. && make &&
