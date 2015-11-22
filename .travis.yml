@@ -5,7 +5,7 @@ rust:
   - beta
 #  - nightly
 before_script: |
-  NAME=twig
+  PKGNAME=twig # must match with cargo.toml
   LOCAL="~/.local" # install here to avoid `sudo`
   export PATH=$LOCAL/bin:$PATH
 addons:
@@ -14,17 +14,12 @@ addons:
     - libcurl4-openssl-dev
     - libelf-dev
     - libdw-dev
+    - libbfd-dev
 after_success: |
   wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
   tar xzf master.tar.gz && mkdir kcov-master/build && cd kcov-master/build &&
   cmake -DCMAKE_INSTALL_PREFIX:PATH=$LOCAL .. && make &&
   make install && cd ../.. &&
-
-  PKGID="$(cargo pkgid)"
-  [ -z "$PKGID" ] && echo "ERROR: Package not found ($PKGID)" && exit 1
-  ORIGIN="${PKGID%#*}"
-  ORIGIN="${ORIGIN:7}"
-  PKGNAME="${ORIGIN##*/}"
 
   kcov --verify \
        --coveralls-id=$TRAVIS_JOB_ID \
