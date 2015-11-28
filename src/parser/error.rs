@@ -14,7 +14,7 @@
 
 use std::fmt::{self, Display};
 use error::Error;
-use error::api::{GeneralizeTo, ErrorCode, Dump};
+use error::api::{GeneralizeTo, ErrorCode};
 
 use lexer::error::TokenErrorCode;
 use parser::job::{self, cursor};
@@ -47,17 +47,17 @@ pub enum ParserErrorCode {
     TokenParserError {
         tag: &'static str, // known at compile-time
         error: String,
-        job: <job::Job<'static, 'static> as Dump>::Data,
+        job: job::JobDump,
     },
     SemanticError,
     NoTagHandler {
         tag: String, // only known at runtime
         position: token::stream::Position,
-        job: <job::Job<'static, 'static> as Dump>::Data,
+        job: job::JobDump,
     },
     UnexpectedBinaryOperator {
         name: String,
-        job: <job::Job<'static, 'static> as Dump>::Data,
+        job: job::JobDump,
     },
     UnexpectedToken {
         reason: Option<&'static str>,
