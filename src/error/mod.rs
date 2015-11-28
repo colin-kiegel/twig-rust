@@ -6,13 +6,13 @@
 /// Twig generic error
 
 use std::fmt::{self, Display};
+use std::error;
 
 
 #[macro_use]
 pub mod macros;
 // use std Error-trait to improve cross-crate compatibility
 // don't mix it up with Err(X)
-pub use std::error;
 pub mod api;
 
 // generic wrapper around some ErrorCode - adds location support
