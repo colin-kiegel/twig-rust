@@ -35,9 +35,9 @@ impl api::Loader for Array {
 
         return match self.templates.get(name) {
             None => {
-                err!(LoaderErrorCode::TemplateNotFound)
-                    .explain(format!("Entry not present {:?}.", name))
-                    .into()
+                err!(LoaderErrorCode::ArrayTemplateNotFound {
+                    name: name.to_string()
+                })
             }
             Some(x) => {
                 Ok(Cow::Borrowed(x))

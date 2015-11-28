@@ -13,7 +13,8 @@
 
 use compiler::extension::api::{self, Extension};
 use std::collections::HashMap;
-use compiler::{Compiler, TwigError, TwigErrorCode};
+use compiler::Compiler;
+use compiler::error::{ExtensionRegistryError, ExtensionRegistryErrorCode};
 
 /////////////
 // exports //
@@ -39,18 +40,15 @@ pub struct ExtensionRegistry {
 
 impl ExtensionRegistry {
     /// Register an extension
-    pub fn push(&mut self, extension: Box<Extension>) -> Result<&mut Self, TwigError> {
+    pub fn push(&mut self, extension: Box<Extension>) -> Result<&mut Self, ExtensionRegistryError> {
         if self.initialized {
-            return err!(TwigErrorCode::Logic)
-                .explain(format!("Compiler are already initialized"))
-                .into()
+            return err!(ExtensionRegistryErrorCode::AlreadyInitialized)
         }
 
         if let Some(prev) = self.ext.insert(extension.name().to_string(), extension)  {
-            return err!(TwigErrorCode::Logic)
-                .explain(format!("Duplicate extension {p:?} has already been registered.",
-                    p = prev))
-                .into();
+            return err!(ExtensionRegistryErrorCode::DuplicateExtension {
+                prev: prev
+            })
         };
 
         Ok(self)
@@ -79,23 +77,19 @@ impl ExtensionRegistry {
 
     /// # Failures
     /// If the extensions have not been initialized with the compiler
-    pub fn check_initialized(&self) -> Result<&Self, TwigError> {
+    pub fn check_initialized(&self) -> Result<&Self, ExtensionRegistryError> {
         if self.initialized {
             Ok(self)
         } else {
-            err!(TwigErrorCode::Logic)
-                .explain(format!("Compiler extensions are not yet initialized"))
-                .into()
+            err!(ExtensionRegistryErrorCode::NotInitialized)
         }
     }
 
     /// Initialize extensions with the compiler
     /// This is where you can load some file that contains filter functions for instance.
-    pub fn init(&mut self, compiler: &mut Compiler) -> Result<(), TwigError> {
+    pub fn init(&mut self, compiler: &mut Compiler) -> Result<(), ExtensionRegistryError> {
         if self.initialized {
-            return err!(TwigErrorCode::Logic)
-                .explain(format!("Compiler extensions already initialized"))
-                .into()
+            return err!(ExtensionRegistryErrorCode::AlreadyInitialized)
         }
 
         for (_, ext) in self.ext.iter() {
@@ -103,26 +97,26 @@ impl ExtensionRegistry {
 
             for (k, v) in ext.filters() {
                 if let Some(prev) = self.filters.insert(k, v) {
-                    return err!(TwigErrorCode::Logic)
-                        .explain(format!("Duplicate filter {p:?} while loading extension {x:?}.",
-                            p = prev, x = ext.name()))
-                        .into();
-                    }
+                    return err!(ExtensionRegistryErrorCode::DuplicateFilter {
+                        prev: prev,
+                        ext_name: ext.name()
+                    })
+                }
             }
             for (k, v) in ext.functions() {
                 if let Some(prev) = self.functions.insert(k, v) {
-                    return err!(TwigErrorCode::Logic)
-                        .explain(format!("Duplicate function {p:?} while loading extension {x:?}.",
-                            p = prev, x = ext.name()))
-                        .into();
+                    return err!(ExtensionRegistryErrorCode::DuplicateFunction {
+                        prev: prev,
+                        ext_name: ext.name()
+                    })
                 }
             }
             for (k, v) in ext.tests() {
                 if let Some(prev) = self.tests.insert(k, v) {
-                    return err!(TwigErrorCode::Logic)
-                        .explain(format!("Duplicate test {p:?} while loading extension {x:?}.",
-                            p = prev, x = ext.name()))
-                        .into();
+                    return err!(ExtensionRegistryErrorCode::DuplicateTest {
+                        prev: prev,
+                        ext_name: ext.name()
+                    })
                 }
             }
             for (k, v) in ext.token_parsers() {
@@ -130,17 +124,17 @@ impl ExtensionRegistry {
                 // and don't want to clone!
                 //
                 // if let Some(prev) = self._token_parser_by_tags.insert(v.tag().to_string(), &v) {
-                //     return err!(TwigErrorCode::Logic)
-                //         .explain(format!("Duplicate token parser by tag {p:?} while loading extension {x:?}.",
-                //             p = prev, x = ext.name()))
-                //         .into();
+                //     return err!(ExtensionRegistryErrorCode::DuplicateTagHandler {
+                //         prev: prev,
+                //         ext_name: ext.name()
+                //     })
                 // }
 
                 if let Some(prev) = self.token_parsers.insert(k, v) {
-                    return err!(TwigErrorCode::Logic)
-                        .explain(format!("Duplicate token parser {p:?} while loading extension {x:?}.",
-                            p = prev, x = ext.name()))
-                        .into();
+                    return err!(ExtensionRegistryErrorCode::DuplicateTokenParser {
+                        prev: prev,
+                        ext_name: ext.name()
+                    })
                 }
             }
 
@@ -148,19 +142,19 @@ impl ExtensionRegistry {
             for v in ext.node_visitors() { self.node_visitors.push(v) }
             for v in ext.operators_unary() {
                 if let Some(prev) = self.operators_unary.insert(v.repr.clone(), v) {
-                    return err!(TwigErrorCode::Logic)
-                        .explain(format!("Duplicate unary operator {p:?} while loading extension {x:?}.",
-                            p = prev, x = ext.name()))
-                        .into();
+                    return err!(ExtensionRegistryErrorCode::DuplicateOperatorUnary {
+                        prev: prev,
+                        ext_name: ext.name()
+                    })
                 }
             }
 
             for v in ext.operators_binary() {
                 if let Some(prev) = self.operators_binary.insert(v.repr.clone(), v) {
-                    return err!(TwigErrorCode::Logic)
-                        .explain(format!("Duplicate binary operator {p:?} while loading extension {x:?}.",
-                            p = prev, x = ext.name()))
-                        .into();
+                    return err!(ExtensionRegistryErrorCode::DuplicateOperatorBinary {
+                        prev: prev,
+                        ext_name: ext.name()
+                    })
                 }
             }
         }

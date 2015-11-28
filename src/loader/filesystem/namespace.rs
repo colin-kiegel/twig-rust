@@ -85,10 +85,9 @@ impl Namespace {
         }
 
         if self.dirs.len() == 0 {
-            return err!(LoaderErrorCode::NotInitialized)
-            .explain(format!("There are no registered directories for template namespace {id:?}",
-            id = self.id))
-            .into()
+            return err!(LoaderErrorCode::FileSystemNamespaceNotInitialized {
+                namespace: self.id.to_string()
+            })
         }
 
         for dir in self.dirs.iter() {
@@ -102,14 +101,11 @@ impl Namespace {
             }
         }
 
-        return err!(LoaderErrorCode::TemplateNotFound)
-            .explain(format!(
-                "Unable to find template {path:?} in namespace {id:?} (looked into: {dirs:?})",
-                path = raw_path,
-                id = self.id,
-                dirs = self.dirs
-            ))
-            .into()
+        return err!(LoaderErrorCode::FileSystemTemplateNotFound {
+            raw_path: raw_path.to_path_buf(),
+            namespace: self.id.to_string(),
+            dirs: self.dirs.clone()
+        })
     }
 
     pub fn clear_path_cache(&mut self) {

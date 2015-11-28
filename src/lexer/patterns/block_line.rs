@@ -18,6 +18,7 @@ use super::Options;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
+use error::api::ErrorCode;
 
 /////////////
 // exports //
@@ -68,7 +69,9 @@ impl<'t> super::Extract<'t> for Pattern {
                 Some(x) => match x.parse::<usize>() {
                         Ok(line) => line,
                         Err(e) => {
-                            return err!(LexerErrorCode::InvalidValue, "{}", x).caused_by(e).into()
+                            return Err(LexerErrorCode::InvalidValue { value: x.to_string() }
+                                .at(loc!())
+                                .caused_by(e))
                         },
                     },
                 _ => unreachable!(),
@@ -121,12 +124,7 @@ mod test {
 
         assert_eq!(
             *err.code(),
-            LexerErrorCode::InvalidValue
-        );
-
-        assert_eq!(
-            err.details().message,
-            Some("1844674407370955161518446744073709551615".to_string())
+            LexerErrorCode::InvalidValue { value: "1844674407370955161518446744073709551615".to_string() }
         );
     }
 }

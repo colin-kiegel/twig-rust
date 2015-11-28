@@ -15,7 +15,7 @@
 /////////////
 
 use regex;
-use regex::Error as regexError;
+use error::api::ErrorCode;
 
 /////////////
 // exports //
@@ -46,7 +46,7 @@ impl Number {
 }
 
 impl Pattern {
-    pub fn new() -> Result<Pattern, regexError> {
+    pub fn new() -> Result<Pattern, regex::Error> {
         Ok(Pattern {
             regex: try_new_regex!(r"\A[0-9]+(\.[0-9]+)?"),
         })
@@ -68,17 +68,17 @@ impl<'t> super::Extract<'t> for Pattern {
                 Ok(float)
                     => Number::Floating(float),
                 Err(e)
-                    => return err!(LexerErrorCode::InvalidValue, "{}", number_string)
-                        .caused_by(e)
-                        .into(),
+                    => return Err(LexerErrorCode::InvalidValue { value: number_string.to_string() }
+                        .at(loc!())
+                        .caused_by(e))
             },
             None => match number_string.parse::<u64>() {
                 Ok(int)
                     => Number::Integer(int),
                 Err(e)
-                    => return err!(LexerErrorCode::InvalidValue, "{}", number_string)
-                        .caused_by(e)
-                        .into(),
+                    => return Err(LexerErrorCode::InvalidValue {value: number_string.to_string() }
+                        .at(loc!())
+                        .caused_by(e))
             },
         };
 

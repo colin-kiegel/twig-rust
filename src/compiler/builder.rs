@@ -133,7 +133,7 @@ impl Builder {
 
     /// Registers an extension
     pub fn add_extension(mut self, extension: Box<Extension>) -> Result<Self, TwigError> {
-        try!(self.ext.push(extension));
+        try_chain!(self.ext.push(extension));
 
         Ok(self)
     }
@@ -148,11 +148,11 @@ impl Builder {
         let o = self.opt;
 
         // add default extensions
-        try!(self.ext.push(extension::Escaper::new(o.autoescape)));
-        try!(self.ext.push(extension::Optimizer::new(o.optimizations)));
+        try_chain!(self.ext.push(extension::Escaper::new(o.autoescape)));
+        try_chain!(self.ext.push(extension::Optimizer::new(o.optimizations)));
 
         // init extensions
-        try!(self.ext.init(&mut c));
+        try_chain!(self.ext.init(&mut c));
         c.ext = Some(Rc::new(self.ext));
 
         // #TODO:360 register staging extension (!)

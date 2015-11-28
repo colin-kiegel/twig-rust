@@ -33,5 +33,5 @@ pub enum TestResult {
     Continue,  // orig: no_match
     KeepToken, // orig: is_match + dropNeedle == false
     DropToken, // orig: is_match + dropNeedle == true
-    Error(ParserError) // *unstable* - not clear whether we need this
+    //Error(ParserError) // *unstable* - not clear whether we need this
 }

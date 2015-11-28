@@ -40,7 +40,7 @@ impl Default for Mode {
 }
 
 impl Extension for Escaper {
-    fn name(&self) -> &str { "escaper" }
+    fn name(&self) -> &'static str { "escaper" }
 }
 
 impl Escaper {

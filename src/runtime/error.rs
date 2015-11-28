@@ -12,23 +12,41 @@
 // imports //
 /////////////
 
-use error;
+use std::fmt::{self, Display};
+use error::Error;
+use error::api::ErrorCode;
 
 /////////////
 // exports //
 /////////////
 
-pub type RuntimeError = error::Exception<RuntimeErrorCode>;
+pub type RuntimeError = Error<RuntimeErrorCode>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub enum RuntimeErrorCode {
-    Unknown,
+    Unreachable {
+        reason: String
+    }
 }
 
-impl ToString for RuntimeErrorCode {
-    fn to_string(&self) -> String {
+impl ErrorCode for RuntimeErrorCode {
+    fn description(&self) -> &str {
         match *self {
-            RuntimeErrorCode::Unknown => "Unknown",
-        }.to_string()
+            RuntimeErrorCode::Unreachable{..} => "Unexptected runtime error (please report as bug with details).",
+        }
+    }
+}
+
+impl Display for RuntimeErrorCode {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        try!(write!(f, "{}", self.description()));
+
+        match *self {
+            RuntimeErrorCode::Unreachable {
+                ref reason
+            } => {
+                write!(f, " {}.", reason)
+            }
+        }
     }
 }

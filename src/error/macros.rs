@@ -3,74 +3,50 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Rust macro
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// exports //
-/////////////
+/// Twig macro for error handling
 
 pub use super::*;
+
 
 #[macro_export]
 macro_rules! err {
     ( $code:expr ) => ({
-            ::error::Exception::new(err_details!(None), $code)
-        });
-    //
-    // ( $code:expr, $message:expr ) => ({
-    //         ::error::Exception::new(err_details!(Some($message.to_string())), $code)
-    //         // #TODO:750 treat Strings differently
-    //     });
-
-    // Use the syntax described in std::fmt.
-    ( $code:expr, $ ( $ arg : tt ) * ) => ({
-            let message: String = format ! ( $ ( $ arg ) * );
-            ::error::Exception::new(err_details!(Some(message)), $code)
-            // #TODO:750 treat Strings differently
-        });
+        Err(::error::Error::new($code, loc!()))
+    });
 }
 
 #[macro_export]
-macro_rules! err_details {
-    ( $opt_message:expr ) => ({
-            ::error::Details {
-                message : $opt_message,
-                module_path : module_path!(),
-                filename : file!(),
-                line : line!(),
-                column : column!(),
-            }
-        });
+macro_rules! loc {
+    () => ({
+        ::error::Location {
+            module_path : module_path!(),
+            filename : file!(),
+            line : line!(),
+            column : column!(),
+        }
+    });
 }
 
-// NOTE: because convert::From<T> already is reflexive (generic `impl From<T> for T`)
-//       we can't generically `impl From<Exception<A>> for Exception<B> where ...`
-//       - to bad!
-//       TODO: file a bug!
-#[macro_export]
-macro_rules! impl_convert_exception {
-    ( $source_type:ty, $target_type:ty, $target_error_code:expr ) => (
-        impl ::std::convert::From<::error::Exception<$source_type>> for ::error::Exception<$target_type> {
-            fn from(cause: ::error::Exception<$source_type>) -> ::error::Exception<$target_type> {
-                let details = ::error::Details {
-                    message: None,
-                    .. *cause.details()
-                };
+// `try_chain!`-macro will create an error-chain with location for each chaining-operation
+//
+// use as follows
+//
+// fn foo() -> Result<(), Exception<CODE_A>> {
+//    let result_B: Result<(), Exception<CODE_B>> = ...;
+//
+//    try_chain!(result_B);
+// }
+macro_rules! try_chain {
+    ( $result:expr ) => (
+        match $result {
+            Ok(value) => value,
+            Err(cause) => {
+                let code = ::error::api::GeneralizeTo::generalize(cause.code());
 
-                // NOTE can't use `err_details!(None)` here
-                //      because that would yield linenumbers from
-                //      calls to impl_convert_exception and not from
-                //      the implicit call-site of .into() ...
-                //
-                //      alternative: manual conversion via different macro
-                //          try_into!() or sth. like that?
-
-                ::error::Exception::new(details, $target_error_code)
+                return Err(::error::Error::new(code, loc!())
                     .caused_by(cause)
+                    .into())
             }
         }
-    );
+    )
 }

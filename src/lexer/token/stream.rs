@@ -19,6 +19,7 @@ use lexer::token::{self, Token, Type};
 use template;
 use lexer::error::{TokenError, TokenErrorCode};
 use lexer::job::Cursor;
+use error::api::Dump;
 
 /////////////
 // exports //
@@ -53,20 +54,39 @@ impl Item {
         &self.position
     }
 
-    pub fn expect<T>(&self, pattern: T, reason: Option<&str>) -> Result<&Item, TokenError>
-        where T: token::Pattern
+    pub fn expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&Item, TokenError>
+        where T: token::Pattern + 'static
     {
         if pattern.matches(self.token()) {
             Ok(&self)
         } else {
-            let mut error = err!(TokenErrorCode::UnexpectedToken,
-                "Expected token {t:?} but found item {x:?} at {p:?}",
-                t = pattern, x = self.token(), p = self.position());
-            if let Some(x) = reason {
-                error = error.explain(x.to_string());
-            }
-            error.into()
+            err!(TokenErrorCode::UnexpectedTokenAtItem {
+                reason: reason,
+                expected: <token::Pattern as Dump>::dump(&pattern),
+                found: self.dump(),
+            })
         }
+    }
+}
+
+pub type ItemDump = Item; // may change as soon as we use RefTokens
+
+impl Dump for Item {
+    type Data = ItemDump;
+
+    fn dump(&self) -> Self::Data {
+        ItemDump {
+            token: self.token.dump(),
+            position: self.position.clone()
+        }
+    }
+}
+
+impl fmt::Display for Item {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "token {t} at position {p}",
+            t = self.token,
+            p = self.position)
     }
 }
 
@@ -163,6 +183,31 @@ impl<'a> fmt::Debug for Stream<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         let v: Vec<String> = self.items.iter().map(|i| format!("{:?}", i.token)).collect();
         write!(f, "[\n\t{}\n]", v.join("\n\t"))
+    }
+}
+
+#[derive(Debug)]
+pub struct StreamDump {
+    pub template_str: String,
+    pub items_str: String,
+}
+
+impl<'a> Dump for Stream<'a> {
+    type Data = StreamDump;
+
+    fn dump(&self) -> Self::Data {
+        StreamDump {
+            template_str: self.template().to_string(),
+            items_str: self.to_string()
+        }
+    }
+}
+
+impl fmt::Display for StreamDump {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, " StreamDump{{ template: {template:?}, items: {items:?}}}",
+            template = self.template_str,
+            items = self.items_str)
     }
 }
 

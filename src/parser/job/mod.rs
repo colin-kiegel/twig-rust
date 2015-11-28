@@ -13,6 +13,7 @@
 /////////////
 
 use std::fmt;
+use error::api::{Dump, ErrorCode};
 use lexer::token::{self, Token, Type};
 use parser::error::*;
 use parser::{node, Parser};
@@ -139,13 +140,13 @@ impl<'p, 'stream> Job<'p, 'stream> {
                 },
                 Token::ExpressionStart => {
                     let node = try!(self.parse_expression(Precedence(0)));
-                    try!(self.cursor().next_expect(Token::ExpressionEnd, None));
+                    try!(self.cursor.next_expect(Token::ExpressionEnd, None));
 
                     nodes.push(node::Print::boxed(node, item.position()));
                 },
                 Token::BlockStart => {
                     let item = {
-                        let item = try!(self.cursor().peek_expect(Type::Name,
+                        let item = try!(self.cursor.peek_expect(Type::Name,
                             Some("A block must start with a tag name")));
 
                         if let Some(ref test) = test { // TODO: rename `test` to something more meaningful
@@ -154,17 +155,17 @@ impl<'p, 'stream> Job<'p, 'stream> {
                                     return Ok(nodes)
                                 },
                                 TestResult::DropToken => {
-                                    self.cursor().next();
+                                    self.cursor.next();
                                     return Ok(nodes)
                                 },
-                                TestResult::Error(e) => {
-                                    return Err(e)
-                                },
+                                // TestResult::Error(e) => {
+                                //     return Err(e)
+                                // },
                                 TestResult::Continue => {}
                             }
                         }
 
-                        self.cursor().next(); // we only peeked before
+                        self.cursor.next(); // we only peeked before
                         item
                     };
 
@@ -174,32 +175,29 @@ impl<'p, 'stream> Job<'p, 'stream> {
                             else { unreachable!() };
 
                         try!(self.parser.tag_handler(tag)
-                            .ok_or_else(||{ return err!(ParserErrorCode::UnexpectedToken,
-                                "There is no registered tag handler for a block {t:?} \
-                                at {pos} in {job}.",
-                                t = tag,
-                                pos = item.position(),
-                                job = self)
+                            .ok_or_else(||{ ParserErrorCode::NoTagHandler {
+                                tag: tag.to_string(),
+                                position: item.position().clone(),
+                                job: self.dump()
+                            }.at(loc!())
                         }))
                     };
 
                     let node = try!(subparser.parse(self, item));
                     nodes.push(node);
                 },
-                _ => return err!(ParserErrorCode::InvalidState,
-                        "Parser ended up in unsupported state with token {token:?} \
-                        at {pos} in {job}.",
-                        token = item.token(),
-                        pos = item.position(),
-                        job = self)
-                        .into()
+                _ => return err!(ParserErrorCode::InvalidState {
+                    item: item.dump(),
+                    job: self.dump()
+                })
             }
         }
 
         if nodes.is_empty() {
-            return err!(ParserErrorCode::Logic)
-                .explain(format!("Parser could not extract node from token stream."))
-                .into()
+            return err!(ParserErrorCode::Unreachable {
+                reason: "Parser could not extract node from token stream.".to_string(),
+                job: self.dump(),
+            })
         }
 
         return Ok(nodes);
@@ -234,7 +232,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
         self.parser.expression_parser.parse(self, precedence)
     }
 
-    pub fn cursor(&mut self) -> &mut Cursor<'stream> {
+    pub fn mut_cursor(&mut self) -> &mut Cursor<'stream> {
         &mut self.cursor
     }
 }
@@ -256,5 +254,15 @@ impl<'p, 'tpl> fmt::Display for Job<'p, 'tpl> {
         write!(f, "{template} with {cursor}.",
             template = self.template,
             cursor = self.cursor)
+    }
+}
+
+pub type JobDump = String;
+
+impl<'p, 'stream> Dump for Job<'p, 'stream> {
+    type Data = JobDump;
+
+    fn dump(&self) -> Self::Data {
+        self.to_string()
     }
 }

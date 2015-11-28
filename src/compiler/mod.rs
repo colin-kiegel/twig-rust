@@ -17,6 +17,7 @@ mod template_cache;
 use loader::api::Loader;
 use std::rc::Rc;
 use template;
+use error::api::ErrorCode;
 
 /////////////
 // exports //
@@ -27,7 +28,7 @@ pub mod options;
 pub mod builder;
 pub mod extension;
 pub mod extension_registry;
-pub use self::error::{TwigError, TwigErrorCode};
+pub use self::error::{TwigError, TwigErrorCode, ExtensionRegistryError, ExtensionRegistryErrorCode};
 pub use self::options::Options;
 pub use self::builder::Builder;
 pub use self::extension::api::Extension;
@@ -98,7 +99,7 @@ impl Compiler {
     /// * When the template cannot be found
     fn load_template_raw(&mut self, path: &str) -> Result<template::Raw, TwigError> {
         let loader = try!(self.loader());
-        let source = try!(loader.source(path));
+        let source = try_chain!(loader.source(path));
         Ok(template::Raw::new(source, path))
     }
 
@@ -109,12 +110,12 @@ impl Compiler {
     fn compile_template(&mut self, template: &template::Raw) -> Result<template::Compiled, TwigError> {
         let tokenstream = {
             let lexer = try!(self.lexer());
-            try!(lexer.tokenize(template))
+            try_chain!(lexer.tokenize(template))
         };
 
         let compiled = {
             let parser = try!(self.parser());
-            try!(parser.parse(&tokenstream))
+            try_chain!(parser.parse(&tokenstream))
         };
 
         Ok(compiled)
@@ -132,9 +133,7 @@ impl Compiler {
         match self.ext {
             Some(ref ext) => Ok(ext),
             None => {
-                err!(TwigErrorCode::Logic)
-                    .explain(format!("Compiler extensions are not initialized"))
-                    .into()
+                try_chain!(err!(ExtensionRegistryErrorCode::NotInitialized))
             }
         }
     }
@@ -151,9 +150,7 @@ impl Compiler {
         match self.loader {
             Some(ref mut loader) => return Ok(&mut **loader), // dereferencing the Box<>
             None => {
-                return err!(TwigErrorCode::Loader)
-                    .explain(format!("The template loader must be initializied prior usage"))
-                    .into()
+                return err!(TwigErrorCode::LoaderNotInitialized)
             }
         }
     }
@@ -170,10 +167,7 @@ impl Compiler {
         match self.lexer {
             Some(ref lexer) => return Ok(lexer),
             None => {
-                self.lexer = match Lexer::new(self, lexer::Options::default()) {
-                    Err(e) => return err!(TwigErrorCode::Lexer).caused_by(e).into(),
-                    Ok(lexer) => Some(lexer)
-                };
+                self.lexer = Some(try_chain!(Lexer::new(self, lexer::Options::default())));
                 return self.lexer();
             }
         }
@@ -192,7 +186,9 @@ impl Compiler {
             Some(ref parser) => return Ok(parser),
             None => {
                 self.parser = match Parser::new(&self) {
-                    Err(e) => return err!(TwigErrorCode::Parser).caused_by(e).into(),
+                    Err(e) => return Err(TwigErrorCode::Parser
+                        .at(loc!())
+                        .caused_by(e)),
                     Ok(parser) => Some(parser)
                 };
                 return self.parser();

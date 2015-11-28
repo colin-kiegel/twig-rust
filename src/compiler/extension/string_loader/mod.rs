@@ -24,7 +24,7 @@ use super::api::Extension;
 pub struct StringLoader;
 
 impl Extension for StringLoader {
-    fn name(&self) -> &str { "string_loader" }
+    fn name(&self) -> &'static str { "string_loader" }
 }
 
 impl StringLoader {

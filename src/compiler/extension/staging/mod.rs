@@ -24,7 +24,7 @@ use super::api::Extension;
 pub struct Staging;
 
 impl Extension for Staging {
-    fn name(&self) -> &str { "staging" }
+    fn name(&self) -> &'static str { "staging" }
 }
 
 impl Staging {

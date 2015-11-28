@@ -14,6 +14,7 @@
 
 use std::fmt;
 use template;
+use error::api::Dump;
 
 /////////////
 // exports //
@@ -21,6 +22,7 @@ use template;
 
 pub type Position = usize;
 pub type Line = usize;
+pub type CursorDump = String;
 
 #[derive(Debug)]
 pub struct Cursor<'a> {
@@ -134,6 +136,14 @@ impl<'a> fmt::Display for Cursor<'a> {
             template_name = self.template.name(),
             line = self.line(),
             column = self.column())
+    }
+}
+
+impl<'a> Dump for Cursor<'a> {
+    type Data = CursorDump;
+
+    fn dump(&self) -> Self::Data {
+        self.to_string()
     }
 }
 

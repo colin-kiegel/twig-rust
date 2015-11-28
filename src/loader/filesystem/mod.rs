@@ -17,6 +17,7 @@ use std::io::Read;
 use std::borrow::Cow;
 use super::{api, LoaderError, LoaderErrorCode};
 use self::namespace::Namespace;
+use error::api::ErrorCode;
 
 /////////////
 // exports //
@@ -43,12 +44,11 @@ impl api::Loader for Filesystem {
                 // seamless fallback to other template directories
                 // - but should avoid infinite loops (one retry only)
 
-                return err!(LoaderErrorCode::TemplateNotFound)
-                .explain(format!("Could not read file {path:?} while loading template {id:?}",
-                    path = path,
-                    id = name))
-                .caused_by(e)
-                .into()
+                return Err(LoaderErrorCode::FileSystemTemplateNotReadable {
+                        name: name.to_string(),
+                        path: path.to_path_buf()
+                    }.at(loc!())
+                    .caused_by(e))
             },
             Ok(source) => Ok(Cow::Owned(source))
         }
@@ -158,10 +158,9 @@ impl Filesystem {
         let raw_path = path.raw_path();
 
         match self.namespaces.get_mut(namespace_id) {
-            None => return err!(LoaderErrorCode::NotInitialized)
-                .explain(format!("The template namespace {id:?} is not initialized.",
-                id = namespace_id))
-                .into(),
+            None => return err!(LoaderErrorCode::FileSystemNamespaceNotInitialized {
+                    namespace: namespace_id.to_string()
+            }),
             Some(namespace) => {
                 try!(path.validate()); // #Doing:0 move these checks somewhere else :-)
                                        // e.g. postpone to reading the directoy

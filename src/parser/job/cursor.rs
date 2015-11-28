@@ -16,6 +16,7 @@ use lexer::token::stream::{self, Stream, Item};
 use lexer::token::{self, Token};
 use parser::{ParserError, ParserErrorCode};
 use std::fmt;
+use error::api::Dump;
 
 /////////////
 // exports //
@@ -70,10 +71,14 @@ impl<'stream> Cursor<'stream> {
         self.next().map(|item| item.position())
     }
 
-    pub fn next_expect<T>(&mut self, pattern: T, reason: Option<&str>) -> Result<&'stream Item, ParserError>
-        where T: token::Pattern
+    pub fn next_expect<T>(&mut self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, ParserError>
+        where T: token::Pattern + 'static
     {
-        Cursor::expect(pattern, self.next(), reason)
+        let next = self.peek();
+        if next.is_some() {
+            self.next += 1;
+        }
+        self.expect(pattern, next, reason)
     }
 
     pub fn peek(&self) -> Option<&'stream Item> {
@@ -88,26 +93,21 @@ impl<'stream> Cursor<'stream> {
         self.peek().map(|item| item.position())
     }
 
-    pub fn peek_expect<T>(&self, pattern: T, reason: Option<&str>) -> Result<&'stream Item, ParserError>
-        where T: token::Pattern
+    pub fn peek_expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, ParserError>         where T: token::Pattern + 'static
     {
-        Cursor::expect(pattern, self.peek(), reason)
+        self.expect(pattern, self.peek(), reason)
     }
 
-    fn expect<T>(pattern: T, value: Option<&'stream Item>, reason: Option<&str>) -> Result<&'stream Item, ParserError>
-        where T: token::Pattern
+    fn expect<T>(&self, pattern: T, value: Option<&'stream Item>, reason: Option<&'static str>) -> Result<&'stream Item, ParserError>
+        where T: token::Pattern + 'static
     {
         match value {
-            Some(item) => Ok(try!(item.expect(pattern, reason))),
-            None => {
-                let mut error = err!(ParserErrorCode::Eof,
-                    "Expected token {t:?} but found end of stream",
-                    t = pattern);
-                if let Some(x) = reason {
-                    error = error.explain(x.to_string());
-                }
-                error.into()
-            }
+            Some(item) => Ok(try_chain!(item.expect(pattern, reason))),
+            None => err!(ParserErrorCode::UnexpectedEof {
+                        expected: Some(<token::Pattern as Dump>::dump(&pattern)),
+                        cursor: self.dump(),
+                        reason: reason
+                    })
         }
     }
 }
@@ -118,5 +118,33 @@ impl<'stream> fmt::Display for Cursor<'stream> {
             next = self.next,
             end = self.end,
             tokens = self.stream)
+    }
+}
+
+#[derive(Debug)]
+pub struct CursorDump {
+    next: Position,
+    end: Position,
+    stream_dump: stream::StreamDump,
+}
+
+impl<'stream> Dump for Cursor<'stream> {
+    type Data = CursorDump;
+
+    fn dump(&self) -> Self::Data {
+        CursorDump {
+            next: self.next,
+            end: self.end,
+            stream_dump: self.stream.dump(),
+        }
+    }
+}
+
+impl fmt::Display for CursorDump {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "Cursor (next: {next}/{end}) for {stream_dump}",
+            next = self.next,
+            end = self.end,
+            stream_dump = self.stream_dump)
     }
 }

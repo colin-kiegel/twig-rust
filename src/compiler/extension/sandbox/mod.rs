@@ -24,7 +24,7 @@ use super::api::Extension;
 pub struct Sandbox;
 
 impl Extension for Sandbox {
-    fn name(&self) -> &str { "sandbox" }
+    fn name(&self) -> &'static str { "sandbox" }
 }
 
 impl Sandbox {

@@ -3,64 +3,42 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Twig base exception.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
+/// Twig generic error
 
+use std::fmt::{self, Display};
 
-/////////////
-// imports //
-/////////////
-
-use std::fmt;
-use std::any::Any;
-use std::convert;
-
-/////////////
-// exports //
-/////////////
 
 #[macro_use]
 pub mod macros;
-pub use std::error::Error;
+// use std Error-trait to improve cross-crate compatibility
+// don't mix it up with Err(X)
+pub use std::error;
+pub mod api;
 
-// #TODO:50 Read more about error handling in rust
-//http://doc.rust-lang.org/std/error/index.html
-
-pub struct Exception<T> {
-    code: T,
-    details: Details,
-    description: String,
-    cause: Option<Box<Error>>,
-}
-
+// generic wrapper around some ErrorCode - adds location support
 #[derive(Debug)]
-pub struct Details {
-    pub message : Option<String>,
-    pub module_path : &'static str, // e.g. twig::lexer::job::state::shared_traits
-    pub filename : &'static str,    // e.g. /src/lexer/job/state/shared_traits.rs
-    pub line : u32,
-    pub column : u32,
+pub struct Error<T>
+    where T: api::ErrorCode
+{
+    // the exception codes are going to be enums
+    // - i.e. Exception<MY_ENUM> implements std::error::Error without any boilerplate
+    // to MY_ENUM. Hurray! :-)
+    code: T,
+    // I decided to call this field `code` instead of `error` to not confuse it with the Error trait
+    location: Location,
+    // chaining is required by std::error::Error
+    cause: Option<Box<error::Error>>,
 }
 
-// #TODO:340 read more about Any trait
-impl<T> Exception<T>
-    where T: Any + fmt::Debug {
-    pub fn new(details: Details, code: T) -> Exception<T> {
-        let description = Self::description_string(&code, &details);
-
-        Exception {
-            code : code,
-            details : details,
-            description: description,
-            cause: None,
+impl<T> Error<T>
+    where T: api::ErrorCode
+{
+    pub fn new(code: T, location: Location) -> Error<T> {
+        Error {
+            code: code,
+            location: location,
+            cause: None
         }
-    }
-
-    fn description_string(code: &T, details: &Details) -> String {
-        format!("[{code:?}]: {details}",
-            code = code,
-            details = details.to_string())
     }
 
     #[allow(dead_code)] // only used by tests
@@ -68,32 +46,23 @@ impl<T> Exception<T>
         &self.code
     }
 
-    pub fn details(&self) -> &Details {
-        &self.details
+    pub fn location(&self) -> &Location {
+        &self.location
     }
 
-    pub fn explain(mut self, message: String) -> Self {
-        self.details.message = Some(match self.details.message {
-            Some(x) => x + " " + &message,
-            None => message
-        });
-        self.description = Self::description_string(&self.code, &self.details);
-
-        self
-    }
-
-    pub fn caused_by<X: 'static + Error>(mut self, cause: X) -> Self {
+    pub fn caused_by<X: 'static + error::Error>(mut self, cause: X) -> Self {
         self.cause = Some(Box::new(cause));
 
         self
     }
 
-    pub fn causes<X>(self, wrapper: Exception<X>) -> Exception<X> where
-        X: Any + fmt::Debug
+    pub fn causes<X>(self, wrapper: Error<X>) -> Error<X> where
+        X: api::ErrorCode
     {
         wrapper.caused_by(self)
     }
 
+    // iterate along the error-chain.
     pub fn iter(&self) -> ErrorIter {
         ErrorIter {
             next: Some(self),
@@ -101,12 +70,26 @@ impl<T> Exception<T>
     }
 }
 
+impl<T> error::Error for Error<T>
+    where T: api::ErrorCode
+{
+    fn description(&self) -> &str {
+        // delegate the error description to the ErrorCode
+        &self.code.description()
+    }
+
+    fn cause<'a>(&'a self) -> Option<&'a error::Error> {
+        // dereference from Option<Box<T>> to Option<&T>
+        self.cause.as_ref().map(|x| &**x)
+    }
+}
+
 pub struct ErrorIter<'a> {
-    next: Option<&'a Error>
+    next: Option<&'a error::Error>
 }
 
 impl<'a> Iterator for ErrorIter<'a> {
-    type Item = &'a Error;
+    type Item = &'a error::Error;
 
     fn next(&mut self) -> Option<Self::Item> {
         return match self.next {
@@ -119,55 +102,36 @@ impl<'a> Iterator for ErrorIter<'a> {
     }
 }
 
-impl<T, V> convert::Into<Result<V, Exception<T>>> for Exception<T> {
-    fn into (self) -> Result<V, Exception<T>> {
-        Err(self)
-    }
-}
-impl<T> Error for Exception<T>
-    where T: Any + fmt::Debug
+impl<T> Display for Error<T>
+    where T: api::ErrorCode
 {
-    fn description(&self) -> &str {
-        self.description.as_ref()
-    }
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        try!(write!(f, "{error_code} at {location}\n",
+            error_code = self.code,
+            location = self.location));
 
-    fn cause<'a>(&'a self) -> Option<&'a Error> {
-        use std::borrow::Borrow;
-        // #TODO:230 is there a simpler way to go from Option<Box<T>> to Option<&T>? Ask this on SO...
         match self.cause {
-            Some(ref cause) => Some(cause.borrow()),
-            None            => None
+            None => Ok(()),
+            Some(ref cause) => write!(f, " - caused by: {}", cause),
         }
     }
 }
 
-impl<T> fmt::Display for Exception<T>
-    where T: Any + fmt::Debug
-{
-    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{}", self.description())
-    }
+#[derive(Debug)]
+pub struct Location {
+    // this might be a bit redundant - but we just store everything we can get.
+    // we don't need to be super performant on exceptions - because we try to avoid them :-)
+    //
+    // note that the module_path is currently only displayed in Debug output due to this redundancy
+    pub module_path : &'static str, // e.g. twig::lexer::job::state::shared_traits
+    pub filename : &'static str,    // e.g. /src/lexer/job/state/shared_traits.rs
+    pub line : u32,
+    pub column : u32,
 }
 
-impl<T> fmt::Debug for Exception<T>
-    where T: Any + fmt::Debug
-{
+impl Display for Location {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let recursive_desc = self.iter().map(|e| e.description())
-             .collect::<Vec<&str>>().join(" caused by\n - ");
-        write!(f, "\n - {}\n", recursive_desc)
-    }
-}
-
-impl ToString for Details {
-    fn to_string(&self) -> String {
-
-        format!("{message}{in_}{filename}:{line}:{column}",
-            message  = match self.message {
-                    Some(ref msg) => msg.as_ref(),
-                    None => "",
-                },
-            in_      = if self.message.is_some() { " in " } else { "" },
+        write!(f, "{filename}:{line}:{column}",
             filename = self.filename,
             line     = self.line,
             column   = self.column)

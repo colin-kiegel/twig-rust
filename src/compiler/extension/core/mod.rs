@@ -34,7 +34,7 @@ pub struct Core {
 }
 
 impl api::Extension for Core {
-    fn name(&self) -> &str { "core" }
+    fn name(&self) -> &'static str { "core" }
 
     /// Initialize the compiler.
     /// This is where you can load some file that contains filter functions for instance.

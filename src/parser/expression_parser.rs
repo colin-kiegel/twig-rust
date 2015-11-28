@@ -20,6 +20,7 @@ use compiler::extension::api::operator::Precedence;
 use compiler::ExtensionRegistry;
 use lexer::token::{Token, Punctuation, BracketType};
 use std::rc::Rc;
+use error::api::{Dump, ErrorCode};
 
 /////////////
 // exports //
@@ -46,9 +47,12 @@ impl ExpressionParser {
     pub fn parse(&self, job: &mut Job, precedence: Precedence) -> Result<Box<Node>, ParserError> {
         let expr = try!(self.primary(job));
 
-        let _token = try!(job.cursor().peek_token().ok_or_else(|| {
-            return err!(ParserErrorCode::Logic,
-                "Unexpected end of token stream")
+        let _token = try!(job.mut_cursor().peek_token().ok_or_else(|| {
+            ParserErrorCode::UnexpectedEof {
+                expected: None,
+                reason: Some("Found unclosed expression"),
+                cursor: job.mut_cursor().dump()
+            }.at(loc!())
         }));
 
         // while self.is_binary(token) {
@@ -79,9 +83,12 @@ impl ExpressionParser {
     }
 
     pub fn primary(&self, job: &mut Job) -> Result<Box<Node>, ParserError> {
-        match *try!(job.cursor().peek_token().ok_or_else(|| {
-            return err!(ParserErrorCode::Logic,
-                "Unexpected end of token stream")
+        match *try!(job.mut_cursor().peek_token().ok_or_else(|| {
+            ParserErrorCode::UnexpectedEof {
+                expected: None,
+                reason: Some("Expected to find an expression"),
+                cursor: job.mut_cursor().dump(),
+            }.at(loc!())
         })) {
             Token::Operator(ref _op) => unimplemented!(),
             Token::Punctuation(Punctuation::OpeningBracket(BracketType::Round)) => {
@@ -93,21 +100,30 @@ impl ExpressionParser {
         return self.parse_primary_expression(job)
     }
 
-    pub fn is_binary(&self, _token: &Token) -> bool { // #TODO:280 move this to token??
+    pub fn is_binary(&self, _token: &Token) -> bool {
+        // #TODO:280 refactor
+        // a) move this to token
+        // b) or merge with binary_operator() below to `binary_operator -> Result<Option<>,>`, so `try!(self.binary_operator(token))` will yield an Option, which we can use in loop `while let Some(binary) = try!(self.binary_operator(token))`
         unimplemented!()
     }
 
     pub fn binary_operator(&self, token: &Token) -> Result<&BinaryOperator, ParserError> {
+        // TODO refactor
+        // merge with `is_binary` above - we may then get rid of these errors (!)
         let name = try!(token.value().ok_or_else(|| {
-            err!(ParserErrorCode::Logic,
-                "Could not parse binary operator, because the token type {type:?} has no value",
-                type = token.get_type())
+            unimplemented!()
+            // ParserErrorCode::Unreachable {
+            //     reason: format!("Could not parse binary operator, because the token type {type:?} has no value",
+            //     type = token.get_type()),
+            //     job: ()
+            // }.at(loc!())
         }));
 
         let operator = try!(self.ext.operators_binary().get(&name).ok_or_else(|| {
-            err!(ParserErrorCode::Logic,
-                "The binary operator {name:?} is unknown to the compiler",
-                name = name)
+            ParserErrorCode::UnexpectedBinaryOperator {
+                name: name.to_string(),
+                job: unimplemented!()
+            }.at(loc!())
         }));
 
         Ok(operator)
@@ -122,20 +138,23 @@ impl ExpressionParser {
         //      instead of peek() + next(), where the next() call
         //      seems to happen in every match-branch (double check!)
         //      this refactoring should be done with sufficient tests.
-        let item = try!(job.cursor().peek().ok_or_else(|| {
-            err!(ParserErrorCode::Logic,
-                "Unexpected end of token stream")
+        let item = try!(job.mut_cursor().peek().ok_or_else(|| {
+            ParserErrorCode::UnexpectedEof {
+                expected: None,
+                reason: Some("Unclosed primary expression"),
+                cursor: job.mut_cursor().dump()
+            }.at(loc!())
         }));
 
         let node: Box<Node> = match *item.token() {
             Token::Name(ref value) => {
-                job.cursor().next_token();
+                job.mut_cursor().next_token();
 
                 match value.as_ref() {
                     "true" | "TRUE" => { unimplemented!() },
                     "false" | "FALSE" => { unimplemented!() },
                     "none" | "NONE" | "null" | "NULL" => { unimplemented!() },
-                    _ => if job.cursor().peek_token() ==
+                    _ => if job.mut_cursor().peek_token() ==
                         Some(&Token::Punctuation(Punctuation::OpeningBracket(BracketType::Round))) {
                             unimplemented!()
                         } else {
@@ -167,9 +186,12 @@ impl ExpressionParser {
         let mut node = node;
 
         'a: while let Token::Punctuation(ref punc) = *try!(
-            job.cursor().peek_token().ok_or_else(|| {
-                err!(ParserErrorCode::Logic,
-                    "Unexpected end of token stream")
+            job.mut_cursor().peek_token().ok_or_else(|| {
+                ParserErrorCode::UnexpectedEof {
+                    expected: None,
+                    reason: Some("Unclosed postfix expression"),
+                    cursor: job.mut_cursor().dump(),
+                }.at(loc!())
         })) {
             match *punc {
                 Punctuation::Dot

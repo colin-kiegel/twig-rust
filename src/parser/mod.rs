@@ -32,6 +32,7 @@ pub use self::error::*;
 pub use self::job::Job;
 pub use self::api::Node;
 pub use self::expression_parser::ExpressionParser;
+use error::api::ErrorCode;
 
 
 #[derive(Debug)]
@@ -43,10 +44,9 @@ pub struct Parser {
 impl Parser {
     pub fn new(cp: &Compiler) -> Result<Parser, ParserError> {
         let ext = match cp.extensions() {
-            Err(e) => return err!(ParserErrorCode::Logic)
-                .explain(format!("Could not initialize parser due to missing compiler extensions"))
-                .caused_by(e)
-                .into(),
+            Err(e) => return Err(ParserErrorCode::MissingExtensions
+                .at(loc!())
+                .caused_by(e)),
             Ok(ext) => ext
         };
 

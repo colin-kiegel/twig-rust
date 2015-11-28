@@ -13,6 +13,7 @@
 /////////////
 
 use std::fmt;
+use error::api::Dump;
 
 /////////////
 // exports //
@@ -21,8 +22,7 @@ use std::fmt;
 pub mod stream;
 pub use self::stream::Stream;
 
-
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum Token {
     _Eof,
     Text(String),
@@ -40,7 +40,7 @@ pub enum Token {
     _InterpolationEnd,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Punctuation {
     Dot,
     Comma,
@@ -60,7 +60,7 @@ pub enum BracketType {
                  // but used as a temporary state of the lexer
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(PartialEq)]
 pub enum Type { // #TODO:10 - remove ?
     Eof                = -1,
     Text               = 0,
@@ -147,14 +147,13 @@ impl Token {
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let typ = self.get_type().name(true);
-        write!(f, "{}", typ)
+        write!(f, "{}", self.get_type().name())
     }
 }
 
 impl fmt::Debug for Token {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        let typ = self.get_type().name(true);
+        let typ = self.get_type().name();
         match self.value() {
             Some(ref val) => write!(f, "{typ}({val:?})", typ = typ, val = val),
             None          => write!(f, "{typ}", typ = typ),
@@ -162,16 +161,21 @@ impl fmt::Debug for Token {
     }
 }
 
+pub type TokenDump = Token; // may change as soon as we use RefTokens
+
+impl Dump for Token {
+    type Data = TokenDump;
+
+    fn dump(&self) -> Self::Data {
+        self.clone()
+    }
+}
+
 #[allow(unused_variables)]
 impl Type {
     /// Returns the name of the token type (internal representation).
-    ///
-    /// # Arguments
-    ///
-    /// * `short` - short or long representation
-
-    pub fn name(&self, short: bool) -> String {
-         let name = match *self {
+    pub fn name(&self) -> &'static str {
+         match *self {
             Type::Eof => "EOF",
             Type::Text => "TEXT",
             Type::BlockStart => "BLOCK_START",
@@ -185,18 +189,11 @@ impl Type {
             Type::Punctuation => "PUNCTUATION",
             Type::InterpolationStart => "INTERPOLATION_START",
             Type::InterpolationEnd => "INTERPOLATION_END",
-        };
-
-        if short {
-            name.to_string()
-        } else {
-            format!("Token::Type::{}", name)
         }
     }
 
     /// Returns the description of the token type in plain english.
-
-    pub fn _description(&self) -> String {
+    pub fn _description(&self) -> &'static str {
          match *self {
             Type::Eof => "end of template",
             Type::Text => "text",
@@ -211,18 +208,34 @@ impl Type {
             Type::Punctuation => "punctuation",
             Type::InterpolationStart => "begin of string interpolation",
             Type::InterpolationEnd => "end of string interpolation",
-        }.to_string()
+        }
     }
 }
 
-impl ToString for Type {
-    fn to_string(&self) -> String {
-         self.name(true)
+impl fmt::Display for Type {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.name())
     }
 }
 
-pub trait Pattern : ::std::fmt::Debug {
+impl fmt::Debug for Type {
+    fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
+        write!(f, "{}", self.name())
+    }
+}
+
+pub trait Pattern: fmt::Debug + fmt::Display {
     fn matches(&self, &Token) -> bool;
+}
+
+pub type PatternDump = String;
+
+impl Dump for Pattern {
+    type Data = PatternDump;
+
+    fn dump(&self) -> Self::Data {
+        format!("{:?}", self)
+    }
 }
 
 impl Pattern for Token {

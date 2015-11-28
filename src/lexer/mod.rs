@@ -19,6 +19,7 @@ use template;
 use compiler::{Compiler, ExtensionRegistry};
 use lexer::job::Job;
 use lexer::job::state::TokenizeState;
+use error::api::ErrorCode;
 
 /////////////
 // exports //
@@ -43,15 +44,16 @@ impl Lexer {
     pub fn new(cp: &Compiler, opt: Options) -> Result<Lexer, LexerError> {
         let ref opt = Rc::new(opt); // #TODO:20 -> switch to &Options (!?)
         let ext = match cp.extensions() {
-            Err(e) => return err!(LexerErrorCode::Logic)
-                .explain(format!("Could not initialize parser due to missing compiler extensions"))
-                .caused_by(e)
-                .into(),
+            Err(e) => return Err(LexerErrorCode::MissingExtensions
+                .at(loc!())
+                .caused_by(e)),
             Ok(ext) => ext
         };
 
         let p = match Patterns::new(opt, ext) {
-            Err(e) => return err!(LexerErrorCode::InvalidPattern).caused_by(e).into(),
+            Err(e) => return Err(LexerErrorCode::PatternRegexError
+                .at(loc!())
+                .caused_by(e)),
             Ok(p) => p
         };
 

@@ -17,7 +17,8 @@ use lexer::job::state;
 use lexer::job::Job;
 use lexer::token::{Token, Punctuation, BracketType};
 use lexer::patterns::{number, Extract};
-use lexer::error::{LexerError, LexerErrorCode, SyntaxErrorCode};
+use lexer::error::{LexerError, SyntaxErrorCode};
+use error::api::Dump;
 
 /////////////
 // exports //
@@ -35,15 +36,19 @@ pub trait LexExpression where
 
         if job.cursor.is_eof() {
             let error_code = match Self::state() {
-                state::Code::Block => SyntaxErrorCode::UnclosedBlock,
-                state::Code::Expression => SyntaxErrorCode::UnclosedVariable,
-                _ => SyntaxErrorCode::Unknown, // should be unreachable
+                state::Code::Block => SyntaxErrorCode::UnclosedBlock {
+                    cursor: job.cursor.dump()
+                },
+                state::Code::Expression => SyntaxErrorCode::UnclosedVariable {
+                    cursor: job.cursor.dump()
+                },
+                _ => SyntaxErrorCode::Unreachable {
+                    reason: "End of template while lexing expression".to_string(),
+                    cursor: job.cursor.dump()
+                },
             };
 
-            return err!(error_code)
-                .explain(format!("at {cursor}", cursor = job.cursor))
-                .causes(err!(LexerErrorCode::SyntaxError))
-                .into();
+            try_chain!(err!(error_code))
         }
 
         // operators
@@ -78,24 +83,19 @@ pub trait LexExpression where
             match punctuation { // check brackets ..
                 Punctuation::ClosingBracket(ref b) => match job.pop_bracket() {
                     None => {
-                        return err!(SyntaxErrorCode::UnexpectedBracket)
-                            .explain(format!("Unexpected {b:?} at {cursor}",
-                                b = b,
-                                cursor = job.cursor))
-                            .causes(err!(LexerErrorCode::SyntaxError))
-                            .into();
+                        return try_chain!(err!(SyntaxErrorCode::UnexpectedBracket {
+                            bracket: b.clone(),
+                            cursor: job.cursor.dump()
+                        }))
                     },
                     Some((b_expected, line)) => {
                         if *b != b_expected {
-                            return err!(SyntaxErrorCode::UnclosedBracket)
-                                .explain(format!("Unclosed {b_before:?} from line\
-                                                {line_before} but found {b:?} at {cursor}",
-                                    b_before = b_expected,
-                                    line_before = line,
-                                    b = b,
-                                    cursor = job.cursor))
-                                .causes(err!(LexerErrorCode::SyntaxError))
-                                .into();
+                            return try_chain!( err!(SyntaxErrorCode::UnclosedBracket {
+                                bracket_before: b_expected,
+                                line_before: line,
+                                bracket: b.clone(),
+                                cursor: job.cursor.dump()
+                            }))
                         }
 
                         let bracket = (b.clone(), job.cursor.line());
@@ -138,14 +138,16 @@ pub trait LexExpression where
         println!("Current Job Status: {:?}", job); // DEBUG INFO
 
         let syntax_error = match job.cursor.tail().chars().next() {
-            Some(c) => err!(SyntaxErrorCode::UnexpectedCharacter)
-                .explain(format!("'{c}' at {cursor}",
-                    c = c,
-                    cursor = job.cursor)),
-            None => err!(SyntaxErrorCode::UnexpectedEof)
-                .explain(format!("at {cursor}", cursor = job.cursor)),
+            Some(c) => err!(SyntaxErrorCode::UnexpectedCharacter {
+                character: c,
+                cursor: job.cursor.dump()
+            }),
+            None => err!(SyntaxErrorCode::UnexpectedEof {
+                reason: "Unclosed expression",
+                cursor: job.cursor.dump()
+            })
         };
 
-        return syntax_error.causes(err!(LexerErrorCode::SyntaxError)).into();
+        try_chain!(syntax_error)
     }
 }

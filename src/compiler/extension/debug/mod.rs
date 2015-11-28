@@ -24,7 +24,7 @@ use super::api::Extension;
 pub struct Debug;
 
 impl Extension for Debug {
-    fn name(&self) -> &str { "debug" }
+    fn name(&self) -> &'static str { "debug" }
 }
 
 impl Debug {

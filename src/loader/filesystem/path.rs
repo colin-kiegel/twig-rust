@@ -39,10 +39,9 @@ impl TemplatePath {
 
         if normalized_path.chars().nth(1) == Some('@') {
             match normalized_path.find('/') {
-                None => return err!(LoaderErrorCode::InvalidPath)
-                    .explain(format!("Malformed namespaced template path {template} (expecting '@namespace/path_to_file').",
-                    template = normalized_path))
-                    .into(),
+                None => return err!(LoaderErrorCode::FileSystemMalformedNamespacedPath {
+                    template_name:  normalized_path
+                }),
                 Some(pos) => {
                     namespace = &normalized_path[1..pos];
                     raw_path = &normalized_path[pos+1..];
@@ -101,10 +100,9 @@ impl TemplatePath {
         }
 
         if level < 0 {
-            return err!(LoaderErrorCode::InvalidPath)
-                .explain(format!("Looks like you try to load a template outside configured directories ({template:?}).",
-                template = self.raw_path))
-                .into()
+            return err!(LoaderErrorCode::FileSystemInvalidPath {
+                path: self.raw_path.clone()
+            })
         }
 
         Ok(())

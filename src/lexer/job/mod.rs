@@ -90,6 +90,10 @@ impl<'c, 't> Job<'c, 't> {
 
         self.tokens.push(token, &self.cursor);
     }
+
+    pub fn cursor(&self) -> &Cursor<'t> {
+        &self.cursor
+    }
 }
 
 // #TODO:490 switch to Debug-Builder once stable

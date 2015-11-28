@@ -38,7 +38,7 @@ pub use self::token_parser::TokenParser;
 
 pub trait Extension : ::std::fmt::Debug {
     /// Get the name of the extension.
-    fn name(&self) -> &str;
+    fn name(&self) -> &'static str;
 
     /// Initialize the compiler.
     /// This is where you can load some file that contains filter functions for instance.

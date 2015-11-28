@@ -68,11 +68,10 @@ impl<T> Node for GenericNode<T> where
     fn attribute(&self, key: &str) -> Result<&str, NodeError> {
         match self.attributes.get(key) {
             None => {
-                err!(NodeErrorCode::Logic)
-                    .explain(format!("Attribute {a:?} does not exist for Node {n:?}.",
-                        a = key,
-                        n = self.tag)) // orig: get_class(self)
-                    .into()
+                err!(NodeErrorCode::AttributeNotFound {
+                    key: key.to_string(),
+                    node_tag: self.tag.to_string()
+                })
             },
             Some(value) => Ok(value)
         }

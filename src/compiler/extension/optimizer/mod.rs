@@ -37,7 +37,7 @@ impl Default for Mode {
 }
 
 impl Extension for Optimizer {
-    fn name(&self) -> &str { "optimizer" }
+    fn name(&self) -> &'static str { "optimizer" }
 }
 
 impl Optimizer {

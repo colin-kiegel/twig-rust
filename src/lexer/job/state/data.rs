@@ -18,6 +18,7 @@ use lexer::job::Job;
 use lexer::token::Token;
 use lexer::patterns::{token_start, verbatim_start, Extract};
 use lexer::error::{LexerError, SyntaxError, SyntaxErrorCode};
+use error::api::Dump;
 
 /////////////
 // exports //
@@ -54,7 +55,7 @@ impl TokenizeState for Data {
 
         match capture.tag {
             token_start::Tag::Comment => {
-                try!(Self::lex_comment(job));
+                try_chain!(Self::lex_comment(job));
 
                 return Self::tokenize(job);
             },
@@ -64,7 +65,7 @@ impl TokenizeState for Data {
                 match job.patterns.verbatim_start.extract(job.cursor.tail()) {
                     Some(verbatim_start) => {
                         job.cursor.move_by(verbatim_start.position.1);
-                        try!(Self::lex_verbatim_data(job, verbatim_start.tag));
+                        try_chain!(Self::lex_verbatim_data(job, verbatim_start.tag));
 
                         return Self::tokenize(job);
                     },
@@ -104,9 +105,9 @@ impl TokenizeState for Data {
 impl<'a> Data {
     fn lex_comment(job: &'a mut Job) -> Result<(), SyntaxError> {
         match job.patterns.comment_end.find(job.cursor.tail()) {
-            None => return err!(SyntaxErrorCode::UnclosedComment)
-                .explain(format!("at {}", job.cursor))
-                .into(),
+            None => return err!(SyntaxErrorCode::UnclosedComment {
+                cursor: job.cursor.dump()
+            }),
             Some(position) => job.cursor.move_by(position.1),
         }
         Ok(())
@@ -116,9 +117,10 @@ impl<'a> Data {
         let capture = match job.patterns.verbatim_end.extract_iter(job.cursor.tail())
                                                  .find(|capture| capture.tag == tag) {
             Some(capture) => capture,
-            _ => return err!(SyntaxErrorCode::UnexpectedEof, "Unclosed (raw|verbatim) block")
-                .explain(format!("at {}", job.cursor))
-                .into(),
+            _ => return err!(SyntaxErrorCode::UnexpectedEof {
+                    reason: "Unclosed (raw|verbatim) block",
+                    cursor: job.cursor().dump()
+                }),
         };
 
         let mut slice = job.cursor.slice_by(capture.position.0);
@@ -149,6 +151,7 @@ mod test {
     use lexer::test::assert_tokenize;
     use lexer::token::Token;
     use std::error::Error;
+    use lexer::SyntaxErrorCode;
 
     #[test]
     pub fn no_more_tokens() {
@@ -172,10 +175,13 @@ mod test {
 
     #[test]
     pub fn unclosed_comment() {
-        let expect = "[UnclosedComment]: at `test-example` line 1 column 19 in ";
+        let cursor_dump = "`test-example` line 1 column 19".to_string();
+        let expect = SyntaxErrorCode::UnclosedComment {
+            cursor: cursor_dump
+        }.to_string();
 
         assert_eq!(
-            &tokenize_err(" lost in space {#-").cause().unwrap().description()[0..expect.len()],
+            &tokenize_err(" lost in space {#-").cause().unwrap().to_string()[0..expect.len()],
             expect
         );
     }
@@ -193,10 +199,13 @@ mod test {
 
     #[test]
     pub fn block_line() {
-        let expect = "[UnclosedBlock]: at `test-example` line 100 column 9 in ";
+        let cursor_dump = "`test-example` line 100 column 9".to_string();
+        let expect = SyntaxErrorCode::UnclosedBlock {
+            cursor: cursor_dump
+        }.to_string();
 
         assert_eq!(
-            &tokenize_err("line1 {% line 99 %}\nline 2{%").cause().unwrap().description()[0..expect.len()],
+            &tokenize_err("line1 {% line 99 %}\nline 2{%").cause().unwrap().to_string()[0..expect.len()],
             expect
         );
     }
@@ -216,10 +225,13 @@ mod test {
 
     #[test]
     pub fn unclosed_block() {
-        let expect = "[UnclosedBlock]: at `test-example` line 2 column 10 in ";
+        let cursor_dump = "`test-example` line 2 column 10".to_string();
+        let expect = SyntaxErrorCode::UnclosedBlock {
+            cursor: cursor_dump
+        }.to_string();
 
         assert_eq!(
-            &tokenize_err(" To \n be   {%-").cause().unwrap().description()[0..expect.len()],
+            &tokenize_err(" To \n be   {%-").cause().unwrap().to_string()[0..expect.len()],
             expect
         );
     }
@@ -239,10 +251,13 @@ mod test {
 
     #[test]
     pub fn unclosed_var() {
-        let expect = "[UnclosedVariable]: at `test-example` line 2 column 13 in ";
+        let cursor_dump = "`test-example` line 2 column 13".to_string();
+        let expect = SyntaxErrorCode::UnclosedVariable {
+            cursor: cursor_dump
+        }.to_string();
 
         assert_eq!(
-            &tokenize_err(" or not \n to be !  {{").cause().unwrap().description()[0..expect.len()],
+            &tokenize_err(" or not \n to be !  {{").cause().unwrap().to_string()[0..expect.len()],
             expect
         );
     }
