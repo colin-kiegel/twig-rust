@@ -53,7 +53,7 @@ fn hello_world_variable() {
     assert_eq!(&compiled.render(&runtime).unwrap(), "Hello world!")
 }
 
-// #[test]
+#[test]
 /// http://twig.sensiolabs.org/doc/tags/if.html
 fn _if_elseif_else() {
     let mut loader = loader::array::Array::default();
