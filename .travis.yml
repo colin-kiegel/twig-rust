@@ -16,7 +16,7 @@ addons:
     - libcurl4-openssl-dev
     - libelf-dev
     - libdw-dev
-    - libbfd-dev
+    - binutils-dev
 before_script: |
   # load travis cargo
   # - https://github.com/huonw/travis-cargo
