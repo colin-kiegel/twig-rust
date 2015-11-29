@@ -168,10 +168,8 @@ mod test {
             cursor: cursor_dump
         }.to_string();
 
-        assert_eq!(
-            &tokenize_err(" lost in space {#-").cause().unwrap().to_string()[0..expect.len()],
-            expect
-        );
+        let err = tokenize_err(" lost in space {#-").cause().unwrap().to_string();
+        assert!(err.starts_with(&expect), "error {} should start with {}", err, expect);
     }
 
     #[test]
@@ -192,10 +190,8 @@ mod test {
             cursor: cursor_dump
         }.to_string();
 
-        assert_eq!(
-            &tokenize_err("line1 {% line 99 %}\nline 2{%").cause().unwrap().to_string()[0..expect.len()],
-            expect
-        );
+        let err = tokenize_err("line1 {% line 99 %}\nline 2{%").cause().unwrap().to_string();
+        assert!(err.starts_with(&expect), "error {} should start with {}", err, expect);
     }
 
     #[test]
@@ -218,10 +214,8 @@ mod test {
             cursor: cursor_dump
         }.to_string();
 
-        assert_eq!(
-            &tokenize_err(" To \n be   {%-").cause().unwrap().to_string()[0..expect.len()],
-            expect
-        );
+        let err = tokenize_err(" To \n be   {%-").cause().unwrap().to_string();
+        assert!(err.starts_with(&expect), "error {} should start with {}", err, expect);
     }
 
     #[test]
@@ -244,9 +238,7 @@ mod test {
             cursor: cursor_dump
         }.to_string();
 
-        assert_eq!(
-            &tokenize_err(" or not \n to be !  {{").cause().unwrap().to_string()[0..expect.len()],
-            expect
-        );
+        let err = tokenize_err(" or not \n to be !  {{").cause().unwrap().to_string();
+        assert!(err.starts_with(&expect), "error {} should start with {}", err, expect);
     }
 }
