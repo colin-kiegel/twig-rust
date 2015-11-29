@@ -1,16 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Parser
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-//////////////
-// imports  //
-//////////////
 
 use compiler::{Compiler, ExtensionRegistry, extension};
 use lexer::token;
@@ -18,10 +11,6 @@ use compiler::extension::api::TokenParser;
 use std::rc::Rc;
 use template;
 use std::collections::HashMap;
-
-/////////////
-// exports //
-/////////////
 
 pub mod api;
 pub mod error;
@@ -33,7 +22,6 @@ pub use self::job::Job;
 pub use self::api::Node;
 pub use self::expression_parser::ExpressionParser;
 use error::api::ErrorCode;
-
 
 #[derive(Debug)]
 pub struct Parser {

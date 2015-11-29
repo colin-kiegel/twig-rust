@@ -1,26 +1,15 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Position within a token stream.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use lexer::token::stream::{self, Stream, Item};
 use lexer::token::{self, Token};
 use parser::{ParserError, ParserErrorCode};
 use std::fmt;
 use error::api::Dump;
-
-/////////////
-// exports //
-/////////////
 
 pub type Position = usize;
 

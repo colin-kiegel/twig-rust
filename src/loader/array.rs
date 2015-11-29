@@ -1,29 +1,20 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
- /// Loads a template from an array.
- ///
- /// When using this loader with a cache mechanism, you should know that a new cache
- /// key is generated each time a template content "changes" (the cache key being the
- /// source code of the template). If you don't want to see your cache grows out of
- /// control, you need to take care of clearing the old cache file by yourself.
- ///
- /// This loader should only be used for unit testing.
-
-/////////////
-// imports //
-/////////////
+/// Loads a template from an array.
+///
+/// When using this loader with a cache mechanism, you should know that a new cache
+/// key is generated each time a template content "changes" (the cache key being the
+/// source code of the template). If you don't want to see your cache grows out of
+/// control, you need to take care of clearing the old cache file by yourself.
+///
+/// This loader should only be used for unit testing.
 
 use std::collections::HashMap;
 use std::borrow::Cow;
 use super::{api, LoaderError, LoaderErrorCode};
-
-/////////////
-// exports //
-/////////////
-
 
 #[derive(Default, Debug)]
 pub struct Array {

@@ -1,26 +1,14 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Stores the Twig configuration.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use std::path::Path;
 use std::rc::Rc;
 use compiler::{Compiler, options, Options, extension, Extension, extension_registry, ExtensionRegistry};
 use compiler::error::{TwigError};
-
-/////////////
-// exports //
-/////////////
-
 
 #[allow(dead_code)]
 pub const VERSION : &'static str = "1.18.1";

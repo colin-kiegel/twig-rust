@@ -1,15 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-///
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-/////////////
-// imports //
-/////////////
+/// Expression parser.
 
 use parser::node;
 use parser::api::Node;
@@ -21,11 +15,6 @@ use compiler::ExtensionRegistry;
 use lexer::token::{Token, Punctuation, BracketType};
 use std::rc::Rc;
 use error::api::{Dump, ErrorCode};
-
-/////////////
-// exports //
-/////////////
-
 
 #[derive(Debug)]
 pub struct Expression; // dummy

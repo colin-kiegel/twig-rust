@@ -1,26 +1,15 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Represents a node that executes an expression.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-//////////////
-// imports  //
-//////////////
 
 use super::GenericNode;
 use runtime::{Runtime, Execute, Job};
 use lexer::token::stream::Position;
 use parser::api::Node;
 use std::clone::Clone;
-
-/////////////
-// exports //
-/////////////
 
 pub type Print = GenericNode<Data>;
 

@@ -1,22 +1,12 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Runtime job
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-/////////////
-// imports //
-/////////////
+/// Runtime job.
 
 use runtime::Runtime;
 use runtime::api::Execute;
-
-/////////////
-// exports //
-/////////////
 
 #[allow(dead_code)]
 #[derive(Debug)]

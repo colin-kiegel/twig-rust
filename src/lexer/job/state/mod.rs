@@ -1,23 +1,12 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// FSM model of the lexer.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use lexer::error::LexerError;
 use lexer::job::Job;
-
-/////////////
-// exports //
-/////////////
 
 pub mod shared_traits;
 pub mod initial;
@@ -34,7 +23,6 @@ pub use self::expression::Expression;
 pub use self::string::String;
 pub use self::interpolation::Interpolation;
 pub use self::final_::Final;
-
 
 pub trait TokenizeState {
     /// tokenize recursively

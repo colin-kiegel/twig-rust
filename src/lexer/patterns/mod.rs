@@ -1,4 +1,4 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
@@ -6,23 +6,12 @@
 /// The patterns used by the lexer to tokenize the templates.
 ///
 /// Written as regular expressions (perl-style).
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use std::iter::Iterator;
 use std::rc::Rc;
 use regex;
 use regex::Error as regexError;
 use compiler::{ExtensionRegistry};
-
-/////////////
-// exports //
-/////////////
 
 #[macro_use]
 pub mod macros;
@@ -44,7 +33,6 @@ pub mod string;
 pub mod string_dq_delim;
 pub mod string_dq_part;
 pub use self::options::Options;
-
 
 //#[derive(PartialEq)]
 #[derive(Debug, PartialEq)]

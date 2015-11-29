@@ -1,23 +1,12 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Twig filecache for compiled templates.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
-
-/////////////
-// exports //
-/////////////
 
 #[allow(dead_code)]
 pub struct Cache {

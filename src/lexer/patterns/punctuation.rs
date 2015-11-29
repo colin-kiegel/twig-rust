@@ -1,4 +1,4 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
@@ -6,20 +6,8 @@
 /// The `name` pattern used by the lexer to tokenize the templates.
 ///
 /// Written as regular expressions (perl-style).
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
-
-/////////////
-// exports //
-/////////////
 
 pub use lexer::token::{Punctuation, BracketType};
-
 
 #[derive(Debug, PartialEq)]
 pub struct Pattern;

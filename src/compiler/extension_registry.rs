@@ -1,25 +1,14 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Extension loader.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-/////////////
-// imports //
-/////////////
 
 use compiler::extension::api::{self, Extension};
 use std::collections::HashMap;
 use compiler::Compiler;
 use compiler::error::{ExtensionRegistryError, ExtensionRegistryErrorCode};
-
-/////////////
-// exports //
-/////////////
-
 
 pub type Iter<'a> = ::std::collections::hash_map::Values<'a, String, Box<Extension>>;
 

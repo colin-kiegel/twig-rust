@@ -1,15 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// The Twig Compiler
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-/////////////
-// imports //
-/////////////
 
 #[cfg(test)]
 mod test;
@@ -18,10 +12,6 @@ use loader::api::Loader;
 use std::rc::Rc;
 use template;
 use error::api::ErrorCode;
-
-/////////////
-// exports //
-/////////////
 
 pub mod error;
 pub mod options;

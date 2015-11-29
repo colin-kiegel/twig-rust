@@ -1,16 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// A parser job
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
+/// A parser job.
 
 use std::fmt;
 use error::api::{Dump, ErrorCode};
@@ -22,10 +15,6 @@ use compiler::extension::api::token_parser::{Test, TestResult};
 use std::iter;
 use template;
 use parser::api::Node;
-
-/////////////
-// exports //
-/////////////
 
 pub mod cursor;
 pub use self::cursor::Cursor;

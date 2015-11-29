@@ -1,25 +1,14 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Text Node
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-//////////////
-// imports  //
-//////////////
+/// Text Node.
 
 use super::GenericNode;
 use runtime::{Runtime, Execute, Job};
 use lexer::token::stream::Position;
 use std::clone::Clone;
-
-/////////////
-// exports //
-/////////////
 
 pub type Virtual = GenericNode<Data>;
 

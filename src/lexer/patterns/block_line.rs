@@ -1,4 +1,4 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
@@ -6,23 +6,12 @@
 /// The `block line` pattern used by the lexer to tokenize the templates.
 ///
 /// Written as regular expressions (perl-style).
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use super::Options;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
 use error::api::ErrorCode;
-
-/////////////
-// exports //
-/////////////
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 pub use lexer::error::{LexerError, LexerErrorCode};

@@ -1,22 +1,13 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
- /// Paths for the filesystem template loader.
-
-/////////////
-// imports //
-/////////////
+/// Paths for the filesystem template loader.
 
 use std::path::{Path, PathBuf, Component};
 use super::namespace;
 use loader::{LoaderError, LoaderErrorCode};
-
-/////////////
-// exports //
-/////////////
-
 
 pub struct TemplatePath {
     namespace: String,

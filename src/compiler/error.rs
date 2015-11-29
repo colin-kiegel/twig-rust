@@ -1,16 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Typisation of syntax errors.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use std::fmt::{self, Display};
 use error::Error;
@@ -21,10 +14,6 @@ use lexer::LexerErrorCode;
 use parser::ParserErrorCode;
 use runtime::RuntimeErrorCode;
 use compiler::extension;
-
-/////////////
-// exports //
-/////////////
 
 pub type TwigError = Error<TwigErrorCode>;
 pub type ExtensionRegistryError = Error<ExtensionRegistryErrorCode>;

@@ -1,15 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Lexer Tests
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-/////////////
-// imports //
-/////////////
+/// Lexer Tests.
 
 use lexer::Lexer;
 use template::raw::Raw;
@@ -17,11 +11,6 @@ use std::rc::Rc;
 use lexer::token::Token;
 use lexer::token::Punctuation;
 use lexer::LexerError;
-
-/////////////
-// exports //
-/////////////
-
 
 //static TWIG_TEMPLATE_Token::Name : &'static str = "twig.template.html";
 static TWIG_TEMPLATE_CODE : &'static str = include_str!("twig.template.html");

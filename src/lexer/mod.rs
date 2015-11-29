@@ -1,16 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Lexes a template string.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-//////////////
-// imports  //
-//////////////
 
 use std::rc::Rc;
 #[cfg(test)]
@@ -20,10 +13,6 @@ use compiler::{Compiler, ExtensionRegistry};
 use lexer::job::Job;
 use lexer::job::state::TokenizeState;
 use error::api::ErrorCode;
-
-/////////////
-// exports //
-/////////////
 
 pub mod error;
 pub mod token;

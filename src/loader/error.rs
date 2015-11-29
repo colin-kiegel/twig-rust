@@ -1,25 +1,14 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Typisation of loader errors.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use std::fmt::{self, Display};
 use error::Error;
 use error::api::ErrorCode;
 use std::path::PathBuf;
-
-/////////////
-// exports //
-/////////////
 
 pub type LoaderError = Error<LoaderErrorCode>;
 

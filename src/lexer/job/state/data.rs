@@ -1,16 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Data state of the lexer.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use super::{TokenizeState, Code};
 use lexer::job::state;
@@ -19,11 +12,6 @@ use lexer::token::Token;
 use lexer::patterns::{token_start, verbatim_start, Extract};
 use lexer::error::{LexerError, SyntaxError, SyntaxErrorCode};
 use error::api::Dump;
-
-/////////////
-// exports //
-/////////////
-
 
 pub struct Data;
 

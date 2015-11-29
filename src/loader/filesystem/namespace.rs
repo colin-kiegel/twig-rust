@@ -1,22 +1,14 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
- /// Namespaces for the filesystem template loader.
-
-/////////////
-// imports //
-/////////////
+/// Namespaces for the filesystem template loader.
 
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use std::fs;
 use loader::{LoaderError, LoaderErrorCode};
-
-/////////////
-// exports //
-/////////////
 
 /// Identifier of the default namespace.
 pub const DEFAULT : &'static str  = "__main__";

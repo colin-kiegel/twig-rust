@@ -1,16 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// A lexer job - modeled as a FSM (Finite State Machine).
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use std::fmt;
 use template;
@@ -19,10 +12,6 @@ use lexer::Patterns;
 use lexer::token::{self, Token, BracketType};
 use lexer::error::LexerError;
 use self::state::TokenizeState;
-
-/////////////
-// exports //
-/////////////
 
 pub mod state;
 pub mod cursor;

@@ -1,15 +1,7 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
-
-///
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-/////////////
-// imports //
-/////////////
 
 use compiler::extension::api::TokenParser;
 use parser::{Node, Job, ParserError, ParserErrorCode};
@@ -18,10 +10,6 @@ use compiler::extension::api::operator::Precedence;
 use compiler::extension::api::token_parser::TestResult;
 use lexer::Token;
 use error::api::{Dump, ErrorCode};
-
-/////////////
-// exports //
-/////////////
 
 #[derive(Debug, Default)]
 pub struct If;

@@ -1,16 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Represents a token stream
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
+/// Represents a token stream.
 
 use std::fmt;
 use std::convert::Into;
@@ -20,10 +13,6 @@ use template;
 use lexer::error::{TokenError, TokenErrorCode};
 use lexer::job::Cursor;
 use error::api::Dump;
-
-/////////////
-// exports //
-/////////////
 
 #[derive(Debug, Default, Clone)]
 pub struct Position {

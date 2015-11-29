@@ -1,13 +1,9 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
- /// Loads a template from the filesystem.
-
-/////////////
-// imports //
-/////////////
+/// Loads a template from the filesystem.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -18,10 +14,6 @@ use std::borrow::Cow;
 use super::{api, LoaderError, LoaderErrorCode};
 use self::namespace::Namespace;
 use error::api::ErrorCode;
-
-/////////////
-// exports //
-/////////////
 
 pub mod namespace;
 pub mod path;

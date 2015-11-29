@@ -1,24 +1,13 @@
-// This file is part of Twig (ported to Rust).
+// This file is part of rust-web/twig
 //
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
 /// Typisation of runtime errors.
-///
-/// @author Colin Kiegel <kiegel@gmx.de>
-
-
-/////////////
-// imports //
-/////////////
 
 use std::fmt::{self, Display};
 use error::Error;
 use error::api::ErrorCode;
-
-/////////////
-// exports //
-/////////////
 
 pub type RuntimeError = Error<RuntimeErrorCode>;
 
