@@ -14,17 +14,17 @@ use compiler::error::{TwigError};
 pub const VERSION : &'static str = "1.18.1";
 
 #[derive(Debug)]
-pub struct Builder {
+pub struct Setup {
     opt: Options,
     ext: ExtensionRegistry,
 }
 
-impl Default for Builder {
-    fn default() -> Builder {
+impl Default for Setup {
+    fn default() -> Setup {
         let mut ext = ExtensionRegistry::default();
         ext.push(extension::Core::new()).unwrap(); // core extension
 
-        Builder {
+        Setup {
             opt: Options::default(),
             ext: ext,
         }
@@ -41,21 +41,21 @@ impl Default for Builder {
 // / # Examples
 // /
 // / ```
-// / use compiler::Builder;
+// / use compiler::Setup;
 // /
-// / let compiler_default = Builder::default().compiler();
+// / let compiler_default = Setup::default().compiler();
 // / ```
 // /
 // / ```
-// / use compiler::Builder;
+// / use compiler::Setup;
 // /
-// / let compiler_custom = Builder::default()
+// / let compiler_custom = Setup::default()
 // /     .set_strict_variables(true)
 // /     .add_extension(extension::Profiler::new())
 // /     .compiler();
 // / ```
 #[allow(dead_code)]
-impl Builder {
+impl Setup {
     /// When set to true, it automatically set "auto_reload" to true as well
     ///     (default to false)
     pub fn set_debug(mut self, debug: bool) -> Self {

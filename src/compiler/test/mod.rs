@@ -9,5 +9,5 @@ use compiler;
 
 #[test]
 fn new() {
-    let _compiler = compiler::Builder::default().compiler();
+    let _compiler = compiler::Setup::default().compiler();
 }

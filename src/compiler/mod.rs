@@ -15,12 +15,12 @@ use error::api::ErrorCode;
 
 pub mod error;
 pub mod options;
-pub mod builder;
+pub mod setup;
 pub mod extension;
 pub mod extension_registry;
 pub use self::error::{TwigError, TwigErrorCode, ExtensionRegistryError, ExtensionRegistryErrorCode};
 pub use self::options::Options;
-pub use self::builder::Builder;
+pub use self::setup::Setup;
 pub use self::extension::api::Extension;
 pub use self::extension_registry::ExtensionRegistry;
 pub use lexer::{self, Lexer};

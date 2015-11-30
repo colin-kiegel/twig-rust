@@ -8,7 +8,7 @@
 //! # Examples
 //!
 //! ```
-//! use twig::compiler;
+//! use twig::compiler::Setup;
 //! use twig::loader;
 //! use twig::runtime::Runtime;
 //! use twig::template::api::Template;
@@ -16,7 +16,7 @@
 //! let mut loader = loader::array::Array::default();
 //! loader.set_template("greetings","Hello {{name}}!");
 //!
-//! let mut compiler = compiler::Builder::default().compiler().unwrap();
+//! let mut compiler = Setup::default().compiler().unwrap();
 //! compiler.set_loader(Box::new(loader));
 //!
 //! let mut runtime = Runtime::default();
