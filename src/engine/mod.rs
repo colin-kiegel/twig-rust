@@ -8,7 +8,7 @@
 #[cfg(test)]
 mod test;
 mod template_cache;
-use loader::api::Loader;
+use loader::Loader;
 use std::rc::Rc;
 use template;
 use error::ErrorCode;

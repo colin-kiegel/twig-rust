@@ -14,14 +14,14 @@
 
 use std::collections::HashMap;
 use std::borrow::Cow;
-use super::{api, LoaderError, LoaderErrorCode};
+use loader::{Loader, LoaderError, LoaderErrorCode};
 
 #[derive(Default, Debug)]
 pub struct Array {
     templates: HashMap<String,String>,
 }
 
-impl api::Loader for Array {
+impl Loader for Array {
     fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
 
         return match self.templates.get(name) {

@@ -11,7 +11,7 @@ use std::fs::{self, File};
 use std::os::unix::fs::MetadataExt;
 use std::io::Read;
 use std::borrow::Cow;
-use super::{api, LoaderError, LoaderErrorCode};
+use loader::{Loader, LoaderError, LoaderErrorCode};
 use self::namespace::Namespace;
 use error::ErrorCode;
 
@@ -24,7 +24,7 @@ pub struct Filesystem {
     path_cache: HashMap<String, PathBuf>,
 }
 
-impl api::Loader for Filesystem {
+impl Loader for Filesystem {
     fn source<'a>(&'a mut self, name: &str) -> Result<Cow<str>, LoaderError> {
         let path = try!(self.find_template(name));
 
