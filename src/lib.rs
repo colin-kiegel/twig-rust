@@ -31,8 +31,6 @@ extern crate regex;
 #[macro_use]
 pub mod error;
 pub mod engine;
-pub mod lexer;
-pub mod parser;
 pub mod runtime;
 pub mod loader;
 pub mod template;

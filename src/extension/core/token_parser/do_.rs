@@ -4,8 +4,9 @@
 // file that was distributed with this source code.
 
 use extension::api::TokenParser;
-use parser::{self, Job, ParserError};
-use lexer::token::stream::Item;
+use engine::Node;
+use engine::parser::{self, Job, ParserError};
+use engine::parser::token::stream::Item;
 
 #[derive(Debug, Default)]
 pub struct Do;
@@ -15,7 +16,7 @@ impl TokenParser for Do {
         "do"
     }
 
-    fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<parser::Node>, ParserError> {
+    fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<Node>, ParserError> {
         // let expr = _parser.expression_parser().parse(); // #TODO:160 collapse to parse_expression()
         // _parser.stream().expect(Token::BlockEnd); // #TODO:110 check if it ends DO-block
         // let node = parser::node::Do::new(expr, token->line(), self.tag());

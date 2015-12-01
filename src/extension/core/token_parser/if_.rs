@@ -4,11 +4,12 @@
 // file that was distributed with this source code.
 
 use extension::api::TokenParser;
-use parser::{Node, Job, ParserError, ParserErrorCode};
-use lexer::token::stream::Item;
+use engine::Node;
+use engine::parser::{Job, ParserError, ParserErrorCode};
+use engine::parser::token::stream::Item;
 use extension::api::operator::Precedence;
 use extension::api::token_parser::TestResult;
-use lexer::Token;
+use engine::parser::token::Token;
 use error::{Dump, ErrorCode};
 
 #[derive(Debug, Default)]

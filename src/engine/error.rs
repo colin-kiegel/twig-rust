@@ -10,8 +10,7 @@ use error::Error;
 use error::{GeneralizeTo, ErrorCode};
 
 use loader::LoaderErrorCode;
-use lexer::LexerErrorCode;
-use parser::ParserErrorCode;
+use engine::parser::{ParserErrorCode, LexerErrorCode};
 use runtime::RuntimeErrorCode;
 use extension;
 

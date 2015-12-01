@@ -5,7 +5,7 @@
 
 //! RegExes of the lexer.
 
-use lexer::{Lexer, token, LexerError};
+use engine::parser::{Lexer, token, LexerError};
 use std::fmt;
 
 #[derive(Default)]

@@ -17,12 +17,14 @@ pub mod error;
 pub mod options;
 pub mod setup;
 pub mod extension_registry;
+pub mod parser;
+pub mod node;
+pub use self::node::Node;
+pub use self::parser::{Parser, lexer, Lexer};
 pub use self::error::{TwigError, TwigErrorCode, ExtensionRegistryError, ExtensionRegistryErrorCode};
 pub use self::options::Options;
 pub use self::setup::Setup;
 pub use self::extension_registry::ExtensionRegistry;
-pub use lexer::{self, Lexer};
-pub use parser::{self, Parser};
 pub use runtime::{self, Runtime};
 
 

@@ -4,8 +4,9 @@
 // file that was distributed with this source code.
 
 use extension::api::TokenParser;
-use parser::{self, Job, ParserError};
-use lexer::token::stream::Item;
+use engine::Node;
+use engine::parser::{self, Job, ParserError};
+use engine::parser::token::stream::Item;
 
 #[derive(Debug, Default)]
 pub struct Set;
@@ -15,7 +16,7 @@ impl TokenParser for Set {
         "set"
     }
 
-    fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<parser::Node>, ParserError> {
+    fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<Node>, ParserError> {
         unimplemented!()
     }
 }

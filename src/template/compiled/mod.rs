@@ -9,7 +9,7 @@ use template::api::Template;
 use engine::TwigError;
 use runtime::{Runtime, Job};
 use runtime::api::Execute;
-use parser::node;
+use engine::node;
 
 #[allow(dead_code)]
 #[derive(Debug)]

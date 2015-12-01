@@ -7,13 +7,14 @@
 
 use std::fmt::Debug;
 
-use parser::{self, Job, ParserError};
-use lexer::token::stream::Item;
+use engine::Node;
+use engine::parser::{self, Job, ParserError};
+use engine::parser::token::stream::Item;
 
 pub trait TokenParser : Debug {
     fn tag(&self) -> &'static str;
 
-    fn parse(&self, job: &mut Job, item: &Item) -> Result<Box<parser::Node>, ParserError>;
+    fn parse(&self, job: &mut Job, item: &Item) -> Result<Box<Node>, ParserError>;
 }
 
 // TODO: move {Test, TestResult} to engine::extension::api::test?
