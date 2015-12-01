@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Represents a node that executes an expression.
+//! Represents a node that executes an expression.
 
 use super::GenericNode;
 use runtime::{Runtime, Execute, Job};

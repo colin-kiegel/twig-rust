@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Loads a template from an array.
+//! Loads a template from an array.
 ///
 /// When using this loader with a cache mechanism, you should know that a new cache
 /// key is generated each time a template content "changes" (the cache key being the

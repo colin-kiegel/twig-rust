@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Twig Error API for error codes
+//! Twig Error API for error codes
 
 use error::{Error, Location};
 use std::fmt::{Debug, Display};

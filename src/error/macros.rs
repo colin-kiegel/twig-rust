@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Twig macro for error handling
+//! Twig macro for error handling
 
 pub use super::*;
 

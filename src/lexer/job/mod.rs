@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// A lexer job - modeled as a FSM (Finite State Machine).
+//! A lexer job - modeled as a FSM (Finite State Machine).
 
 use std::fmt;
 use template;

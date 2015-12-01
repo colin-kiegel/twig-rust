@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Typisation of runtime errors.
+//! Typisation of runtime errors.
 
 use std::fmt::{self, Display};
 use error::Error;

@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Twig generic error
+//! Twig generic error
 
 use std::fmt::{self, Display};
 use std::error;

@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Twig filecache for compiled templates.
+//! Twig filecache for compiled templates.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};

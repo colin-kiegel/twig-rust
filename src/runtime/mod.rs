@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Runtime for compiled templates
+//! Runtime for compiled templates
 /// - it holds all data
 /// - defines all necessary interfaces
 /// - manages i/o for the compiled templates

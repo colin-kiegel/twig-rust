@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Final state of the lexer job.
+//! Final state of the lexer job.
 
 use super::{TokenizeState, Code};
 use lexer::error::LexerError;

@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Block state of the lexer.
+//! Block state of the lexer.
 
 use super::{TokenizeState, Code};
 use lexer::job::Job;

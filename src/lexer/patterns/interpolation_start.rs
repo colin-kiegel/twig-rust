@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// The `interpolation start` pattern used by the lexer to tokenize the templates.
+//! The `interpolation start` pattern used by the lexer to tokenize the templates.
 ///
 /// Written as regular expressions (perl-style).
 

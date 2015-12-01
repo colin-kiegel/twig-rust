@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Debug Extension.
+//! Debug Extension.
 
 use super::api::Extension;
 

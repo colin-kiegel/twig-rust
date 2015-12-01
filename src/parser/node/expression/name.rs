@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Name Expression Node.
+//! Name Expression Node.
 
 use parser::node::GenericNode;
 use runtime::{Runtime, Execute, Job};

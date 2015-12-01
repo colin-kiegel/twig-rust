@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Position within a token stream.
+//! Position within a token stream.
 
 use lexer::token::stream::{self, Stream, Item};
 use lexer::token::{self, Token};

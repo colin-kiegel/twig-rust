@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Node of compiled templates (forming an Abstract-Syntax-Tree)
+//! Node of compiled templates (forming an Abstract-Syntax-Tree)
 
 use runtime::{Runtime, Job};
 use std::fmt::Debug;

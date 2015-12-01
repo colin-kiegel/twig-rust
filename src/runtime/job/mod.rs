@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Runtime job.
+//! Runtime job.
 
 use runtime::Runtime;
 use runtime::api::Execute;

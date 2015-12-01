@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Paths for the filesystem template loader.
+//! Paths for the filesystem template loader.
 
 use std::path::{Path, PathBuf, Component};
 use super::namespace;

@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Twig Template API.
+//! Twig Template API.
 
 use engine::TwigError;
 use runtime::Runtime;

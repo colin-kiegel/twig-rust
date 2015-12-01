@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Twig configuration options.
+//! Twig configuration options.
 
 use std::path::{Path, PathBuf};
 use engine::extension::escaper;

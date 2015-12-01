@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Core Extension
+//! Core Extension
 
 use engine;
 use engine::extension::api;

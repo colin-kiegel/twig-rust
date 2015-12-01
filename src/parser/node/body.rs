@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Root node of the template body.
+//! Root node of the template body.
 
 use super::GenericNode;
 use runtime::{Runtime, Execute, Job};

@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Position within a raw template.
+//! Position within a raw template.
 
 use std::fmt;
 use template;

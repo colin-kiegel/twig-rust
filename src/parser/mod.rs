@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Parser
+//! Parser
 
 use engine::{Engine, ExtensionRegistry, extension};
 use lexer::token;

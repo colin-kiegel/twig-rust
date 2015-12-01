@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Loads a template from the filesystem.
+//! Loads a template from the filesystem.
 
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
