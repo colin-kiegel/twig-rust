@@ -21,7 +21,7 @@ pub struct Options {
     pub tag_block_end:          OptionData,
     pub tag_comment_start:      OptionData,
     pub tag_comment_end:        OptionData,
-    pub tag_expression_start:     OptionData,
+    pub tag_expression_start:   OptionData,
     pub tag_variable_end:       OptionData,
     pub whitespace_trim:        OptionData,
 }

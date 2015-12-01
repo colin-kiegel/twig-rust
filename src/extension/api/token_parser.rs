@@ -8,7 +8,7 @@
 use std::fmt::Debug;
 
 use engine::Node;
-use engine::parser::{self, Job, ParserError};
+use engine::parser::{Job, ParserError};
 use engine::parser::token::stream::Item;
 
 pub trait TokenParser : Debug {

@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-//! RegExes of the lexer.
+//! Twig raw template.
 
 use engine::parser::{Lexer, token, LexerError};
 use std::fmt;

@@ -5,7 +5,7 @@
 
 use extension::api::TokenParser;
 use engine::Node;
-use engine::parser::{self, Job, ParserError};
+use engine::parser::{Job, ParserError};
 use engine::parser::token::stream::Item;
 
 #[derive(Debug, Default)]

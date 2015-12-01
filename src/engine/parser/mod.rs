@@ -5,14 +5,13 @@
 
 //! Parser
 
-use engine::{Engine, ExtensionRegistry, Node};
+use engine::{Engine, ExtensionRegistry};
 use extension;
 use extension::api::TokenParser;
 use std::rc::Rc;
 use template;
 use std::collections::HashMap;
 
-pub mod api;
 pub mod error;
 pub mod job;
 pub mod expression_parser;
@@ -56,16 +55,6 @@ impl Parser {
 
         job.parse()
     }
-
-    // NOTE: deprecated! -> moved to parser::Job
-    // pub fn parse_expression (
-    //     &self,
-    //     job: &mut Job,
-    //     precedence: Precedence
-    // ) -> Result<Box<Node>, ParserError>
-    // {
-    //     self.expression_parser.parse(job, precedence)
-    // }
 
     /// Returns the engine extensions.
     pub fn extensions(&self) -> &ExtensionRegistry {

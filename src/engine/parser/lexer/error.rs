@@ -8,7 +8,6 @@
 use std::fmt::{self, Display};
 use error::Error;
 use error::{GeneralizeTo, ErrorCode};
-use engine::parser::token::TokenErrorCode;
 
 use engine::parser::token;
 use engine::parser::lexer::job::cursor;
