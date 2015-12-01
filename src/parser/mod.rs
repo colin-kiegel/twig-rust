@@ -21,7 +21,7 @@ pub use self::error::*;
 pub use self::job::Job;
 pub use self::api::Node;
 pub use self::expression_parser::ExpressionParser;
-use error::api::ErrorCode;
+use error::ErrorCode;
 
 #[derive(Debug)]
 pub struct Parser {

@@ -14,7 +14,7 @@ use engine::extension::api::operator::Precedence;
 use engine::ExtensionRegistry;
 use lexer::token::{Token, Punctuation, BracketType};
 use std::rc::Rc;
-use error::api::{Dump, ErrorCode};
+use error::{Dump, ErrorCode};
 
 #[derive(Debug)]
 pub struct Expression; // dummy

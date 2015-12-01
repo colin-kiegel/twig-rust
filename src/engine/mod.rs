@@ -11,7 +11,7 @@ mod template_cache;
 use loader::api::Loader;
 use std::rc::Rc;
 use template;
-use error::api::ErrorCode;
+use error::ErrorCode;
 
 pub mod error;
 pub mod options;

@@ -11,7 +11,7 @@ use super::Options;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
-use error::api::ErrorCode;
+use error::ErrorCode;
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 pub use lexer::error::{LexerError, LexerErrorCode};

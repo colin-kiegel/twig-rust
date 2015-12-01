@@ -11,7 +11,7 @@ use lexer::job::Job;
 use lexer::token::{Token, Punctuation, BracketType};
 use lexer::patterns::{number, Extract};
 use lexer::error::{LexerError, SyntaxErrorCode};
-use error::api::Dump;
+use error::Dump;
 
 pub trait LexExpression where
     Self: Sized + TokenizeState

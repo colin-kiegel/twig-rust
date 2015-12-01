@@ -12,7 +12,7 @@ use lexer::token::{self, Token, Type};
 use template;
 use lexer::error::{TokenError, TokenErrorCode};
 use lexer::job::Cursor;
-use error::api::Dump;
+use error::Dump;
 
 #[derive(Debug, Default, Clone)]
 pub struct Position {

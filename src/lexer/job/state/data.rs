@@ -11,7 +11,7 @@ use lexer::job::Job;
 use lexer::token::Token;
 use lexer::patterns::{token_start, verbatim_start, Extract};
 use lexer::error::{LexerError, SyntaxError, SyntaxErrorCode};
-use error::api::Dump;
+use error::Dump;
 
 pub struct Data;
 

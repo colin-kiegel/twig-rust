@@ -9,7 +9,7 @@ use lexer::token::stream::{self, Stream, Item};
 use lexer::token::{self, Token};
 use parser::{ParserError, ParserErrorCode};
 use std::fmt;
-use error::api::Dump;
+use error::Dump;
 
 pub type Position = usize;
 

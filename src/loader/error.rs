@@ -7,7 +7,7 @@
 
 use std::fmt::{self, Display};
 use error::Error;
-use error::api::ErrorCode;
+use error::ErrorCode;
 use std::path::PathBuf;
 
 pub type LoaderError = Error<LoaderErrorCode>;

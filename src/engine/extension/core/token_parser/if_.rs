@@ -9,7 +9,7 @@ use lexer::token::stream::Item;
 use engine::extension::api::operator::Precedence;
 use engine::extension::api::token_parser::TestResult;
 use lexer::Token;
-use error::api::{Dump, ErrorCode};
+use error::{Dump, ErrorCode};
 
 #[derive(Debug, Default)]
 pub struct If;

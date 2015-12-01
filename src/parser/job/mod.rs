@@ -6,7 +6,7 @@
 //! A parser job.
 
 use std::fmt;
-use error::api::{Dump, ErrorCode};
+use error::{Dump, ErrorCode};
 use lexer::token::{self, Token, Type};
 use parser::error::*;
 use parser::{node, Parser};

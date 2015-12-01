@@ -6,7 +6,7 @@
 //! Represents a Token
 
 use std::fmt;
-use error::api::Dump;
+use error::Dump;
 
 pub mod stream;
 pub use self::stream::Stream;

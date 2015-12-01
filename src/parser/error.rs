@@ -7,7 +7,7 @@
 
 use std::fmt::{self, Display};
 use error::Error;
-use error::api::{GeneralizeTo, ErrorCode};
+use error::{GeneralizeTo, ErrorCode};
 
 use lexer::error::TokenErrorCode;
 use parser::job::{self, cursor};

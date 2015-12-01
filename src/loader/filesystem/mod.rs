@@ -13,7 +13,7 @@ use std::io::Read;
 use std::borrow::Cow;
 use super::{api, LoaderError, LoaderErrorCode};
 use self::namespace::Namespace;
-use error::api::ErrorCode;
+use error::ErrorCode;
 
 pub mod namespace;
 pub mod path;

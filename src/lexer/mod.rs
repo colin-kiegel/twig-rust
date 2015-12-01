@@ -12,7 +12,7 @@ use template;
 use engine::{Engine, ExtensionRegistry};
 use lexer::job::Job;
 use lexer::job::state::TokenizeState;
-use error::api::ErrorCode;
+use error::ErrorCode;
 
 pub mod error;
 pub mod token;
