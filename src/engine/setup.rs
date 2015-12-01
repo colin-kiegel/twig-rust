@@ -7,8 +7,8 @@
 
 use std::path::Path;
 use std::rc::Rc;
-use compiler::{Compiler, options, Options, extension, Extension, extension_registry, ExtensionRegistry};
-use compiler::error::{TwigError};
+use engine::{Engine, options, Options, extension, Extension, extension_registry, ExtensionRegistry};
+use engine::error::{TwigError};
 
 #[allow(dead_code)]
 pub const VERSION : &'static str = "1.18.1";
@@ -31,7 +31,7 @@ impl Default for Setup {
     }
 }
 
-/// Builds an instance of the Twig Compiler, according to supplied options and compiler extensions.
+/// Builds an instance of the Twig Engine, according to supplied options and engine extensions.
 ///
 /// The following extensions will be registered by default:
 /// * core
@@ -41,18 +41,18 @@ impl Default for Setup {
 // / # Examples
 // /
 // / ```
-// / use compiler::Setup;
+// / use engine::Setup;
 // /
-// / let compiler_default = Setup::default().compiler();
+// / let engine_default = Setup::default().engine();
 // / ```
 // /
 // / ```
-// / use compiler::Setup;
+// / use engine::Setup;
 // /
-// / let compiler_custom = Setup::default()
+// / let engine_custom = Setup::default()
 // /     .set_strict_variables(true)
 // /     .add_extension(extension::Profiler::new())
-// /     .compiler();
+// /     .engine();
 // / ```
 #[allow(dead_code)]
 impl Setup {
@@ -131,8 +131,8 @@ impl Setup {
         self.ext.iter()
     }
 
-    pub fn compiler(mut self) -> Result<Compiler, TwigError> {
-        let mut c = Compiler::default();
+    pub fn engine(mut self) -> Result<Engine, TwigError> {
+        let mut c = Engine::default();
         let o = self.opt;
 
         // add default extensions

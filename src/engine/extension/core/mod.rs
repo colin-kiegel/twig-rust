@@ -5,8 +5,8 @@
 
 /// Core Extension
 
-use compiler;
-use compiler::extension::api;
+use engine;
+use engine::extension::api;
 use super::api::Extension;
 use std::collections::HashMap;
 
@@ -25,11 +25,11 @@ pub struct Core {
 impl api::Extension for Core {
     fn name(&self) -> &'static str { "core" }
 
-    /// Initialize the compiler.
+    /// Initialize the engine.
     /// This is where you can load some file that contains filter functions for instance.
-    fn init(&self, _compiler: &mut compiler::Compiler) {} // #TODO:90 add error handling ???
+    fn init(&self, _engine: &mut engine::Engine) {} // #TODO:90 add error handling ???
 
-    /// Get the token parser instances to register with the compiler.
+    /// Get the token parser instances to register with the engine.
     fn token_parsers(&self) -> HashMap<String, Box<api::TokenParser>> {
         let mut p : HashMap<String, Box<api::TokenParser>> = HashMap::new();
         p.insert("for".to_string(), Box::new(token_parser::For::default()));
@@ -51,27 +51,27 @@ impl api::Extension for Core {
         return p;
     }
 
-    // /// Get the filters to register with the compiler.
+    // /// Get the filters to register with the engine.
     // fn filters(&self) -> HashMap<String, Box<api::Filter>> {
     //     unimplemented!()
     // }
     //
-    // /// Get the tests to register with the compiler.
+    // /// Get the tests to register with the engine.
     // fn tests(&self) -> HashMap<String, Box<api::Test>> {
     //     unimplemented!()
     // }
     //
-    // /// Get the functions to register with the compiler.
+    // /// Get the functions to register with the engine.
     // fn functions(&self) -> HashMap<String, Box<api::Function>> {
     //     unimplemented!()
     // }
     //
-    // /// Get the unary operators to register with the compiler.
+    // /// Get the unary operators to register with the engine.
     // fn operators_unary(&self) -> Vec<api::UnaryOperator> {
     //     unimplemented!()
     // }
     //
-    // /// Get the binary operators to register with the compiler.
+    // /// Get the binary operators to register with the engine.
     // fn operators_binary(&self) -> Vec<api::BinaryOperator> {
     //     unimplemented!()
     // }

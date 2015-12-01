@@ -16,7 +16,7 @@ pub trait TokenParser : Debug {
     fn parse(&self, job: &mut Job, item: &Item) -> Result<Box<parser::Node>, ParserError>;
 }
 
-// TODO: move {Test, TestResult} to compiler::extension::api::test?
+// TODO: move {Test, TestResult} to engine::extension::api::test?
 pub type Test = Fn(&Item) -> TestResult;
 
 #[derive(Debug)]

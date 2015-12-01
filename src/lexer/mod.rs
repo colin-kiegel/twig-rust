@@ -9,7 +9,7 @@ use std::rc::Rc;
 #[cfg(test)]
 mod test;
 use template;
-use compiler::{Compiler, ExtensionRegistry};
+use engine::{Engine, ExtensionRegistry};
 use lexer::job::Job;
 use lexer::job::state::TokenizeState;
 use error::api::ErrorCode;
@@ -30,9 +30,9 @@ pub struct Lexer {
 }
 
 impl Lexer {
-    pub fn new(cp: &Compiler, opt: Options) -> Result<Lexer, LexerError> {
+    pub fn new(twig: &Engine, opt: Options) -> Result<Lexer, LexerError> {
         let ref opt = Rc::new(opt); // #TODO:20 -> switch to &Options (!?)
-        let ext = match cp.extensions() {
+        let ext = match twig.extensions() {
             Err(e) => return Err(LexerErrorCode::MissingExtensions
                 .at(loc!())
                 .caused_by(e)),
@@ -63,10 +63,10 @@ impl Lexer {
 
 impl Default for Lexer {
     fn default() -> Lexer {
-        let mut compiler = Compiler::default();
-        compiler.set_extensions(ExtensionRegistry::default());
+        let mut engine = Engine::default();
+        engine.set_extensions(ExtensionRegistry::default());
         let options = Options::default();
 
-        Lexer::new(&compiler, options).unwrap()
+        Lexer::new(&engine, options).unwrap()
     }
 }

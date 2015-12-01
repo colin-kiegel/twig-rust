@@ -64,7 +64,7 @@ impl ErrorCode for ParserErrorCode {
     fn description(&self) -> &str {
         match *self {
             ParserErrorCode::Unreachable{..} => "Unexptected parser error (please report as bug with details).",
-            ParserErrorCode::MissingExtensions => "Could not initialize parser due to missing compiler extensions.",
+            ParserErrorCode::MissingExtensions => "Could not initialize parser due to missing engine extensions.",
             ParserErrorCode::InvalidState{..} => "Parser ended up in unsupported state.",
             ParserErrorCode::TokenError => "Token error.",
             ParserErrorCode::TokenParserError{..} => "Token parser error.",
@@ -115,7 +115,7 @@ impl Display for ParserErrorCode {
             ParserErrorCode::UnexpectedBinaryOperator {
                 name: ref n, job: ref j
             } => {
-                write!(f, " The binary operator {name:?} is unknown to the compiler for job {job}",
+                write!(f, " The binary operator {name:?} is unknown to the engine for job {job}",
                     name = n,
                     job = j)
             },

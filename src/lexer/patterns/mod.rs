@@ -11,7 +11,7 @@ use std::iter::Iterator;
 use std::rc::Rc;
 use regex;
 use regex::Error as regexError;
-use compiler::{ExtensionRegistry};
+use engine::{ExtensionRegistry};
 
 #[macro_use]
 pub mod macros;

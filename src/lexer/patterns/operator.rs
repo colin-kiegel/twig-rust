@@ -9,8 +9,8 @@
 
 use regex;
 use regex::Error as regexError;
-use compiler::extension::api::{UnaryOperator, BinaryOperator};
-use compiler::ExtensionRegistry;
+use engine::extension::api::{UnaryOperator, BinaryOperator};
+use engine::ExtensionRegistry;
 use std::collections::HashMap;
 use std::rc::Rc;
 

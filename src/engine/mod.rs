@@ -3,7 +3,7 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// The Twig Compiler
+/// The Twig Engine
 
 #[cfg(test)]
 mod test;
@@ -29,7 +29,7 @@ pub use runtime::{self, Runtime};
 
 
 #[derive(Default, Debug)] // #TODO:0 - provide a different constructor
-pub struct Compiler {
+pub struct Engine {
     options: Options,
     ext: Option<Rc<ExtensionRegistry>>,
     //ext_staging: Option<Box<ext::Staging>>,
@@ -45,7 +45,7 @@ pub struct Compiler {
 }
 
 
-impl Compiler {
+impl Engine {
     /// Renders a template.
     ///
     /// # Failures
@@ -111,14 +111,14 @@ impl Compiler {
         Ok(compiled)
     }
 
-    /// Sets the compiler extensions.
-    pub fn set_extensions(&mut self, ext: ExtensionRegistry) -> &mut Compiler {
+    /// Sets the engine extensions.
+    pub fn set_extensions(&mut self, ext: ExtensionRegistry) -> &mut Engine {
         self.ext = Some(Rc::new(ext)); // #TODO:570 switch to callback pattern to provide arguments
 
         self
     }
 
-    /// Gets the compiler extensions.
+    /// Gets the engine extensions.
     pub fn extensions(&self) -> Result<&Rc<ExtensionRegistry>, TwigError> {
         match self.ext {
             Some(ref ext) => Ok(ext),
@@ -129,7 +129,7 @@ impl Compiler {
     }
 
     /// Sets the loader instance.
-    pub fn set_loader(&mut self, loader: Box<Loader>) -> &mut Compiler {
+    pub fn set_loader(&mut self, loader: Box<Loader>) -> &mut Engine {
         self.loader = Some(loader); // #TODO:580 switch to callback pattern to provide arguments
 
         self
@@ -146,7 +146,7 @@ impl Compiler {
     }
 
     /// Sets the lexer instance.
-    pub fn set_lexer(&mut self, lexer: Lexer) -> &mut Compiler {
+    pub fn set_lexer(&mut self, lexer: Lexer) -> &mut Engine {
         self.lexer = Some(lexer); // #TODO:590 switch to callback pattern to provide arguments
 
         self
@@ -164,7 +164,7 @@ impl Compiler {
     }
 
     /// Sets the parser instance.
-    pub fn set_parser(&mut self, parser: Parser) -> &mut Compiler {
+    pub fn set_parser(&mut self, parser: Parser) -> &mut Engine {
         self.parser = Some(parser); // #TODO:600 switch to callback pattern to provide arguments
 
         self
@@ -187,7 +187,7 @@ impl Compiler {
     }
 
     // /// Sets the runtime instance.
-    // pub fn set_runtime(&mut self, runtime: Runtime) -> &mut Compiler {
+    // pub fn set_runtime(&mut self, runtime: Runtime) -> &mut Engine {
     //     self.runtime = Some(runtime); // #TODO:610 switch to callback pattern to provide arguments
     //
     //     self

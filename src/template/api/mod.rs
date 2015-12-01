@@ -5,7 +5,7 @@
 
 /// Twig Template API.
 
-use compiler::TwigError;
+use engine::TwigError;
 use runtime::Runtime;
 
 pub const _ANY_CALL    : &'static str = "any";
@@ -23,7 +23,7 @@ pub trait Template {
     fn display(&self, runtime: &Runtime, blocks: Option<Vec<()>>); // #TODO:210 error handling
 
     // /**
-    //  * Get the bound compiler for this template.
+    //  * Get the bound engine for this template.
     //  */
-    // fn compiler(&self) -> &Compiler;
+    // fn engine(&self) -> &Engine;
 }

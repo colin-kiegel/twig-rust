@@ -10,8 +10,8 @@ use error::api::{Dump, ErrorCode};
 use lexer::token::{self, Token, Type};
 use parser::error::*;
 use parser::{node, Parser};
-use compiler::extension::api::operator::Precedence;
-use compiler::extension::api::token_parser::{Test, TestResult};
+use engine::extension::api::operator::Precedence;
+use engine::extension::api::token_parser::{Test, TestResult};
 use std::iter;
 use template;
 use parser::api::Node;
@@ -102,7 +102,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
         self.state = self.stack.pop().unwrap();
 
         // *IMPORTANT TODO*: move initialisation somewhere else(!)
-        // let traverser = NodeTraverser::new(compiler, self.visitors);
+        // let traverser = NodeTraverser::new(engine, self.visitors);
         // module = traverser.traverse(module);
 
         let compiled = template::Compiled::new(module);

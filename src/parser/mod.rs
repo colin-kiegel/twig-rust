@@ -5,9 +5,9 @@
 
 /// Parser
 
-use compiler::{Compiler, ExtensionRegistry, extension};
+use engine::{Engine, ExtensionRegistry, extension};
 use lexer::token;
-use compiler::extension::api::TokenParser;
+use engine::extension::api::TokenParser;
 use std::rc::Rc;
 use template;
 use std::collections::HashMap;
@@ -27,11 +27,11 @@ use error::api::ErrorCode;
 pub struct Parser {
     ext: Rc<ExtensionRegistry>,
     expression_parser: ExpressionParser,
-} // avoid a circular reference to the compiler!
+} // avoid a circular reference to the engine!
 
 impl Parser {
-    pub fn new(cp: &Compiler) -> Result<Parser, ParserError> {
-        let ext = match cp.extensions() {
+    pub fn new(twig: &Engine) -> Result<Parser, ParserError> {
+        let ext = match twig.extensions() {
             Err(e) => return Err(ParserErrorCode::MissingExtensions
                 .at(loc!())
                 .caused_by(e)),
@@ -63,7 +63,7 @@ impl Parser {
     //     self.expression_parser.parse(job, precedence)
     // }
 
-    /// Returns the compiler extensions.
+    /// Returns the engine extensions.
     pub fn extensions(&self) -> &ExtensionRegistry {
         &*self.ext
     }
@@ -75,14 +75,14 @@ impl Parser {
         self.ext.token_parsers().get(tag).map(|x| &**x)
     }
 
-    /// Returns all token parsers defined by compiler extensions.
+    /// Returns all token parsers defined by engine extensions.
     ///
     /// Note: Tag handlers and token parsers are *identical*.
     pub fn _token_parsers(&self) -> &HashMap<String, Box<extension::api::TokenParser>> {
         self.ext.token_parsers()
     }
 
-    /// Returns the visitors defined by compiler extensions.
+    /// Returns the visitors defined by engine extensions.
     pub fn visitors(&self) -> &Vec<Box<extension::api::NodeVisitor>> {
         self.ext.node_visitors()
     }
@@ -90,9 +90,9 @@ impl Parser {
 
 impl Default for Parser {
     fn default() -> Parser {
-        let mut compiler = Compiler::default();
-        compiler.set_extensions(ExtensionRegistry::default());
+        let mut engine = Engine::default();
+        engine.set_extensions(ExtensionRegistry::default());
 
-        Parser::new(&compiler).unwrap()
+        Parser::new(&engine).unwrap()
     }
 }

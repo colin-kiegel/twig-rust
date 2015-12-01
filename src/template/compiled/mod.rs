@@ -6,7 +6,7 @@
 /// Default base class for compiled templates.
 
 use template::api::Template;
-use compiler::TwigError;
+use engine::TwigError;
 use runtime::{Runtime, Job};
 use runtime::api::Execute;
 use parser::node;

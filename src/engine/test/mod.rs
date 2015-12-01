@@ -3,11 +3,11 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-/// Compiler Tests.
+/// Engine Tests.
 
-use compiler;
+use engine;
 
 #[test]
 fn new() {
-    let _compiler = compiler::Setup::default().compiler();
+    let _engine = engine::Setup::default().engine();
 }

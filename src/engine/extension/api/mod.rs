@@ -7,7 +7,7 @@
 
 use std::collections::HashMap;
 
-use compiler;
+use engine;
 
 // Abstract extension traits + structs // #TODO:120 check what needs to be trait / can be struct
 pub mod filter;
@@ -29,46 +29,46 @@ pub trait Extension : ::std::fmt::Debug {
     /// Get the name of the extension.
     fn name(&self) -> &'static str;
 
-    /// Initialize the compiler.
+    /// Initialize the engine.
     /// This is where you can load some file that contains filter functions for instance.
-    fn init(&self, _compiler: &mut compiler::Compiler) {} // #TODO:80 add error handling ???
+    fn init(&self, _engine: &mut engine::Engine) {} // #TODO:80 add error handling ???
 
-    /// Get the token parser instances to register with the compiler.
+    /// Get the token parser instances to register with the engine.
     fn token_parsers(&self) -> HashMap<String, Box<TokenParser>> { // #TODO:620 switch to iterators or Option<Vec<...>> ???
         HashMap::new()
     }
 
-    /// Get the node visitor instances to register with the compiler.
+    /// Get the node visitor instances to register with the engine.
     fn node_visitors(&self) -> Vec<Box<NodeVisitor>> {
         Vec::new()
     }
 
-    /// Get the filters to register with the compiler.
+    /// Get the filters to register with the engine.
     fn filters(&self) -> HashMap<String, Box<Filter>> {
         HashMap::new()
     }
 
-    /// Get the tests to register with the compiler.
+    /// Get the tests to register with the engine.
     fn tests(&self) -> HashMap<String, Box<Test>> {
         HashMap::new()
     }
 
-    /// Get the functions to register with the compiler.
+    /// Get the functions to register with the engine.
     fn functions(&self) -> HashMap<String, Box<Function>> {
         HashMap::new()
     }
 
-    /// Get the unary operators to register with the compiler.
+    /// Get the unary operators to register with the engine.
     fn operators_unary(&self) -> Vec<UnaryOperator> {
         Vec::new()
     }
 
-    /// Get the binary operators to register with the compiler.
+    /// Get the binary operators to register with the engine.
     fn operators_binary(&self) -> Vec<BinaryOperator> {
         Vec::new()
     }
 
-    /// Get the global variables to register with the compiler.
+    /// Get the global variables to register with the engine.
     fn globals(&self) -> Vec<Box<Global>> {
         Vec::new()
     }

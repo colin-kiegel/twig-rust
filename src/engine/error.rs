@@ -13,7 +13,7 @@ use loader::LoaderErrorCode;
 use lexer::LexerErrorCode;
 use parser::ParserErrorCode;
 use runtime::RuntimeErrorCode;
-use compiler::extension;
+use engine::extension;
 
 pub type TwigError = Error<TwigErrorCode>;
 pub type ExtensionRegistryError = Error<ExtensionRegistryErrorCode>;
@@ -129,8 +129,8 @@ pub enum ExtensionRegistryErrorCode {
 impl ErrorCode for ExtensionRegistryErrorCode {
     fn description(&self) -> &str {
         match *self {
-            ExtensionRegistryErrorCode::AlreadyInitialized => "Compiler extensions are already initialized.",
-            ExtensionRegistryErrorCode::NotInitialized => "Compiler extensions are not yet initialized.",
+            ExtensionRegistryErrorCode::AlreadyInitialized => "Engine extensions are already initialized.",
+            ExtensionRegistryErrorCode::NotInitialized => "Engine extensions are not yet initialized.",
             ExtensionRegistryErrorCode::DuplicateExtension{..} => "Duplicate extension.",
             ExtensionRegistryErrorCode::DuplicateFilter{..} => "Duplicate filter.",
             ExtensionRegistryErrorCode::DuplicateFunction{..} => "Duplicate function.",

@@ -154,7 +154,7 @@ impl ErrorCode for LexerErrorCode {
     fn description(&self) -> &str {
         match *self {
             LexerErrorCode::Unreachable{..} => "Unexptected lexer error (please report as bug with details).",
-            LexerErrorCode::MissingExtensions => "Could not initialize lexer due to missing compiler extensions.",
+            LexerErrorCode::MissingExtensions => "Could not initialize lexer due to missing engine extensions.",
             LexerErrorCode::PatternRegexError => "Could not initialize lexer due to invalid regular expression.",
             LexerErrorCode::_InvalidPatternMatch => "Invalid pattern match.",
             LexerErrorCode::InvalidValue{..} => "Invalid value.",
