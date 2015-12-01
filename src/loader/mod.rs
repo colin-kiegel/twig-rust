@@ -5,8 +5,29 @@
 
 //! Twig template loader.
 
-pub mod api;
 pub mod array;
 pub mod filesystem;
 pub mod error;
 pub use self::error::{LoaderError, LoaderErrorCode};
+
+use std::fmt::Debug;
+use std::borrow::Cow;
+
+pub trait Loader : Debug {
+    /// Gets the source code of a template, given its name
+    ///
+    /// Returns a Cow<str> to allow for efficient caching mechanisms.
+    ///
+    /// # Failures
+    /// * When `name` is not found
+    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<str>, LoaderError>;
+
+    /// Gets the cache key to use for the cache for a given template
+    ///
+    /// # Failures
+    /// * When `name` is not found
+    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError>;
+
+    /// returns true if the template is still fresh
+    fn is_fresh(&mut self, name: &str, time: i64) -> bool;
+}
