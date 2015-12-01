@@ -12,7 +12,7 @@ use engine::parser::lexer::patterns::{Extract};
 use engine::parser::lexer::{LexerError};
 use super::shared_traits::LexExpression;
 
-#[allow(dead_code)] // #TODO:190 dummy
+#[allow(dead_code)] // TODO: dummy
 pub struct Expression;
 
 impl TokenizeState for Expression {

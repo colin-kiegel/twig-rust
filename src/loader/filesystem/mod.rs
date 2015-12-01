@@ -30,7 +30,7 @@ impl api::Loader for Filesystem {
 
         return match Self::read(&path) {
             Err(e) => {
-                // #TODO:400 self.unset_cached_path(name);
+                // TODO: self.unset_cached_path(name);
 
                 // #NOTE:10 could add one final retry here, to support
                 // seamless fallback to other template directories
@@ -47,7 +47,7 @@ impl api::Loader for Filesystem {
     }
 
     fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
-        self.find_template(name).map(|x| Cow::Borrowed(x.to_str().unwrap())) // #TODO:370 remove unwrap!
+        self.find_template(name).map(|x| Cow::Borrowed(x.to_str().unwrap())) // TODO: remove unwrap!
     }
 
     fn is_fresh(&mut self, name: &str, time: i64) -> bool {
@@ -133,7 +133,7 @@ impl Filesystem {
     /// Find template.
     fn find_template(&mut self, template_path: &str) -> Result<&Path, LoaderError> {
         if let Some(cached) = self.path_cache.get(template_path) {
-            // #TODO:140 clear cache if file vanished - else return
+            // TODO: clear cache if file vanished - else return
 
             // #NOTE:50 working around rust limitation with conditionally escaping borrows
             //          * https://github.com/rust-lang/rust/issues/16481

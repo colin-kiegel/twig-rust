@@ -16,7 +16,7 @@ impl Extension for Debug {
 }
 
 impl Debug {
-    pub fn _new() -> Box<Debug> {
+    pub fn new() -> Box<Debug> {
         Box::new(Debug)
     }
 }

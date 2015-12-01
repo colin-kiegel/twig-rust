@@ -119,7 +119,7 @@ impl<'a> Stream<'a> {
     pub fn new(template: &'a template::Raw) -> Stream<'a> {
         Stream {
             items: Vec::new(),
-            template: template, // #TODO:380 rename path??
+            template: template, // TODO: rename path??
         }
     }
 
@@ -200,7 +200,7 @@ impl fmt::Display for StreamDump {
     }
 }
 
-// #TODO:70 add another token_iter() to the main implementation [using .map(|i| i.into()) as MapIterator]
+// TODO: add another token_iter() to the main implementation [using .map(|i| i.into()) as MapIterator]
 impl<'a> IntoIterator for Stream<'a> {
     type Item = self::Item;
     type IntoIter = <Vec<self::Item> as IntoIterator>::IntoIter;

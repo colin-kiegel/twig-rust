@@ -18,7 +18,7 @@ impl TokenizeState for Final {
     }
 
     fn tokenize<'a>(_job: &'a mut Job) -> Result<(),LexerError> {
-        // #TODO:170 do some final checks like
+        // TODO: do some final checks like
         // - job.cursor.position() == job.cursor.end() <- implicit alternative?
         Ok(()) // means we are done.
         /*

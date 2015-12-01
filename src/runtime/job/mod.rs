@@ -11,7 +11,7 @@ use runtime::api::Execute;
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct Job {
-    writer: String, // #TODO:560 switch to a 'more generic' string writer
+    writer: String, // TODO: switch to a 'more generic' string writer
 }
 
 #[allow(dead_code)]

@@ -17,7 +17,7 @@ pub struct Raw {
 
 #[allow(unused_variables)]
 impl Raw {
-    #[allow(dead_code)] // #TODO:730 testcase
+    #[allow(dead_code)] // TODO: testcase
     pub fn new<C,N>(code: C, name: N) -> Raw where
         C: ToString,
         N: ToString,

@@ -58,7 +58,7 @@ impl TemplatePath {
     }
 
     fn normalize(template_path: &str) -> String {
-        // #TODO:740 these operations could be done by the path object?
+        // TODO: these operations could be done by the path object?
         let mut normalized_path = String::with_capacity(template_path.len());
         let mut accepting_slash = true;
 

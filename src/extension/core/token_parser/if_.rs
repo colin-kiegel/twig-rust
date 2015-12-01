@@ -7,7 +7,7 @@ use extension::api::TokenParser;
 use engine::Node;
 use engine::parser::{Job, ParserError, ParserErrorCode};
 use engine::parser::token::stream::Item;
-use extension::api::operator::Precedence;
+use extension::api::op::Precedence;
 use extension::api::token_parser::TestResult;
 use engine::parser::token::Token;
 use error::{Dump, ErrorCode};

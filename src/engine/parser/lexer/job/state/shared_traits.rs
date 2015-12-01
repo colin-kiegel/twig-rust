@@ -16,12 +16,12 @@ use error::Dump;
 pub trait LexExpression where
     Self: Sized + TokenizeState
 {
-    // #TODO:290 move this up or find another way to share (like trait)
+    // TODO: move this up or find another way to share (like trait)
     //     - because it is shared by block and variable state!
     fn lex_expression<'a>(job: &'a mut Job) -> Result<(), LexerError> {
         // whitespace
         let whitespace = job.cursor.tail().len() - job.cursor.tail().trim_left().len();
-        job.cursor.move_by(whitespace); // #TODO:270 move this into cursor (trim_left?)
+        job.cursor.move_by(whitespace); // TODO: move this into cursor (trim_left?)
 
         if job.cursor.is_eof() {
             let error_code = match Self::state() {
@@ -42,7 +42,7 @@ pub trait LexExpression where
 
         // operators
         if let Some(x) = job.patterns.operator.extract(job.cursor.tail()) {
-            // #TODO:330 overwrite extract() in operator pattern: preg_replace('/\s+/', ' ', x)
+            // TODO: overwrite extract() in operator pattern: preg_replace('/\s+/', ' ', x)
             job.push_token(Token::Operator(x.operator.to_string()));
             job.cursor.move_by(x.position.1);
             return Self::tokenize(job);
@@ -112,7 +112,7 @@ pub trait LexExpression where
         }
 
         // opening double quoted string
-        // #TODO:630 switch to more simple pattern?
+        // TODO: switch to more simple pattern?
         //      Alternatively get all data generically from the match
         if let Some(_) = job.patterns.string_dq_delim.extract(job.cursor.tail()) {
             let bracket = (BracketType::DoubleQuote, job.cursor.line());

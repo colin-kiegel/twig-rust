@@ -35,3 +35,6 @@ pub mod runtime;
 pub mod loader;
 pub mod template;
 pub mod extension;
+
+pub use engine::Engine;
+pub use engine::Setup;

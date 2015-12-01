@@ -121,7 +121,7 @@ impl PartialEq for Pattern {
 }
 
 
-// #TODO:650 test-cases?
+// TODO: test-cases?
 
 // #[cfg(test)]
 // mod test {

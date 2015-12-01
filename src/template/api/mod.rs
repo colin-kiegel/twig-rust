@@ -20,7 +20,7 @@ pub trait Template {
     ///
     /// context is an array of parameters to pass to the template
     /// blocks is an array of blocks to pass to the template
-    fn display(&self, runtime: &Runtime, blocks: Option<Vec<()>>); // #TODO:210 error handling
+    fn display(&self, runtime: &Runtime, blocks: Option<Vec<()>>); // TODO: error handling
 
     // /**
     //  * Get the bound engine for this template.

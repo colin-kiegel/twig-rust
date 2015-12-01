@@ -18,7 +18,7 @@ pub struct Cursor<'a> {
     pos: Position,   // 0,..
     end: Position,   // 0,..
     line: Line,    // 1,..
-    template: &'a template::Raw, // #TODO:640 switch to pointer or slice
+    template: &'a template::Raw, // TODO: switch to pointer or slice
 }
 
 impl<'a> Cursor<'a> {
@@ -40,7 +40,7 @@ impl<'a> Cursor<'a> {
     /// when the `increment` would move the cursor `position` out of range
     pub fn move_by(&mut self, increment: usize) {
         if increment == 0 {
-            println!("cursor.move_by 0"); // #TODO:30 DEBUG + REMOVE
+            println!("cursor.move_by 0"); // TODO: DEBUG + REMOVE
             return;
         };
 

@@ -14,7 +14,7 @@ pub type Iter<'a> = ::std::collections::hash_map::Values<'a, String, Box<Extensi
 
 #[derive(Debug, Default)]
 pub struct ExtensionRegistry {
-    ext: HashMap<String, Box<api::Extension>>, // #TODO:100 check for alternative Map-Types
+    ext: HashMap<String, Box<api::Extension>>, // TODO: check for alternative Map-Types
     initialized: bool,
     filters: HashMap<String, Box<api::Filter>>,
     functions: HashMap<String, Box<api::Function>>,
@@ -127,7 +127,7 @@ impl ExtensionRegistry {
                 }
             }
 
-            // #TODO:60 `vec.append()` is not yet stable ...
+            // TODO: `vec.append()` is not yet stable ...
             for v in ext.node_visitors() { self.node_visitors.push(v) }
             for v in ext.operators_unary() {
                 if let Some(prev) = self.operators_unary.insert(v.repr.clone(), v) {

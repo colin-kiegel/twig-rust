@@ -66,7 +66,7 @@ impl Options {
     }
 
     pub fn cache(&self) -> Option<&Path> {
-        // #TODO:770 why doesn't this work? -> self.cache.map(|ref buf| buf.as_ref())
+        // TODO: why doesn't this work? -> self.cache.map(|ref buf| buf.as_ref())
         match self.cache {
             Some(ref buf) => Some(buf.as_ref()),
             None => None

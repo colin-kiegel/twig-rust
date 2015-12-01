@@ -64,7 +64,7 @@ impl Namespace {
 
     pub fn find_template(&mut self, raw_path: &Path) -> Result<&Path, LoaderError> {
         if let Some(cached) = self.path_cache.get(raw_path) {
-            // #TODO:150 clear cache if file vanished - else return
+            // TODO: clear cache if file vanished - else return
 
             // #NOTE:40 working around rust limitation with conditionally escaping borrows
             //          * https://github.com/rust-lang/rust/issues/16481

@@ -10,7 +10,7 @@ use error::{Dump, ErrorCode};
 use engine::parser::token::{self, Token, Type};
 use engine::parser::{Parser, ParserError, ParserErrorCode};
 use engine::node;
-use extension::api::operator::Precedence;
+use extension::api::op::Precedence;
 use extension::api::token_parser::{Test, TestResult};
 use std::iter;
 use template;
@@ -49,7 +49,7 @@ pub struct State {
 }
 
 impl<'p, 'stream> Job<'p, 'stream> {
-    #[allow(dead_code)] // #TODO:700 testcase
+    #[allow(dead_code)] // TODO: testcase
     pub fn new(tokens: &'stream token::Stream, parser: &'p Parser) -> Job<'p, 'stream> {
         Job {
             tokens: tokens,
@@ -70,7 +70,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
     }
 
     #[allow(unused_mut)]
-    #[allow(dead_code)] // #TODO:710 testcase
+    #[allow(dead_code)] // TODO: testcase
     fn do_parse(mut self: Job<'p, 'stream>, test: Option<&Test>) -> Result<template::Compiled, ParserError> {
 
         // NOTE: try to move this to other point
@@ -226,7 +226,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
     }
 }
 
-// #TODO:500 switch to Debug-Builder once stable
+// TODO: switch to Debug-Builder once stable
 impl<'p, 'tpl> fmt::Debug for Job<'p, 'tpl> {
     fn fmt(&self, _f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         unimplemented!()

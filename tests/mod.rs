@@ -13,7 +13,7 @@
 /////////////
 
 extern crate twig;
-use twig::engine::{Engine, Setup};
+use twig::{Engine, Setup};
 use twig::loader;
 use twig::runtime::Runtime;
 use twig::template::api::Template;
@@ -25,7 +25,7 @@ use twig::template::api::Template;
 #[test]
 fn hello_world_static() {
     let mut loader = loader::array::Array::default();
-    let mut engine : Engine = Setup::default().engine().unwrap();
+    let mut engine = Engine::new(Setup::default()).unwrap();
     let runtime = Runtime::default();
 
     loader.set_template("test","Hello world!");
@@ -40,7 +40,7 @@ fn hello_world_static() {
 #[test]
 fn hello_world_variable() {
     let mut loader = loader::array::Array::default();
-    let mut engine : Engine = Setup::default().engine().unwrap();
+    let mut engine = Engine::new(Setup::default()).unwrap();
     let mut runtime = Runtime::default();
 
     loader.set_template("test","Hello {{name}}!");
@@ -57,7 +57,7 @@ fn hello_world_variable() {
 /// http://twig.sensiolabs.org/doc/tags/if.html
 fn _if_elseif_else() {
     let mut loader = loader::array::Array::default();
-    let mut engine : Engine = Setup::default().engine().unwrap();
+    let mut engine = Engine::new(Setup::default()).unwrap();
     let mut runtime = Runtime::default();
 
     loader.set_template("test","\

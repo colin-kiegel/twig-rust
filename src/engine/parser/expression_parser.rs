@@ -10,7 +10,7 @@ use engine::Node;
 use engine::parser::job::Job;
 use engine::parser::{ParserError, ParserErrorCode};
 use extension::api::BinaryOperator;
-use extension::api::operator::Precedence;
+use extension::api::op::Precedence;
 use engine::ExtensionRegistry;
 use engine::parser::token::{Token, Punctuation, BracketType};
 use std::rc::Rc;
@@ -90,7 +90,7 @@ impl ExpressionParser {
     }
 
     pub fn is_binary(&self, _token: &Token) -> bool {
-        // #TODO:280 refactor
+        // TODO: refactor
         // a) move this to token
         // b) or merge with binary_operator() below to `binary_operator -> Result<Option<>,>`, so `try!(self.binary_operator(token))` will yield an Option, which we can use in loop `while let Some(binary) = try!(self.binary_operator(token))`
         unimplemented!()

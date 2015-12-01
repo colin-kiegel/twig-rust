@@ -47,7 +47,7 @@ impl Parser {
         })
     }
 
-    #[allow(dead_code)] // #TODO:720 testcase
+    #[allow(dead_code)] // TODO: testcase
     pub fn parse<'a, 't> (&'a self, stream: &'t token::Stream<'t>) -> Result<template::Compiled, ParserError>
         where 't: 'a // the token stream must outlive the Parser
     {

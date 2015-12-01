@@ -27,7 +27,7 @@ impl api::Extension for Core {
     /// Initialize the engine.
     ///
     /// This is where you can load some file that contains filter functions for instance.
-    fn init(&self, _engine: &mut engine::Engine) {} // #TODO:90 add error handling ???
+    fn init(&self, _engine: &mut engine::Engine) {} // TODO: add error handling ???
 
     /// Get the token parser instances to register with the engine.
     fn token_parsers(&self) -> HashMap<String, Box<api::TokenParser>> {

@@ -32,7 +32,7 @@ pub struct Job<'c, 't> {
 }
 
 impl<'c, 't> Job<'c, 't> {
-    #[allow(dead_code)] // #TODO:660 testcase
+    #[allow(dead_code)] // TODO: testcase
     pub fn new(template: &'t template::Raw, patterns: &'c Patterns) -> Box<Job<'c, 't>> {
         let token_start_iter = patterns.token_start.extract_iter(&template.code);
         let cursor = Cursor::new(&template);
@@ -50,13 +50,13 @@ impl<'c, 't> Job<'c, 't> {
         })
     }
 
-    #[allow(dead_code)] // #TODO:670 testcase
+    #[allow(dead_code)] // TODO: testcase
     pub fn tokenize(mut self: Job<'c, 't>) -> Result<token::Stream<'t>, LexerError> {
         // The TokenizeStates call each other *recursively* to avoid dynamic dispatch
         // for better performance. However, we loose debugging information about the
         // nesting of lexer states.
         try!(state::Initial::tokenize(&mut self));
-        // #TODO:130 check whether we returned from *final* state
+        // TODO: check whether we returned from *final* state
 
         Ok(self.tokens)
     }
@@ -73,7 +73,7 @@ impl<'c, 't> Job<'c, 't> {
     // - #TODO:180 does it make sense to put `push_token` in a trait,
     //   only visible to the states, i.e. hiding it from clients?
     pub fn push_token(&mut self, token: token::Token) {
-        // #TODO:420 sometime in the future: cow<_>
+        // TODO: sometime in the future: cow<_>
         // * check if the template can be disassembled into string-objects without
         //   copying - i.e. without calling to_string(&str)
 
@@ -85,7 +85,7 @@ impl<'c, 't> Job<'c, 't> {
     }
 }
 
-// #TODO:490 switch to Debug-Builder once stable
+// TODO: switch to Debug-Builder once stable
 impl<'c, 't> fmt::Debug for Job<'c, 't> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         write!(f, "[\n\

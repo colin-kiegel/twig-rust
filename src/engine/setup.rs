@@ -39,25 +39,57 @@ impl Default for Setup {
 /// * core
 /// * escaper
 /// * optimizer
-// /
-// / # Examples
-// /
-// / ```
-// / use engine::Setup;
-// /
-// / let engine_default = Setup::default().engine();
-// / ```
-// /
-// / ```
-// / use engine::Setup;
-// /
-// / let engine_custom = Setup::default()
-// /     .set_strict_variables(true)
-// /     .add_extension(extension::Profiler::new())
-// /     .engine();
-// / ```
+///
+/// # Examples
+///
+/// ```
+/// use twig::{Setup, Engine};
+/// use twig::extension::Debug;
+///
+/// let mut setup = Setup::default()
+///     .set_strict_variables(true)
+///     .add_extension(Debug::new()).unwrap();
+/// let engine = Engine::new(setup).unwrap();
+/// ```
 #[allow(dead_code)]
 impl Setup {
+    /// Create engine from setup.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use twig::Setup;
+    ///
+    /// let twig = Setup::default().engine().unwrap();
+    /// ```
+    pub fn engine(mut self) -> Result<Engine, TwigError> {
+        let mut c = Engine::default();
+        let o = self.opt;
+
+        // add default extensions
+        try_chain!(self.ext.push(extension::Escaper::new(o.autoescape)));
+        try_chain!(self.ext.push(extension::Optimizer::new(o.optimizations)));
+
+        // init extensions
+        try_chain!(self.ext.init(&mut c));
+        c.ext = Some(Rc::new(self.ext));
+
+        // TODO: register staging extension (!)
+        // // init staging extension
+        // let staging = ext::Staging::new();
+        // try!(c.init_extension(&*staging));
+        // c.ext_staging = Some(staging);
+
+        return Ok(c);
+    }
+
+    /// Registers an extension
+    pub fn add_extension(mut self, extension: Box<Extension>) -> Result<Self, TwigError> {
+        try_chain!(self.ext.push(extension));
+
+        Ok(self)
+    }
+    
     /// When set to true, it automatically set "auto_reload" to true as well
     ///     (default to false)
     pub fn set_debug(mut self, debug: bool) -> Self {
@@ -121,37 +153,9 @@ impl Setup {
         &self.opt
     }
 
-    /// Registers an extension
-    pub fn add_extension(mut self, extension: Box<Extension>) -> Result<Self, TwigError> {
-        try_chain!(self.ext.push(extension));
-
-        Ok(self)
-    }
-
     /// Get all registered extensions
     pub fn extensions(&self) -> extension_registry::Iter {
         self.ext.iter()
-    }
-
-    pub fn engine(mut self) -> Result<Engine, TwigError> {
-        let mut c = Engine::default();
-        let o = self.opt;
-
-        // add default extensions
-        try_chain!(self.ext.push(extension::Escaper::new(o.autoescape)));
-        try_chain!(self.ext.push(extension::Optimizer::new(o.optimizations)));
-
-        // init extensions
-        try_chain!(self.ext.init(&mut c));
-        c.ext = Some(Rc::new(self.ext));
-
-        // #TODO:360 register staging extension (!)
-        // // init staging extension
-        // let staging = ext::Staging::new();
-        // try!(c.init_extension(&*staging));
-        // c.ext_staging = Some(staging);
-
-        return Ok(c);
     }
 }
 

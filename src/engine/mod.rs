@@ -28,7 +28,7 @@ pub use self::extension_registry::ExtensionRegistry;
 pub use runtime::{self, Runtime};
 
 
-#[derive(Default, Debug)] // #TODO:0 - provide a different constructor
+#[derive(Default, Debug)] // TODO: - provide a different constructor
 pub struct Engine {
     options: Options,
     ext: Option<Rc<ExtensionRegistry>>,
@@ -46,6 +46,19 @@ pub struct Engine {
 
 
 impl Engine {
+    /// Create a new Twig `Engine`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use twig::{Engine, Setup};
+    ///
+    /// let twig = Engine::new(Setup::default()).unwrap();
+    /// ```
+    pub fn new(setup: setup::Setup) -> Result<Self, TwigError> {
+        setup.engine()
+    }
+
     /// Renders a template.
     ///
     /// # Failures
@@ -113,7 +126,7 @@ impl Engine {
 
     /// Sets the engine extensions.
     pub fn set_extensions(&mut self, ext: ExtensionRegistry) -> &mut Engine {
-        self.ext = Some(Rc::new(ext)); // #TODO:570 switch to callback pattern to provide arguments
+        self.ext = Some(Rc::new(ext)); // TODO: switch to callback pattern to provide arguments
 
         self
     }
@@ -130,7 +143,7 @@ impl Engine {
 
     /// Sets the loader instance.
     pub fn set_loader(&mut self, loader: Box<Loader>) -> &mut Engine {
-        self.loader = Some(loader); // #TODO:580 switch to callback pattern to provide arguments
+        self.loader = Some(loader); // TODO: switch to callback pattern to provide arguments
 
         self
     }
@@ -147,7 +160,7 @@ impl Engine {
 
     /// Sets the lexer instance.
     pub fn set_lexer(&mut self, lexer: Lexer) -> &mut Engine {
-        self.lexer = Some(lexer); // #TODO:590 switch to callback pattern to provide arguments
+        self.lexer = Some(lexer); // TODO: switch to callback pattern to provide arguments
 
         self
     }
@@ -165,7 +178,7 @@ impl Engine {
 
     /// Sets the parser instance.
     pub fn set_parser(&mut self, parser: Parser) -> &mut Engine {
-        self.parser = Some(parser); // #TODO:600 switch to callback pattern to provide arguments
+        self.parser = Some(parser); // TODO: switch to callback pattern to provide arguments
 
         self
     }
@@ -188,7 +201,7 @@ impl Engine {
 
     // /// Sets the runtime instance.
     // pub fn set_runtime(&mut self, runtime: Runtime) -> &mut Engine {
-    //     self.runtime = Some(runtime); // #TODO:610 switch to callback pattern to provide arguments
+    //     self.runtime = Some(runtime); // TODO: switch to callback pattern to provide arguments
     //
     //     self
     // }

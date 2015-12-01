@@ -48,7 +48,7 @@ impl TokenizeState for Data {
                 return Self::tokenize(job);
             },
             token_start::Tag::Block => {
-                // #TODO:300 nested matches don't look nice - alternative??
+                // TODO: nested matches don't look nice - alternative??
                 // raw data?
                 match job.patterns.verbatim_start.extract(job.cursor.tail()) {
                     Some(verbatim_start) => {

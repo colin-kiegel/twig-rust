@@ -29,7 +29,7 @@ pub struct Lexer {
 
 impl Lexer {
     pub fn new(twig: &Engine, opt: Options) -> Result<Lexer, LexerError> {
-        let ref opt = Rc::new(opt); // #TODO:20 -> switch to &Options (!?)
+        let ref opt = Rc::new(opt); // TODO: -> switch to &Options (!?)
         let ext = match twig.extensions() {
             Err(e) => return Err(LexerErrorCode::MissingExtensions
                 .at(loc!())
@@ -49,7 +49,7 @@ impl Lexer {
         })
     }
 
-    #[allow(dead_code)] // #TODO:680 testcase
+    #[allow(dead_code)] // TODO: testcase
     pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream<'t>, LexerError>
         where 't: 'a // the template must outlive the Lexer
     {
