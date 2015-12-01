@@ -5,9 +5,10 @@
 
 //! Parser
 
-use engine::{Engine, ExtensionRegistry, extension};
+use engine::{Engine, ExtensionRegistry};
+use extension;
 use lexer::token;
-use engine::extension::api::TokenParser;
+use extension::api::TokenParser;
 use std::rc::Rc;
 use template;
 use std::collections::HashMap;

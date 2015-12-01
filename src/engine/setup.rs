@@ -7,7 +7,9 @@
 
 use std::path::Path;
 use std::rc::Rc;
-use engine::{Engine, options, Options, extension, Extension, extension_registry, ExtensionRegistry};
+use extension;
+use extension::api::Extension;
+use engine::{Engine, options, Options, extension_registry, ExtensionRegistry};
 use engine::error::{TwigError};
 
 #[allow(dead_code)]

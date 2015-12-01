@@ -3,16 +3,16 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-use engine::extension::api::TokenParser;
+use extension::api::TokenParser;
 use parser::{self, Job, ParserError};
 use lexer::token::stream::Item;
 
 #[derive(Debug, Default)]
-pub struct Set;
+pub struct Flush;
 
-impl TokenParser for Set {
+impl TokenParser for Flush  {
     fn tag(&self) -> &'static str {
-        "set"
+        "flush"
     }
 
     fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<parser::Node>, ParserError> {

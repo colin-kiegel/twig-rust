@@ -3,16 +3,16 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-use engine::extension::api::TokenParser;
+use extension::api::TokenParser;
 use parser::{self, Job, ParserError};
 use lexer::token::stream::Item;
 
 #[derive(Debug, Default)]
-pub struct For;
+pub struct Embed;
 
-impl TokenParser for For {
+impl TokenParser for Embed  {
     fn tag(&self) -> &'static str {
-        "for"
+        "embed"
     }
 
     fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<parser::Node>, ParserError> {

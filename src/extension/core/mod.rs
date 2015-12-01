@@ -6,8 +6,7 @@
 //! Core Extension
 
 use engine;
-use engine::extension::api;
-use super::api::Extension;
+use extension::api;
 use std::collections::HashMap;
 
 pub mod token_parser;
@@ -26,6 +25,7 @@ impl api::Extension for Core {
     fn name(&self) -> &'static str { "core" }
 
     /// Initialize the engine.
+    ///
     /// This is where you can load some file that contains filter functions for instance.
     fn init(&self, _engine: &mut engine::Engine) {} // #TODO:90 add error handling ???
 

@@ -16,12 +16,10 @@ use error::ErrorCode;
 pub mod error;
 pub mod options;
 pub mod setup;
-pub mod extension;
 pub mod extension_registry;
 pub use self::error::{TwigError, TwigErrorCode, ExtensionRegistryError, ExtensionRegistryErrorCode};
 pub use self::options::Options;
 pub use self::setup::Setup;
-pub use self::extension::api::Extension;
 pub use self::extension_registry::ExtensionRegistry;
 pub use lexer::{self, Lexer};
 pub use parser::{self, Parser};
@@ -52,7 +50,7 @@ impl Engine {
     /// * When the template cannot be found
     /// * When an error occurred during compilation
     /// * When an error occurred during rendering
-    pub fn render(&mut self, _path: &str, _context: Vec<()>) -> Result<String, TwigError> {
+    pub fn render(&mut self, _path: &str, _data: ()) -> Result<String, TwigError> {
         unimplemented!()
         //return Ok(try!(self.load_template(path, None)).render(context));
     }
@@ -63,7 +61,7 @@ impl Engine {
     /// * When the template cannot be found
     /// * When an error occurred during compilation
     /// * When an error occurred during rendering
-    pub fn display(&mut self, _path: &str, _context: Vec<()>) -> Result<(), TwigError> {
+    pub fn display(&mut self, _path: &str, _data: ()) -> Result<(), TwigError> {
        unimplemented!()
        // return Ok(try!(self.load_template(path, None)).display(context, None));
     }

@@ -6,8 +6,8 @@
 //! Twig configuration options.
 
 use std::path::{Path, PathBuf};
-use engine::extension::escaper;
-use engine::extension::optimizer;
+use extension::escaper;
+use extension::optimizer;
 
 pub type Autoescape = escaper::Mode;
 pub type Optimizations = optimizer::Mode;

@@ -5,7 +5,7 @@
 
 //! Extension loader.
 
-use engine::extension::api::{self, Extension};
+use extension::api::{self, Extension};
 use std::collections::HashMap;
 use engine::Engine;
 use engine::error::{ExtensionRegistryError, ExtensionRegistryErrorCode};

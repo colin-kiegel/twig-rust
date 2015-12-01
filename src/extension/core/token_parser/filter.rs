@@ -3,16 +3,17 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-use engine::extension::api::TokenParser;
+use extension::api::TokenParser;
+
 use parser::{self, Job, ParserError};
 use lexer::token::stream::Item;
 
 #[derive(Debug, Default)]
-pub struct Spaceless;
+pub struct Filter;
 
-impl TokenParser for Spaceless {
+impl TokenParser for Filter  {
     fn tag(&self) -> &'static str {
-        "spaceless"
+        "filter"
     }
 
     fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<parser::Node>, ParserError> {

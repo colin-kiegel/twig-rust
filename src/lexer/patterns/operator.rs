@@ -9,7 +9,7 @@
 
 use regex;
 use regex::Error as regexError;
-use engine::extension::api::{UnaryOperator, BinaryOperator};
+use extension::api::{UnaryOperator, BinaryOperator};
 use engine::ExtensionRegistry;
 use std::collections::HashMap;
 use std::rc::Rc;

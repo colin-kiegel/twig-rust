@@ -13,7 +13,7 @@ use loader::LoaderErrorCode;
 use lexer::LexerErrorCode;
 use parser::ParserErrorCode;
 use runtime::RuntimeErrorCode;
-use engine::extension;
+use extension;
 
 pub type TwigError = Error<TwigErrorCode>;
 pub type ExtensionRegistryError = Error<ExtensionRegistryErrorCode>;

@@ -3,11 +3,11 @@
 // For the copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-use engine::extension::api::TokenParser;
+use extension::api::TokenParser;
 use parser::{Node, Job, ParserError, ParserErrorCode};
 use lexer::token::stream::Item;
-use engine::extension::api::operator::Precedence;
-use engine::extension::api::token_parser::TestResult;
+use extension::api::operator::Precedence;
+use extension::api::token_parser::TestResult;
 use lexer::Token;
 use error::{Dump, ErrorCode};
 
