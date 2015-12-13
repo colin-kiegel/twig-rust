@@ -6,32 +6,29 @@
 //! Typisation of runtime errors.
 
 use std::fmt::{self, Display};
-use error::Error;
-use error::ErrorCode;
-
-pub type RuntimeError = Error<RuntimeErrorCode>;
+use std::error::Error;
 
 #[derive(Debug)]
-pub enum RuntimeErrorCode {
+pub enum RuntimeError {
     Unreachable {
         reason: String
     }
 }
 
-impl ErrorCode for RuntimeErrorCode {
+impl Error for RuntimeError {
     fn description(&self) -> &str {
         match *self {
-            RuntimeErrorCode::Unreachable{..} => "Unexptected runtime error (please report as bug with details).",
+            RuntimeError::Unreachable{..} => "Unexptected runtime error (please report as bug with details).",
         }
     }
 }
 
-impl Display for RuntimeErrorCode {
+impl Display for RuntimeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(f, "{}", self.description()));
 
         match *self {
-            RuntimeErrorCode::Unreachable {
+            RuntimeError::Unreachable {
                 ref reason
             } => {
                 write!(f, " {}.", reason)

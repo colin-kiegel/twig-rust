@@ -7,6 +7,7 @@
 
 use engine::parser::lexer::LexerError;
 use engine::parser::lexer::job::Job;
+use api::error::Traced;
 
 pub mod shared_traits;
 pub mod initial;
@@ -26,7 +27,7 @@ pub use self::final_::Final;
 
 pub trait TokenizeState {
     /// tokenize recursively
-    fn tokenize<'a>(_job: &'a mut Job) -> Result<(), LexerError> where
+    fn tokenize<'a>(_job: &'a mut Job) -> Result<(), Traced<LexerError>> where
         Self: Sized;
 
     fn state() -> Code where

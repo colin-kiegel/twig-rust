@@ -28,8 +28,7 @@
 
 extern crate regex;
 
-#[macro_use]
-pub mod error;
+#[macro_use] pub mod api;
 pub mod engine;
 pub mod runtime;
 pub mod loader;

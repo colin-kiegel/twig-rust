@@ -15,7 +15,7 @@ pub mod job;
 pub mod error;
 pub use self::api::Execute;
 pub use self::job::Job;
-pub use self::error::{RuntimeError, RuntimeErrorCode};
+pub use self::error::RuntimeError;
 
 #[allow(dead_code)]
 #[derive(Debug, Default)]

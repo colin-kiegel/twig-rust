@@ -10,6 +10,7 @@ use std::collections::HashMap;
 use engine::{self, Node};
 use engine::parser::{Job, ParserError};
 use engine::parser::token::stream::Item;
+use api::error::Traced;
 
 /// Extends the Twig Engine with new behaviour.
 pub trait Extension : fmt::Debug {
@@ -84,7 +85,7 @@ pub trait Test : fmt::Debug {}
 pub trait TokenParser : fmt::Debug {
     fn tag(&self) -> &'static str;
 
-    fn parse(&self, job: &mut Job, item: &Item) -> Result<Box<Node>, ParserError>;
+    fn parse(&self, job: &mut Job, item: &Item) -> Result<Box<Node>, Traced<ParserError>>;
 }
 
 pub mod token_parser {

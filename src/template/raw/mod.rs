@@ -7,6 +7,7 @@
 
 use engine::parser::{Lexer, token, LexerError};
 use std::fmt;
+use api::error::Traced;
 
 #[derive(Default)]
 #[derive(Debug)]
@@ -43,7 +44,7 @@ impl Raw {
     }
 
     #[allow(dead_code)]
-    pub fn tokenize<'a, 't> (&'t self, lexer: &'a Lexer) -> Result<token::Stream<'t>, LexerError>
+    pub fn tokenize<'a, 't> (&'t self, lexer: &'a Lexer) -> Result<token::Stream<'t>, Traced<LexerError>>
         where 't: 'a // the template must outlive the Lexer
     {
         lexer.tokenize(self)

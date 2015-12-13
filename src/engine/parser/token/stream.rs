@@ -10,9 +10,9 @@ use std::convert::Into;
 use std::ops::Deref;
 use engine::parser::token::{self, Token, Type};
 use template;
-use engine::parser::token::{TokenError, TokenErrorCode};
+use engine::parser::token::TokenError;
 use engine::parser::lexer::job::Cursor;
-use error::Dump;
+use api::error::{Traced, Dump};
 
 #[derive(Debug, Default, Clone)]
 pub struct Position {
@@ -43,13 +43,13 @@ impl Item {
         &self.position
     }
 
-    pub fn expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&Item, TokenError>
+    pub fn expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&Item, Traced<TokenError>>
         where T: token::Pattern + 'static
     {
         if pattern.matches(self.token()) {
             Ok(&self)
         } else {
-            err!(TokenErrorCode::UnexpectedTokenAtItem {
+            traced_err!(TokenError::UnexpectedTokenAtItem {
                 reason: reason,
                 expected: <token::Pattern as Dump>::dump(&pattern),
                 found: self.dump(),

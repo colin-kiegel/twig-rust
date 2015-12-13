@@ -11,6 +11,7 @@ use super::Options;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
+use api::error::Traced;
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
@@ -26,7 +27,7 @@ pub struct ItemData {
 }
 
 impl Pattern {
-    pub fn new(opt: &Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"(?:{ws}{c1}\s*|{c1})\n?",
                 ws = opt.whitespace_trim.quoted(),

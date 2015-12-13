@@ -7,10 +7,10 @@
 
 use std::fmt::Debug;
 use std::collections::HashMap;
-use engine::parser::error::{NodeError, NodeErrorCode};
+use engine::parser::error::NodeError;
 use runtime::api::Execute;
 use engine::parser::token::stream::Position;
-
+use api::error::Traced;
 
 pub mod module;
 pub mod body;
@@ -30,7 +30,7 @@ pub trait Node : Debug + Execute {
     fn children(&self) -> &Vec<Box<Node>>;
     fn children_mut(&mut self) -> &mut Vec<Box<Node>>;
     fn has_attribute(&self, key: &str) -> bool;
-    fn attribute(&self, key: &str) -> Result<&str, NodeError>;
+    fn attribute(&self, key: &str) -> Result<&str, Traced<NodeError>>;
     fn set_attribute(&mut self, key: &str, value: &str) -> Option<String>;
     fn rm_attribute(&mut self, key: &str) -> Option<String>;
 }
@@ -64,10 +64,10 @@ impl<T> Node for GenericNode<T> where
         self.attributes.contains_key(key)
     }
 
-    fn attribute(&self, key: &str) -> Result<&str, NodeError> {
+    fn attribute(&self, key: &str) -> Result<&str, Traced<NodeError>> {
         match self.attributes.get(key) {
             None => {
-                err!(NodeErrorCode::AttributeNotFound {
+                traced_err!(NodeError::AttributeNotFound {
                     key: key.to_string(),
                     node_tag: self.tag.to_string()
                 })

@@ -8,10 +8,11 @@
 /// Written as regular expressions (perl-style).
 
 use regex;
-use error::ErrorCode;
+use std::error::Error;
+use api::error::{Traced, ErrorExt};
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
-pub use engine::parser::lexer::{LexerError, LexerErrorCode};
+pub use engine::parser::lexer::LexerError;
 
 #[derive(Debug, PartialEq)]
 pub struct Pattern {
@@ -35,7 +36,7 @@ impl Number {
 }
 
 impl Pattern {
-    pub fn new() -> Result<Pattern, regex::Error> {
+    pub fn new() -> Result<Pattern, Traced<regex::Error>> {
         Ok(Pattern {
             regex: try_new_regex!(r"\A[0-9]+(\.[0-9]+)?"),
         })
@@ -43,13 +44,13 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = Result<ItemData, LexerError>;
+    type Item = Result<ItemData, Traced<LexerError>>;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
-    fn item_from_captures(&self, captures: &regex::Captures) -> Result<ItemData, LexerError> {
+    fn item_from_captures(&self, captures: &regex::Captures) -> Result<ItemData, Traced<LexerError>> {
         let number_string = captures.at(0).unwrap_or_else(|| unreachable!());
 
         let number = match captures.pos(1) { // float or int?
@@ -57,17 +58,15 @@ impl<'t> super::Extract<'t> for Pattern {
                 Ok(float)
                     => Number::Floating(float),
                 Err(e)
-                    => return Err(LexerErrorCode::InvalidValue { value: number_string.to_string() }
-                        .at(loc!())
-                        .caused_by(e))
+                    => return Err(LexerError::InvalidFloat { value: number_string.to_string(), parse_error: e }
+                        .at(loc!()))
             },
             None => match number_string.parse::<u64>() {
                 Ok(int)
                     => Number::Integer(int),
                 Err(e)
-                    => return Err(LexerErrorCode::InvalidValue {value: number_string.to_string() }
-                        .at(loc!())
-                        .caused_by(e))
+                    => return Err(LexerError::InvalidInteger {value: number_string.to_string(), parse_error: e }
+                        .at(loc!()))
             },
         };
 

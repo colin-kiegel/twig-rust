@@ -11,11 +11,12 @@ use std::rc::Rc;
 use engine::parser::token::Token;
 use engine::parser::token::Punctuation;
 use engine::parser::lexer::LexerError;
+use api::error::Traced;
 
 //static TWIG_TEMPLATE_Token::Name : &'static str = "twig.template.html";
 static TWIG_TEMPLATE_CODE : &'static str = include_str!("twig.template.html");
 
-pub fn tokenize_err<'a>(code: &'a str) -> LexerError {
+pub fn tokenize_err<'a>(code: &'a str) -> Traced<LexerError> {
     let tpl = Rc::new(Raw::new(code, "test-example"));
     let lxr = Lexer::default();
 

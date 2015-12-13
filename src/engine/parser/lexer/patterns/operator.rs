@@ -13,6 +13,7 @@ use extension::api::{UnaryOperator, BinaryOperator};
 use engine::ExtensionRegistry;
 use std::collections::HashMap;
 use std::rc::Rc;
+use api::error::Traced;
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
@@ -33,9 +34,9 @@ struct Builder {
 }
 
 impl Builder {
-    fn new() -> Result<Builder, regexError> {
+    fn new() -> Result<Builder, Traced<regexError>> {
         Ok(Builder {
-            whitespace: try!(regex::Regex::new(r"\s+"))
+            whitespace: try_untraced!(regex::Regex::new(r"\s+"))
         })
     }
 
@@ -79,15 +80,15 @@ impl Builder {
 
 #[allow(dead_code, unused_variables)]
 impl Pattern {
-    pub fn new(ext: &Rc<ExtensionRegistry>) -> Result<Pattern, regexError> {
+    pub fn new(ext: &Rc<ExtensionRegistry>) -> Result<Pattern, Traced<regexError>> {
         let unary = ext.operators_unary();
         let binary = ext.operators_binary();
 
         Ok(Pattern {
             regex: {
-                let regex = try!(Builder::new()).operators_to_regex(unary, binary);
+                let regex = try_traced!(Builder::new()).operators_to_regex(unary, binary);
 
-                try!(regex::Regex::new(&regex))
+                try_untraced!(regex::Regex::new(&regex))
             }
         })
     }

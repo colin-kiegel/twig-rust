@@ -9,6 +9,7 @@
 
 use regex;
 use regex::Error as regexError;
+use api::error::Traced;
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
@@ -23,7 +24,7 @@ pub struct ItemData {
 }
 
 impl Pattern {
-    pub fn new() -> Result<Pattern, regexError> {
+    pub fn new() -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(r##"\A""##),
         })

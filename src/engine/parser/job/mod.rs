@@ -6,9 +6,9 @@
 //! A parser job.
 
 use std::fmt;
-use error::{Dump, ErrorCode};
+use api::error::{Traced, Dump, ErrorExt};
 use engine::parser::token::{self, Token, Type};
-use engine::parser::{Parser, ParserError, ParserErrorCode};
+use engine::parser::{Parser, ParserError};
 use engine::node;
 use extension::api::op::Precedence;
 use extension::api::token_parser::{Test, TestResult};
@@ -61,17 +61,17 @@ impl<'p, 'stream> Job<'p, 'stream> {
         }
     }
 
-    pub fn parse(self: Job<'p, 'stream>) -> Result<template::Compiled, ParserError> {
+    pub fn parse(self: Job<'p, 'stream>) -> Result<template::Compiled, Traced<ParserError>> {
         self.do_parse(None)
     }
 
-    pub fn parse_until(self: Job<'p, 'stream>, test: &Test) -> Result<template::Compiled, ParserError> {
+    pub fn parse_until(self: Job<'p, 'stream>, test: &Test) -> Result<template::Compiled, Traced<ParserError>> {
         self.do_parse(Some(test))
     }
 
     #[allow(unused_mut)]
     #[allow(dead_code)] // TODO: testcase
-    fn do_parse(mut self: Job<'p, 'stream>, test: Option<&Test>) -> Result<template::Compiled, ParserError> {
+    fn do_parse(mut self: Job<'p, 'stream>, test: Option<&Test>) -> Result<template::Compiled, Traced<ParserError>> {
 
         // NOTE: try to move this to other point
         //  - to avoid very first redundant push?
@@ -110,15 +110,15 @@ impl<'p, 'stream> Job<'p, 'stream> {
         return Ok(compiled);
     }
 
-    pub fn sub_parse(&mut self) -> Result<Vec<Box<Node>>, ParserError> {
+    pub fn sub_parse(&mut self) -> Result<Vec<Box<Node>>, Traced<ParserError>> {
         self.do_sub_parse(None)
     }
 
-    pub fn sub_parse_until(&mut self, test: &Test) -> Result<Vec<Box<Node>>, ParserError> {
+    pub fn sub_parse_until(&mut self, test: &Test) -> Result<Vec<Box<Node>>, Traced<ParserError>> {
         self.do_sub_parse(Some(test))
     }
 
-    fn do_sub_parse(&mut self, test: Option<&Test>) -> Result<Vec<Box<Node>>, ParserError> {
+    fn do_sub_parse(&mut self, test: Option<&Test>) -> Result<Vec<Box<Node>>, Traced<ParserError>> {
         // let line = self.current_token().line();
         let mut nodes : Vec<Box<Node>> = Vec::new();
 
@@ -128,14 +128,14 @@ impl<'p, 'stream> Job<'p, 'stream> {
                     nodes.push(node::Text::boxed(value.to_string(), item.position()));
                 },
                 Token::ExpressionStart => {
-                    let node = try!(self.parse_expression(Precedence(0)));
-                    try!(self.cursor.next_expect(Token::ExpressionEnd, None));
+                    let node = try_traced!(self.parse_expression(Precedence(0)));
+                    try_traced!(self.cursor.next_expect(Token::ExpressionEnd, None));
 
                     nodes.push(node::Print::boxed(node, item.position()));
                 },
                 Token::BlockStart => {
                     let item = {
-                        let item = try!(self.cursor.peek_expect(Type::Name,
+                        let item = try_traced!(self.cursor.peek_expect(Type::Name,
                             Some("A block must start with a tag name")));
 
                         if let Some(ref test) = test { // TODO: rename `test` to something more meaningful
@@ -163,8 +163,8 @@ impl<'p, 'stream> Job<'p, 'stream> {
                         let tag = if let Token::Name(ref tag) = *item.token() { tag }
                             else { unreachable!() };
 
-                        try!(self.parser.tag_handler(tag)
-                            .ok_or_else(||{ ParserErrorCode::NoTagHandler {
+                        try_traced!(self.parser.tag_handler(tag)
+                            .ok_or_else(||{ ParserError::NoTagHandler {
                                 tag: tag.to_string(),
                                 position: item.position().clone(),
                                 job: self.dump()
@@ -172,10 +172,10 @@ impl<'p, 'stream> Job<'p, 'stream> {
                         }))
                     };
 
-                    let node = try!(subparser.parse(self, item));
+                    let node = try_traced!(subparser.parse(self, item));
                     nodes.push(node);
                 },
-                _ => return err!(ParserErrorCode::InvalidState {
+                _ => return traced_err!(ParserError::InvalidState {
                     item: item.dump(),
                     job: self.dump()
                 })
@@ -183,7 +183,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
         }
 
         if nodes.is_empty() {
-            return err!(ParserErrorCode::Unreachable {
+            return traced_err!(ParserError::Unreachable {
                 reason: "Parser could not extract node from token stream.".to_string(),
                 job: self.dump(),
             })
@@ -203,7 +203,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
         //     Some(node) => {
         //         Ok(node)
         //     },
-        //     None => err!(ParserErrorCode::Logic)
+        //     None => traced_err!(ParserError::Logic)
         //         .explain(format!("Parser could not extract node from token stream."))
         //         .into(),
         // }
@@ -216,7 +216,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
     pub fn parse_expression (
         &mut self,
         precedence: Precedence
-    ) -> Result<Box<Node>, ParserError>
+    ) -> Result<Box<Node>, Traced<ParserError>>
     {
         self.parser.expression_parser.parse(self, precedence)
     }

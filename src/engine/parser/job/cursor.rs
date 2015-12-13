@@ -7,9 +7,9 @@
 
 use engine::parser::token::stream::{self, Stream, Item};
 use engine::parser::token::{self, Token};
-use engine::parser::{ParserError, ParserErrorCode};
+use engine::parser::ParserError;
 use std::fmt;
-use error::Dump;
+use api::error::{Traced, Dump};
 
 pub type Position = usize;
 
@@ -60,7 +60,7 @@ impl<'stream> Cursor<'stream> {
         self.next().map(|item| item.position())
     }
 
-    pub fn next_expect<T>(&mut self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, ParserError>
+    pub fn next_expect<T>(&mut self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, Traced<ParserError>>
         where T: token::Pattern + 'static
     {
         let next = self.peek();
@@ -82,17 +82,17 @@ impl<'stream> Cursor<'stream> {
         self.peek().map(|item| item.position())
     }
 
-    pub fn peek_expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, ParserError>         where T: token::Pattern + 'static
+    pub fn peek_expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, Traced<ParserError>>         where T: token::Pattern + 'static
     {
         self.expect(pattern, self.peek(), reason)
     }
 
-    fn expect<T>(&self, pattern: T, value: Option<&'stream Item>, reason: Option<&'static str>) -> Result<&'stream Item, ParserError>
+    fn expect<T>(&self, pattern: T, value: Option<&'stream Item>, reason: Option<&'static str>) -> Result<&'stream Item, Traced<ParserError>>
         where T: token::Pattern + 'static
     {
         match value {
-            Some(item) => Ok(try_chain!(item.expect(pattern, reason))),
-            None => err!(ParserErrorCode::UnexpectedEof {
+            Some(item) => Ok(try_traced!(item.expect(pattern, reason))),
+            None => traced_err!(ParserError::UnexpectedEof {
                         expected: Some(<token::Pattern as Dump>::dump(&pattern)),
                         cursor: self.dump(),
                         reason: reason

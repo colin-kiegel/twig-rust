@@ -11,6 +11,7 @@ use super::Options;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
+use api::error::Traced;
 
 pub type ExtractIter<'pattern, 'tpl> = super::ExtractIter<'pattern, 'tpl, Pattern>;
 
@@ -35,7 +36,7 @@ pub enum Tag {
 }
 
 impl Pattern {
-    pub fn new(opt: &Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"({v0}|{b0}|{c0})({ws})?",
                 ws = opt.whitespace_trim.quoted(),

@@ -8,13 +8,13 @@
 use engine::node;
 use engine::Node;
 use engine::parser::job::Job;
-use engine::parser::{ParserError, ParserErrorCode};
+use engine::parser::ParserError;
 use extension::api::BinaryOperator;
 use extension::api::op::Precedence;
 use engine::ExtensionRegistry;
 use engine::parser::token::{Token, Punctuation, BracketType};
 use std::rc::Rc;
-use error::{Dump, ErrorCode};
+use api::error::{Traced, Dump, ErrorExt};
 
 #[derive(Debug)]
 pub struct Expression; // dummy
@@ -33,11 +33,11 @@ impl ExpressionParser {
     }
 
     // orig. parse_expression
-    pub fn parse(&self, job: &mut Job, precedence: Precedence) -> Result<Box<Node>, ParserError> {
-        let expr = try!(self.primary(job));
+    pub fn parse(&self, job: &mut Job, precedence: Precedence) -> Result<Box<Node>, Traced<ParserError>> {
+        let expr = try_traced!(self.primary(job));
 
-        let _token = try!(job.mut_cursor().peek_token().ok_or_else(|| {
-            ParserErrorCode::UnexpectedEof {
+        let _token = try_traced!(job.mut_cursor().peek_token().ok_or_else(|| {
+            ParserError::UnexpectedEof {
                 expected: None,
                 reason: Some("Found unclosed expression"),
                 cursor: job.mut_cursor().dump()
@@ -45,7 +45,7 @@ impl ExpressionParser {
         }));
 
         // while self.is_binary(token) {
-        //     let operator = try!(self.binary_operator(token));
+        //     let operator = try_traced!(self.binary_operator(token));
         //
         //     if operator.prec >= precedence {
         //         unimplemented!();//self.parser.stream().next();
@@ -71,9 +71,9 @@ impl ExpressionParser {
             _ => expr});
     }
 
-    pub fn primary(&self, job: &mut Job) -> Result<Box<Node>, ParserError> {
-        match *try!(job.mut_cursor().peek_token().ok_or_else(|| {
-            ParserErrorCode::UnexpectedEof {
+    pub fn primary(&self, job: &mut Job) -> Result<Box<Node>, Traced<ParserError>> {
+        match *try_traced!(job.mut_cursor().peek_token().ok_or_else(|| {
+            ParserError::UnexpectedEof {
                 expected: None,
                 reason: Some("Expected to find an expression"),
                 cursor: job.mut_cursor().dump(),
@@ -92,43 +92,43 @@ impl ExpressionParser {
     pub fn is_binary(&self, _token: &Token) -> bool {
         // TODO: refactor
         // a) move this to token
-        // b) or merge with binary_operator() below to `binary_operator -> Result<Option<>,>`, so `try!(self.binary_operator(token))` will yield an Option, which we can use in loop `while let Some(binary) = try!(self.binary_operator(token))`
+        // b) or merge with binary_operator() below to `binary_operator -> Result<Option<>,>`, so `try_traced!(self.binary_operator(token))` will yield an Option, which we can use in loop `while let Some(binary) = try_traced!(self.binary_operator(token))`
         unimplemented!()
     }
 
-    pub fn binary_operator(&self, token: &Token) -> Result<&BinaryOperator, ParserError> {
+    pub fn binary_operator(&self, _token: &Token) -> Result<&BinaryOperator, Traced<ParserError>> {
         // TODO refactor
         // merge with `is_binary` above - we may then get rid of these errors (!)
-        let name = try!(token.value().ok_or_else(|| {
-            unimplemented!()
-            // ParserErrorCode::Unreachable {
-            //     reason: format!("Could not parse binary operator, because the token type {type:?} has no value",
-            //     type = token.get_type()),
-            //     job: ()
-            // }.at(loc!())
-        }));
-
-        let operator = try!(self.ext.operators_binary().get(&name).ok_or_else(|| {
-            ParserErrorCode::UnexpectedBinaryOperator {
-                name: name.to_string(),
-                job: unimplemented!()
-            }.at(loc!())
-        }));
-
-        Ok(operator)
+        unimplemented!()
+        // let name = try_traced!(token.value().ok_or_else(|| {
+        //     ParserError::Unreachable {
+        //         reason: format!("Could not parse binary operator, because the token type {type:?} has no value",
+        //         type = token.get_type()),
+        //         job: ()
+        //     }.at(loc!())
+        // }));
+        //
+        // let operator = try_traced!(self.ext.operators_binary().get(&name).ok_or_else(|| {
+        //     ParserError::UnexpectedBinaryOperator {
+        //         name: name.to_string(),
+        //         job: unimplemented!()
+        //     }.at(loc!())
+        // }));
+        //
+        // Ok(operator)
     }
 
     pub fn parse_conditional_expression(&self, _expr: &Box<Node>) -> Box<Node> {
         unimplemented!()
     }
 
-    pub fn parse_primary_expression(&self, job: &mut Job) -> Result<Box<Node>, ParserError> {
+    pub fn parse_primary_expression(&self, job: &mut Job) -> Result<Box<Node>, Traced<ParserError>> {
         // TODO: Check if we can call next_token() immediately
         //      instead of peek() + next(), where the next() call
         //      seems to happen in every match-branch (double check!)
         //      this refactoring should be done with sufficient tests.
-        let item = try!(job.mut_cursor().peek().ok_or_else(|| {
-            ParserErrorCode::UnexpectedEof {
+        let item = try_traced!(job.mut_cursor().peek().ok_or_else(|| {
+            ParserError::UnexpectedEof {
                 expected: None,
                 reason: Some("Unclosed primary expression"),
                 cursor: job.mut_cursor().dump()
@@ -171,12 +171,12 @@ impl ExpressionParser {
         self.parse_postfix_expression(job, node)
     }
 
-    fn parse_postfix_expression(&self, job: &mut Job, node: Box<Node>) -> Result<Box<Node>, ParserError> {
+    fn parse_postfix_expression(&self, job: &mut Job, node: Box<Node>) -> Result<Box<Node>, Traced<ParserError>> {
         let mut node = node;
 
-        'a: while let Token::Punctuation(ref punc) = *try!(
+        'a: while let Token::Punctuation(ref punc) = *try_traced!(
             job.mut_cursor().peek_token().ok_or_else(|| {
-                ParserErrorCode::UnexpectedEof {
+                ParserError::UnexpectedEof {
                     expected: None,
                     reason: Some("Unclosed postfix expression"),
                     cursor: job.mut_cursor().dump(),
@@ -185,10 +185,10 @@ impl ExpressionParser {
             match *punc {
                 Punctuation::Dot
                 | Punctuation::OpeningBracket(BracketType::Square) => {
-                    node = try!(self.parse_subscript_expression(job, node));
+                    node = try_traced!(self.parse_subscript_expression(job, node));
                 },
                 Punctuation::VerticalBar => {
-                    node = try!(self.parse_filter_expression(job, node));
+                    node = try_traced!(self.parse_filter_expression(job, node));
                 },
                 _ => break 'a,
             }
@@ -197,11 +197,11 @@ impl ExpressionParser {
         return Ok(node);
     }
 
-    fn parse_subscript_expression(&self, _job: &mut Job, _node: Box<Node>) -> Result<Box<Node>, ParserError> {
+    fn parse_subscript_expression(&self, _job: &mut Job, _node: Box<Node>) -> Result<Box<Node>, Traced<ParserError>> {
         unimplemented!()
     }
 
-    fn parse_filter_expression(&self, _job: &mut Job, _node: Box<Node>) -> Result<Box<Node>, ParserError> {
+    fn parse_filter_expression(&self, _job: &mut Job, _node: Box<Node>) -> Result<Box<Node>, Traced<ParserError>> {
         unimplemented!()
     }
 }

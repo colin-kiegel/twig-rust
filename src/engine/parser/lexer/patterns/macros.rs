@@ -16,6 +16,6 @@ macro_rules! try_new_regex {
     ($regex:expr) => ({
         use regex::Regex;
 
-        try!(Regex::new(&$regex))
+        try_untraced!(Regex::new(&$regex))
     });
 }

@@ -6,23 +6,15 @@
 //! Typisation of parser errors.
 
 use std::fmt::{self, Display};
-use error::Error;
-use error::{GeneralizeTo, ErrorCode};
+use std::error::Error;
 
-use engine::parser::token::TokenErrorCode;
+use engine::parser::token::TokenError;
 use engine::parser::job::{self, cursor};
 use engine::parser::token;
 
-pub type ParserError = Error<ParserErrorCode>;
-pub type NodeError = Error<NodeErrorCode>; // todo move somewhere else??
-
-impl GeneralizeTo<ParserErrorCode> for TokenErrorCode {
-    fn generalize(&self) -> ParserErrorCode { ParserErrorCode::TokenError }
-}
-
 #[allow(dead_code)]
 #[derive(Debug)]
-pub enum ParserErrorCode {
+pub enum ParserError {
     Unreachable {
         reason: String,
         job: job::JobDump,
@@ -32,7 +24,7 @@ pub enum ParserErrorCode {
         item: token::stream::Item,
         job: job::JobDump,
     },
-    TokenError,
+    Token(TokenError),
     TokenParserError {
         tag: &'static str, // known at compile-time
         error: String,
@@ -60,37 +52,43 @@ pub enum ParserErrorCode {
     },
 }
 
-impl ErrorCode for ParserErrorCode {
+impl From<TokenError> for ParserError {
+    fn from(err: TokenError) -> ParserError {
+        ParserError::Token(err)
+    }
+}
+
+impl Error for ParserError {
     fn description(&self) -> &str {
         match *self {
-            ParserErrorCode::Unreachable{..} => "Unexptected parser error (please report as bug with details).",
-            ParserErrorCode::MissingExtensions => "Could not initialize parser due to missing engine extensions.",
-            ParserErrorCode::InvalidState{..} => "Parser ended up in unsupported state.",
-            ParserErrorCode::TokenError => "Token error.",
-            ParserErrorCode::TokenParserError{..} => "Token parser error.",
-            ParserErrorCode::SemanticError => "Semantic error.",
-            ParserErrorCode::NoTagHandler{..} => "There is no registered tag handler for named block.",
-            ParserErrorCode::UnexpectedBinaryOperator{..} => "Unexpected Binary Operator.",
-            ParserErrorCode::UnexpectedToken{..} => "Unexpected Token.",
-            ParserErrorCode::UnexpectedEof{..} => "Unexpected end of token stream.",
+            ParserError::Unreachable{..} => "Unexptected parser error (please report as bug with details).",
+            ParserError::MissingExtensions => "Could not initialize parser due to missing engine extensions.",
+            ParserError::InvalidState{..} => "Parser ended up in unsupported state.",
+            ParserError::Token(..) => "Token error.",
+            ParserError::TokenParserError{..} => "Token parser error.",
+            ParserError::SemanticError => "Semantic error.",
+            ParserError::NoTagHandler{..} => "There is no registered tag handler for named block.",
+            ParserError::UnexpectedBinaryOperator{..} => "Unexpected Binary Operator.",
+            ParserError::UnexpectedToken{..} => "Unexpected Token.",
+            ParserError::UnexpectedEof{..} => "Unexpected end of token stream.",
         }
     }
 }
 
-impl Display for ParserErrorCode {
+impl Display for ParserError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(f, "{}", self.description()));
 
         match *self {
-            ParserErrorCode::Unreachable {
+            ParserError::Unreachable {
                 ref reason, ref job
             } => {
                 write!(f, " {reason} for {job}",
                     reason = reason,
                     job = job)
             }
-            ParserErrorCode::MissingExtensions => Ok(()),
-            ParserErrorCode::InvalidState {
+            ParserError::MissingExtensions => Ok(()),
+            ParserError::InvalidState {
                 item: ref i, job: ref j
             } => {
                 write!(f, " Found token {token:?} at {pos} in {job}",
@@ -98,28 +96,28 @@ impl Display for ParserErrorCode {
                     pos = i.position(),
                     job = j)
             },
-            ParserErrorCode::TokenError => Ok(()),
-            ParserErrorCode::TokenParserError {
+            ParserError::Token(ref e) => Display::fmt(e,f),
+            ParserError::TokenParserError {
                 tag, ref error, ref job
             } => {
                 write!(f, " {tag:?}-block: {error} for job {job}.",
                     tag = tag, error = error, job = job)
             },
-            ParserErrorCode::SemanticError => Ok(()),
-            ParserErrorCode::NoTagHandler {
+            ParserError::SemanticError => Ok(()),
+            ParserError::NoTagHandler {
                 tag: ref t, position: ref p, job: ref j
             } => {
                 write!(f, " Found block {tag} at {pos} for job {job}.",
                     tag = t, pos = p, job = j)
             },
-            ParserErrorCode::UnexpectedBinaryOperator {
+            ParserError::UnexpectedBinaryOperator {
                 name: ref n, job: ref j
             } => {
                 write!(f, " The binary operator {name:?} is unknown to the engine for job {job}",
                     name = n,
                     job = j)
             },
-            ParserErrorCode::UnexpectedToken {
+            ParserError::UnexpectedToken {
                 reason: r, expected: ref x, found: ref i
             } => {
                 try!(write!(f, " Expected token {x:?} but found {t:?} at {p:?}.",
@@ -131,7 +129,7 @@ impl Display for ParserErrorCode {
 
                 Ok(())
             },
-            ParserErrorCode::UnexpectedEof {
+            ParserError::UnexpectedEof {
                 reason, ref expected, ref cursor
             } => {
                 if let Some(ref expected) = *expected {
@@ -150,7 +148,7 @@ impl Display for ParserErrorCode {
 
 #[allow(dead_code)]
 #[derive(Debug)]
-pub enum NodeErrorCode {
+pub enum NodeError {
     Unreachable {
         reason: String
     },
@@ -160,26 +158,26 @@ pub enum NodeErrorCode {
     }
 }
 
-impl ErrorCode for NodeErrorCode {
+impl Error for NodeError {
     fn description(&self) -> &str {
         match *self {
-            NodeErrorCode::Unreachable{..} => "Unexptected node error (please report as bug with details).",
-            NodeErrorCode::AttributeNotFound{..} => "Attribute not found.",
+            NodeError::Unreachable{..} => "Unexptected node error (please report as bug with details).",
+            NodeError::AttributeNotFound{..} => "Attribute not found.",
         }
     }
 }
 
-impl Display for NodeErrorCode {
+impl Display for NodeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(f, "{}", self.description()));
 
         match *self {
-            NodeErrorCode::Unreachable {
+            NodeError::Unreachable {
                 ref reason
             } => {
                 write!(f, " {}", reason)
             }
-            NodeErrorCode::AttributeNotFound{
+            NodeError::AttributeNotFound{
                 ref key, ref node_tag
             } => {
                 write!(f, " Attribute {key:?} does not exist for Node {node:?}.",

@@ -11,9 +11,9 @@ use std::fs::{self, File};
 use std::os::unix::fs::MetadataExt;
 use std::io::Read;
 use std::borrow::Cow;
-use loader::{Loader, LoaderError, LoaderErrorCode};
+use loader::{Loader, LoaderError};
 use self::namespace::Namespace;
-use error::ErrorCode;
+use api::error::Traced;
 
 pub mod namespace;
 pub mod path;
@@ -25,8 +25,8 @@ pub struct Filesystem {
 }
 
 impl Loader for Filesystem {
-    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<str>, LoaderError> {
-        let path = try!(self.find_template(name));
+    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<str>, Traced<LoaderError>> {
+        let path = try_traced!(self.find_template(name));
 
         return match Self::read(&path) {
             Err(e) => {
@@ -36,17 +36,17 @@ impl Loader for Filesystem {
                 // seamless fallback to other template directories
                 // - but should avoid infinite loops (one retry only)
 
-                return Err(LoaderErrorCode::FileSystemTemplateNotReadable {
+                return traced_err!(LoaderError::FileSystemTemplateNotReadable {
                         name: name.to_string(),
-                        path: path.to_path_buf()
-                    }.at(loc!())
-                    .caused_by(e))
+                        path: path.to_path_buf(),
+                        io_err: e,
+                    })
             },
             Ok(source) => Ok(Cow::Owned(source))
         }
     }
 
-    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
+    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, Traced<LoaderError>> {
         self.find_template(name).map(|x| Cow::Borrowed(x.to_str().unwrap())) // TODO: remove unwrap!
     }
 
@@ -131,7 +131,7 @@ impl Filesystem {
     }
 
     /// Find template.
-    fn find_template(&mut self, template_path: &str) -> Result<&Path, LoaderError> {
+    fn find_template(&mut self, template_path: &str) -> Result<&Path, Traced<LoaderError>> {
         if let Some(cached) = self.path_cache.get(template_path) {
             // TODO: clear cache if file vanished - else return
 
@@ -145,18 +145,18 @@ impl Filesystem {
             // <-- borrow ends here and is not extended
         }
 
-        let path = try!(path::TemplatePath::parse(template_path));
+        let path = try_traced!(path::TemplatePath::parse(template_path));
         let namespace_id = path.namespace_id();
         let raw_path = path.raw_path();
 
         match self.namespaces.get_mut(namespace_id) {
-            None => return err!(LoaderErrorCode::FileSystemNamespaceNotInitialized {
+            None => return traced_err!(LoaderError::FileSystemNamespaceNotInitialized {
                     namespace: namespace_id.to_string()
             }),
             Some(namespace) => {
-                try!(path.validate()); // #Doing:0 move these checks somewhere else :-)
+                try_traced!(path.validate()); // #Doing:0 move these checks somewhere else :-)
                                        // e.g. postpone to reading the directoy
-                let full_path = try!(namespace.find_template(raw_path));
+                let full_path = try_traced!(namespace.find_template(raw_path));
                 self.path_cache.insert(template_path.to_string(), full_path.to_path_buf());
 
                 return Ok(full_path);

@@ -11,7 +11,7 @@ mod template_cache;
 use loader::Loader;
 use std::rc::Rc;
 use template;
-use error::ErrorCode;
+use api::error::Traced;
 
 pub mod error;
 pub mod options;
@@ -21,7 +21,7 @@ pub mod parser;
 pub mod node;
 pub use self::node::Node;
 pub use self::parser::{Parser, lexer, Lexer};
-pub use self::error::{TwigError, TwigErrorCode, ExtensionRegistryError, ExtensionRegistryErrorCode};
+pub use self::error::{TwigError, ExtensionRegistryError};
 pub use self::options::Options;
 pub use self::setup::Setup;
 pub use self::extension_registry::ExtensionRegistry;
@@ -55,7 +55,7 @@ impl Engine {
     ///
     /// let twig = Engine::new(Setup::default()).unwrap();
     /// ```
-    pub fn new(setup: setup::Setup) -> Result<Self, TwigError> {
+    pub fn new(setup: setup::Setup) -> Result<Self, Traced<TwigError>> {
         setup.engine()
     }
 
@@ -65,9 +65,9 @@ impl Engine {
     /// * When the template cannot be found
     /// * When an error occurred during compilation
     /// * When an error occurred during rendering
-    pub fn render(&mut self, _path: &str, _data: ()) -> Result<String, TwigError> {
+    pub fn render(&mut self, _path: &str, _data: ()) -> Result<String, Traced<TwigError>> {
         unimplemented!()
-        //return Ok(try!(self.load_template(path, None)).render(context));
+        //return Ok(try_traced!(self.load_template(path, None)).render(context));
     }
 
     /// Displays a template.
@@ -76,9 +76,9 @@ impl Engine {
     /// * When the template cannot be found
     /// * When an error occurred during compilation
     /// * When an error occurred during rendering
-    pub fn display(&mut self, _path: &str, _data: ()) -> Result<(), TwigError> {
+    pub fn display(&mut self, _path: &str, _data: ()) -> Result<(), Traced<TwigError>> {
        unimplemented!()
-       // return Ok(try!(self.load_template(path, None)).display(context, None));
+       // return Ok(try_traced!(self.load_template(path, None)).display(context, None));
     }
 
     /// Loads and compiles a template.
@@ -86,13 +86,13 @@ impl Engine {
     /// # Failures
     /// * When the template cannot be found
     /// * When an error occurred during compilation
-    pub fn load_template(&mut self, path: &str, _index: Option<u32>) -> Result<template::Compiled, TwigError> {
+    pub fn load_template(&mut self, path: &str, _index: Option<u32>) -> Result<template::Compiled, Traced<TwigError>> {
         // TODO: Cache compiled templates
         //  * cache lookup
         //  * check if cache is fresh
         //  * store in cache
 
-        let template_raw = try!(self.load_template_raw(path));
+        let template_raw = try_traced!(self.load_template_raw(path));
         return self.compile_template(&template_raw);
     }
 
@@ -100,9 +100,9 @@ impl Engine {
     ///
     /// # Failures
     /// * When the template cannot be found
-    fn load_template_raw(&mut self, path: &str) -> Result<template::Raw, TwigError> {
-        let loader = try!(self.loader());
-        let source = try_chain!(loader.source(path));
+    fn load_template_raw(&mut self, path: &str) -> Result<template::Raw, Traced<TwigError>> {
+        let loader = try_traced!(self.loader());
+        let source = try_traced!(loader.source(path));
         Ok(template::Raw::new(source, path))
     }
 
@@ -110,15 +110,15 @@ impl Engine {
     ///
     /// # Failures
     /// * When an error occurred during lexing or parsing.
-    fn compile_template(&mut self, template: &template::Raw) -> Result<template::Compiled, TwigError> {
+    fn compile_template(&mut self, template: &template::Raw) -> Result<template::Compiled, Traced<TwigError>> {
         let tokenstream = {
-            let lexer = try!(self.lexer());
-            try_chain!(lexer.tokenize(template))
+            let lexer = try_traced!(self.lexer());
+            try_traced!(lexer.tokenize(template))
         };
 
         let compiled = {
-            let parser = try!(self.parser());
-            try_chain!(parser.parse(&tokenstream))
+            let parser = try_traced!(self.parser());
+            try_traced!(parser.parse(&tokenstream))
         };
 
         Ok(compiled)
@@ -132,11 +132,11 @@ impl Engine {
     }
 
     /// Gets the engine extensions.
-    pub fn extensions(&self) -> Result<&Rc<ExtensionRegistry>, TwigError> {
+    pub fn extensions(&self) -> Result<&Rc<ExtensionRegistry>, Traced<TwigError>> {
         match self.ext {
             Some(ref ext) => Ok(ext),
             None => {
-                try_chain!(err!(ExtensionRegistryErrorCode::NotInitialized))
+                return traced_err!(TwigError::ExtensionRegistry(ExtensionRegistryError::NotInitialized))
             }
         }
     }
@@ -149,11 +149,11 @@ impl Engine {
     }
 
     /// Gets the loader instance.
-    pub fn loader(&mut self) -> Result<&mut Loader, TwigError> {
+    pub fn loader(&mut self) -> Result<&mut Loader, Traced<TwigError>> {
         match self.loader {
             Some(ref mut loader) => return Ok(&mut **loader), // dereferencing the Box<>
             None => {
-                return err!(TwigErrorCode::LoaderNotInitialized)
+                return traced_err!(TwigError::LoaderNotInitialized)
             }
         }
     }
@@ -166,11 +166,11 @@ impl Engine {
     }
 
     /// Gets the lexer instance.
-    pub fn lexer(&mut self) -> Result<&Lexer, TwigError> {
+    pub fn lexer(&mut self) -> Result<&Lexer, Traced<TwigError>> {
         match self.lexer {
             Some(ref lexer) => return Ok(lexer),
             None => {
-                self.lexer = Some(try_chain!(Lexer::new(self, lexer::Options::default())));
+                self.lexer = Some(try_traced!(Lexer::new(self, lexer::Options::default())));
                 return self.lexer();
             }
         }
@@ -184,17 +184,13 @@ impl Engine {
     }
 
     /// Gets the parser instance.
-    pub fn parser(&mut self) -> Result<&Parser, TwigError> {
+    pub fn parser(&mut self) -> Result<&Parser, Traced<TwigError>> {
         match self.parser {
             Some(ref parser) => return Ok(parser),
             None => {
-                self.parser = match Parser::new(&self) {
-                    Err(e) => return Err(TwigErrorCode::Parser
-                        .at(loc!())
-                        .caused_by(e)),
-                    Ok(parser) => Some(parser)
-                };
-                return self.parser();
+                self.parser = Some(try_traced!(Parser::new(&self)));
+
+                return self.parser()
             }
         }
     }
@@ -207,7 +203,7 @@ impl Engine {
     // }
     //
     // /// Gets the runtime instance.
-    // pub fn runtime(&mut self) -> Result<&Runtime, TwigError> {
+    // pub fn runtime(&mut self) -> Result<&Runtime, Traced<TwigError>> {
     //     match self.runtime {
     //         Some(ref runtime) => return Ok(runtime),
     //         None => {

@@ -6,90 +6,90 @@
 //! Typisation of syntax errors.
 
 use std::fmt::{self, Display};
-use error::Error;
-use error::{GeneralizeTo, ErrorCode};
+use std::error::Error;
 
-use loader::LoaderErrorCode;
-use engine::parser::{ParserErrorCode, LexerErrorCode};
-use runtime::RuntimeErrorCode;
+use loader::LoaderError;
+use engine::parser::{ParserError, LexerError};
 use extension;
 
-pub type TwigError = Error<TwigErrorCode>;
-pub type ExtensionRegistryError = Error<ExtensionRegistryErrorCode>;
 
 #[derive(Debug)]
-pub enum TwigErrorCode {
+pub enum TwigError {
+    Loader(LoaderError),
+    Lexer(LexerError),
+    Parser(ParserError),
+    ExtensionRegistry(ExtensionRegistryError),
     Unreachable {
         reason: String
     },
-    Loader,
     LoaderNotInitialized,
-    Lexer,
     LexerNotInitialized,
-    Parser,
     Runtime,
-    ExtensionRegistry,
 }
 
-impl GeneralizeTo<TwigErrorCode> for LoaderErrorCode {
-    fn generalize(&self) -> TwigErrorCode { TwigErrorCode::Loader }
+impl From<LoaderError> for TwigError {
+    fn from(err: LoaderError) -> TwigError {
+        TwigError::Loader(err)
+    }
 }
 
-impl GeneralizeTo<TwigErrorCode> for LexerErrorCode {
-    fn generalize(&self) -> TwigErrorCode { TwigErrorCode::Lexer }
+impl From<LexerError> for TwigError {
+    fn from(err: LexerError) -> TwigError {
+        TwigError::Lexer(err)
+    }
 }
 
-impl GeneralizeTo<TwigErrorCode> for ParserErrorCode {
-    fn generalize(&self) -> TwigErrorCode { TwigErrorCode::Parser }
+impl From<ParserError> for TwigError {
+    fn from(err: ParserError) -> TwigError {
+        TwigError::Parser(err)
+    }
 }
 
-impl GeneralizeTo<TwigErrorCode> for RuntimeErrorCode {
-    fn generalize(&self) -> TwigErrorCode { TwigErrorCode::Runtime }
+impl From<ExtensionRegistryError> for TwigError {
+    fn from(err: ExtensionRegistryError) -> TwigError {
+        TwigError::ExtensionRegistry(err)
+    }
 }
 
-impl GeneralizeTo<TwigErrorCode> for ExtensionRegistryErrorCode {
-    fn generalize(&self) -> TwigErrorCode { TwigErrorCode::ExtensionRegistry }
-}
-
-impl ErrorCode for TwigErrorCode {
+impl Error for TwigError {
     fn description(&self) -> &str {
         match *self {
-            TwigErrorCode::Unreachable{..} => "Unexptected twig error (please report as bug with details).",
-            TwigErrorCode::Loader => "Twig loader error.",
-            TwigErrorCode::LoaderNotInitialized => "The template loader must be initializied prior usage.",
-            TwigErrorCode::Lexer => "Twig lexer error.",
-            TwigErrorCode::LexerNotInitialized => "The template lexer must be initializied prior usage.",
-            TwigErrorCode::Parser => "Twig parser error.",
-            TwigErrorCode::Runtime => "Twig runtime error.",
-            TwigErrorCode::ExtensionRegistry => "Twig extension registry error."
+            TwigError::Loader(..) => "Twig loader error.",
+            TwigError::Lexer(..) => "Twig lexer error.",
+            TwigError::Parser(..) => "Twig parser error.",
+            TwigError::ExtensionRegistry(..) => "Twig extension registry error.",
+            TwigError::Unreachable{..} => "Unexptected twig error (please report as bug with details).",
+            TwigError::LoaderNotInitialized => "The template loader must be initializied prior usage.",
+            TwigError::LexerNotInitialized => "The template lexer must be initializied prior usage.",
+            TwigError::Runtime => "Twig runtime error.",
         }
     }
 }
 
-impl Display for TwigErrorCode {
+impl Display for TwigError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(f, "{}", self.description()));
 
         match *self {
-            TwigErrorCode::Unreachable {
+            TwigError::Loader(ref e) => Display::fmt(e,f),
+            TwigError::Lexer(ref e) => Display::fmt(e,f),
+            TwigError::Parser(ref e) => Display::fmt(e,f),
+            TwigError::ExtensionRegistry(ref e) => Display::fmt(e,f),
+            TwigError::Unreachable {
                 ref reason
             } => {
                 write!(f, " {}.", reason)
             },
-            TwigErrorCode::Loader
-            | TwigErrorCode::LoaderNotInitialized
-            | TwigErrorCode::Lexer
-            | TwigErrorCode::LexerNotInitialized
-            | TwigErrorCode::Parser
-            | TwigErrorCode::Runtime
-            | TwigErrorCode::ExtensionRegistry
+            TwigError::LoaderNotInitialized
+            | TwigError::LexerNotInitialized
+            | TwigError::Runtime
             => Ok(())
         }
     }
 }
 
 #[derive(Debug)]
-pub enum ExtensionRegistryErrorCode {
+pub enum ExtensionRegistryError {
     AlreadyInitialized,
     NotInitialized,
     DuplicateExtension {
@@ -125,73 +125,73 @@ pub enum ExtensionRegistryErrorCode {
     },
 }
 
-impl ErrorCode for ExtensionRegistryErrorCode {
+impl Error for ExtensionRegistryError {
     fn description(&self) -> &str {
         match *self {
-            ExtensionRegistryErrorCode::AlreadyInitialized => "Engine extensions are already initialized.",
-            ExtensionRegistryErrorCode::NotInitialized => "Engine extensions are not yet initialized.",
-            ExtensionRegistryErrorCode::DuplicateExtension{..} => "Duplicate extension.",
-            ExtensionRegistryErrorCode::DuplicateFilter{..} => "Duplicate filter.",
-            ExtensionRegistryErrorCode::DuplicateFunction{..} => "Duplicate function.",
-            ExtensionRegistryErrorCode::DuplicateOperatorBinary{..} => "Duplicate binary operator.",
-            ExtensionRegistryErrorCode::DuplicateOperatorUnary{..} => "Duplicate unary operator.",
-            ExtensionRegistryErrorCode::DuplicateTest{..} => "Duplicate test.",
-            ExtensionRegistryErrorCode::DuplicateTagHandler{..} => "Duplicate tag handler.",
-            ExtensionRegistryErrorCode::DuplicateTokenParser{..} => "Duplicate token parser.",
+            ExtensionRegistryError::AlreadyInitialized => "Engine extensions are already initialized.",
+            ExtensionRegistryError::NotInitialized => "Engine extensions are not yet initialized.",
+            ExtensionRegistryError::DuplicateExtension{..} => "Duplicate extension.",
+            ExtensionRegistryError::DuplicateFilter{..} => "Duplicate filter.",
+            ExtensionRegistryError::DuplicateFunction{..} => "Duplicate function.",
+            ExtensionRegistryError::DuplicateOperatorBinary{..} => "Duplicate binary operator.",
+            ExtensionRegistryError::DuplicateOperatorUnary{..} => "Duplicate unary operator.",
+            ExtensionRegistryError::DuplicateTest{..} => "Duplicate test.",
+            ExtensionRegistryError::DuplicateTagHandler{..} => "Duplicate tag handler.",
+            ExtensionRegistryError::DuplicateTokenParser{..} => "Duplicate token parser.",
         }
     }
 }
 
-impl Display for ExtensionRegistryErrorCode {
+impl Display for ExtensionRegistryError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(f, "{}", self.description()));
 
         match *self {
-            ExtensionRegistryErrorCode::AlreadyInitialized => Ok(()),
-            ExtensionRegistryErrorCode::NotInitialized => Ok(()),
-            ExtensionRegistryErrorCode::DuplicateExtension {
+            ExtensionRegistryError::AlreadyInitialized => Ok(()),
+            ExtensionRegistryError::NotInitialized => Ok(()),
+            ExtensionRegistryError::DuplicateExtension {
                 prev: ref p
             } => {
                 write!(f, " {prev:?} has already been registered.",
                     prev = p)
             },
-            ExtensionRegistryErrorCode::DuplicateFilter {
+            ExtensionRegistryError::DuplicateFilter {
                 prev: ref p, ext_name: ref x
             } => {
                 write!(f, " {prev:?} has already been registered, while loading extension {ext:?}.",
                     prev = p, ext = x)
             },
-            ExtensionRegistryErrorCode::DuplicateFunction {
+            ExtensionRegistryError::DuplicateFunction {
                 prev: ref p, ext_name: ref x
             } => {
                 write!(f, " {prev:?} has already been registered, while loading extension {ext:?}.",
                     prev = p, ext = x)
             },
-            ExtensionRegistryErrorCode::DuplicateOperatorBinary {
+            ExtensionRegistryError::DuplicateOperatorBinary {
                 prev: ref p, ext_name: ref x
             } => {
                 write!(f, " {prev:?} has already been registered, while loading extension {ext:?}.",
                     prev = p, ext = x)
             },
-            ExtensionRegistryErrorCode::DuplicateOperatorUnary {
+            ExtensionRegistryError::DuplicateOperatorUnary {
                 prev: ref p, ext_name: ref x
             } => {
                 write!(f, " {prev:?} has already been registered, while loading extension {ext:?}.",
                     prev = p, ext = x)
             },
-            ExtensionRegistryErrorCode::DuplicateTest {
+            ExtensionRegistryError::DuplicateTest {
                 prev: ref p, ext_name: ref x
             } => {
                 write!(f, " {prev:?} has already been registered, while loading extension {ext:?}.",
                     prev = p, ext = x)
             },
-            ExtensionRegistryErrorCode::DuplicateTagHandler {
+            ExtensionRegistryError::DuplicateTagHandler {
                 prev: ref p, ext_name: ref x
             } => {
                 write!(f, " {prev:?} has already been registered, while loading extension {ext:?}.",
                     prev = p, ext = x)
             },
-            ExtensionRegistryErrorCode::DuplicateTokenParser {
+            ExtensionRegistryError::DuplicateTokenParser {
                 prev: ref p, ext_name: ref x
             } => {
                 write!(f, " {prev:?} has already been registered, while loading extension {ext:?}.",

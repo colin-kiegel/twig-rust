@@ -10,34 +10,34 @@ use engine::parser::lexer::job::state;
 use engine::parser::lexer::job::Job;
 use engine::parser::token::{Token, Punctuation, BracketType};
 use engine::parser::lexer::patterns::{number, Extract};
-use engine::parser::lexer::{LexerError, SyntaxErrorCode};
-use error::Dump;
+use engine::parser::lexer::{LexerError, SyntaxError};
+use api::error::{Traced, Dump};
 
 pub trait LexExpression where
     Self: Sized + TokenizeState
 {
     // TODO: move this up or find another way to share (like trait)
     //     - because it is shared by block and variable state!
-    fn lex_expression<'a>(job: &'a mut Job) -> Result<(), LexerError> {
+    fn lex_expression<'a>(job: &'a mut Job) -> Result<(), Traced<LexerError>> {
         // whitespace
         let whitespace = job.cursor.tail().len() - job.cursor.tail().trim_left().len();
         job.cursor.move_by(whitespace); // TODO: move this into cursor (trim_left?)
 
         if job.cursor.is_eof() {
             let error_code = match Self::state() {
-                state::Code::Block => SyntaxErrorCode::UnclosedBlock {
+                state::Code::Block => SyntaxError::UnclosedBlock {
                     cursor: job.cursor.dump()
                 },
-                state::Code::Expression => SyntaxErrorCode::UnclosedVariable {
+                state::Code::Expression => SyntaxError::UnclosedVariable {
                     cursor: job.cursor.dump()
                 },
-                _ => SyntaxErrorCode::Unreachable {
+                _ => SyntaxError::Unreachable {
                     reason: "End of template while lexing expression".to_string(),
                     cursor: job.cursor.dump()
                 },
             };
 
-            try_chain!(err!(error_code))
+            try_traced!(traced_err!(error_code))
         }
 
         // operators
@@ -57,7 +57,7 @@ pub trait LexExpression where
 
         // numbers
         if let Some(x) = job.patterns.number.extract(job.cursor.tail()) {
-            let x = try!(x);
+            let x = try_traced!(x);
             let token = match x.number {
                 number::Number::Integer(u) => Token::IntegerNumber(u),
                 number::Number::Floating(f) => Token::FloatingNumber(f),
@@ -72,14 +72,14 @@ pub trait LexExpression where
             match punctuation { // check brackets ..
                 Punctuation::ClosingBracket(ref b) => match job.pop_bracket() {
                     None => {
-                        return try_chain!(err!(SyntaxErrorCode::UnexpectedBracket {
+                        return try_traced!(traced_err!(SyntaxError::UnexpectedBracket {
                             bracket: b.clone(),
                             cursor: job.cursor.dump()
                         }))
                     },
                     Some((b_expected, line)) => {
                         if *b != b_expected {
-                            return try_chain!( err!(SyntaxErrorCode::UnclosedBracket {
+                            return try_traced!( traced_err!(SyntaxError::UnclosedBracket {
                                 bracket_before: b_expected,
                                 line_before: line,
                                 bracket: b.clone(),
@@ -118,7 +118,7 @@ pub trait LexExpression where
             let bracket = (BracketType::DoubleQuote, job.cursor.line());
             job.push_bracket(bracket);
             job.cursor.move_by(1);
-            try!(state::String::tokenize(job));
+            try_traced!(state::String::tokenize(job));
 
             return Self::tokenize(job);
         }
@@ -127,16 +127,16 @@ pub trait LexExpression where
         println!("Current Job Status: {:?}", job); // DEBUG INFO
 
         let syntax_error = match job.cursor.tail().chars().next() {
-            Some(c) => err!(SyntaxErrorCode::UnexpectedCharacter {
+            Some(c) => traced_err!(SyntaxError::UnexpectedCharacter {
                 character: c,
                 cursor: job.cursor.dump()
             }),
-            None => err!(SyntaxErrorCode::UnexpectedEof {
+            None => traced_err!(SyntaxError::UnexpectedEof {
                 reason: "Unclosed expression",
                 cursor: job.cursor.dump()
             })
         };
 
-        try_chain!(syntax_error)
+        try_traced!(syntax_error)
     }
 }

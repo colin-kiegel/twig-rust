@@ -7,6 +7,7 @@ use extension::api::TokenParser;
 use engine::Node;
 use engine::parser::{Job, ParserError};
 use engine::parser::token::stream::Item;
+use api::error::Traced;
 
 #[derive(Debug, Default)]
 pub struct For;
@@ -16,7 +17,7 @@ impl TokenParser for For {
         "for"
     }
 
-    fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<Node>, ParserError> {
+    fn parse(&self, _job: &mut Job, _item: &Item) -> Result<Box<Node>, Traced<ParserError>> {
         unimplemented!()
     }
 }

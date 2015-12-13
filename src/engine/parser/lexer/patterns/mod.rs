@@ -12,6 +12,7 @@ use std::rc::Rc;
 use regex;
 use regex::Error as regexError;
 use engine::{ExtensionRegistry};
+use api::error::Traced;
 
 #[macro_use]
 pub mod macros;
@@ -57,24 +58,24 @@ pub struct Patterns {
 
 #[allow(unused_variables)]
 impl Patterns {
-    pub fn new(opt: &Rc<Options>, ext: &Rc<ExtensionRegistry>) -> Result<Patterns, regexError> {
+    pub fn new(opt: &Rc<Options>, ext: &Rc<ExtensionRegistry>) -> Result<Patterns, Traced<regexError>> {
         Ok(Patterns {
-            expression_end: try!(expression_end::Pattern::new(opt)),
-            verbatim_end: try!(verbatim_end::Pattern::new(opt)),
-            operator: try!(operator::Pattern::new(ext)),
-            block_end: try!(block_end::Pattern::new(opt)),
-            comment_end: try!(comment_end::Pattern::new(opt)),
-            verbatim_start: try!(verbatim_start::Pattern::new(opt)),
-            block_line: try!(block_line::Pattern::new(opt)),
-            token_start: try!(token_start::Pattern::new(opt)),
-            interpolation_start: try!(interpolation_start::Pattern::new(opt)),
-            interpolation_end: try!(interpolation_end::Pattern::new(opt)),
-            name: try!(name::Pattern::new()),
-            number: try!(number::Pattern::new()),
+            expression_end: try_traced!(expression_end::Pattern::new(opt)),
+            verbatim_end: try_traced!(verbatim_end::Pattern::new(opt)),
+            operator: try_traced!(operator::Pattern::new(ext)),
+            block_end: try_traced!(block_end::Pattern::new(opt)),
+            comment_end: try_traced!(comment_end::Pattern::new(opt)),
+            verbatim_start: try_traced!(verbatim_start::Pattern::new(opt)),
+            block_line: try_traced!(block_line::Pattern::new(opt)),
+            token_start: try_traced!(token_start::Pattern::new(opt)),
+            interpolation_start: try_traced!(interpolation_start::Pattern::new(opt)),
+            interpolation_end: try_traced!(interpolation_end::Pattern::new(opt)),
+            name: try_traced!(name::Pattern::new()),
+            number: try_traced!(number::Pattern::new()),
             punctuation: punctuation::Pattern::instance(),
-            string: try!(string::Pattern::new()),
-            string_dq_delim: try!(string_dq_delim::Pattern::new()),
-            string_dq_part: try!(string_dq_part::Pattern::new()),
+            string: try_traced!(string::Pattern::new()),
+            string_dq_delim: try_traced!(string_dq_delim::Pattern::new()),
+            string_dq_part: try_traced!(string_dq_part::Pattern::new()),
         })
     }
 }

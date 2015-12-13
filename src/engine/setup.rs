@@ -11,6 +11,7 @@ use extension;
 use extension::api::Extension;
 use engine::{Engine, options, Options, extension_registry, ExtensionRegistry};
 use engine::error::{TwigError};
+use api::error::Traced;
 
 #[allow(dead_code)]
 pub const VERSION : &'static str = "1.18.1";
@@ -62,34 +63,34 @@ impl Setup {
     ///
     /// let twig = Setup::default().engine().unwrap();
     /// ```
-    pub fn engine(mut self) -> Result<Engine, TwigError> {
+    pub fn engine(mut self) -> Result<Engine, Traced<TwigError>> {
         let mut c = Engine::default();
         let o = self.opt;
 
         // add default extensions
-        try_chain!(self.ext.push(extension::Escaper::new(o.autoescape)));
-        try_chain!(self.ext.push(extension::Optimizer::new(o.optimizations)));
+        try_traced!(self.ext.push(extension::Escaper::new(o.autoescape)));
+        try_traced!(self.ext.push(extension::Optimizer::new(o.optimizations)));
 
         // init extensions
-        try_chain!(self.ext.init(&mut c));
+        try_traced!(self.ext.init(&mut c));
         c.ext = Some(Rc::new(self.ext));
 
         // TODO: register staging extension (!)
         // // init staging extension
         // let staging = ext::Staging::new();
-        // try!(c.init_extension(&*staging));
+        // try_traced!(c.init_extension(&*staging));
         // c.ext_staging = Some(staging);
 
         return Ok(c);
     }
 
     /// Registers an extension
-    pub fn add_extension(mut self, extension: Box<Extension>) -> Result<Self, TwigError> {
-        try_chain!(self.ext.push(extension));
+    pub fn add_extension(mut self, extension: Box<Extension>) -> Result<Self, Traced<TwigError>> {
+        try_traced!(self.ext.push(extension));
 
         Ok(self)
     }
-    
+
     /// When set to true, it automatically set "auto_reload" to true as well
     ///     (default to false)
     pub fn set_debug(mut self, debug: bool) -> Self {

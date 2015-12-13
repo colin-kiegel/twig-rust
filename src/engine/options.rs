@@ -23,7 +23,7 @@ impl Default for Charset {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug)]
 pub struct Options {
     pub debug: bool,
     pub charset: Charset,

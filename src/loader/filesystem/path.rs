@@ -7,7 +7,8 @@
 
 use std::path::{Path, PathBuf, Component};
 use super::namespace;
-use loader::{LoaderError, LoaderErrorCode};
+use loader::{LoaderError};
+use api::error::Traced;
 
 pub struct TemplatePath {
     namespace: String,
@@ -15,22 +16,22 @@ pub struct TemplatePath {
 }
 
 impl TemplatePath {
-    // pub fn new(namespace: &str, raw_path: &str) -> Result<TemplatePath, TwigError> {
+    // pub fn new(namespace: &str, raw_path: &str) -> Result<TemplatePath, Traced<TwigError>> {
     //
     //
     //     template_path.normalize();
-    //     try!(template_path.parse());
+    //     try_traced!(template_path.parse());
     //
     //     return template_path;
     // }
-    pub fn parse(template_path: &str) -> Result<TemplatePath, LoaderError> {
+    pub fn parse(template_path: &str) -> Result<TemplatePath, Traced<LoaderError>> {
         let normalized_path = TemplatePath::normalize(template_path);
         let namespace: &str;
         let raw_path: &str;
 
         if normalized_path.chars().nth(1) == Some('@') {
             match normalized_path.find('/') {
-                None => return err!(LoaderErrorCode::FileSystemMalformedNamespacedPath {
+                None => return traced_err!(LoaderError::FileSystemMalformedNamespacedPath {
                     template_name:  normalized_path
                 }),
                 Some(pos) => {
@@ -78,7 +79,7 @@ impl TemplatePath {
         normalized_path
     }
 
-    pub fn validate(&self) -> Result<(), LoaderError> {
+    pub fn validate(&self) -> Result<(), Traced<LoaderError>> {
         let mut level = 0;
         for component in self.raw_path.components() {
             match component {
@@ -91,7 +92,7 @@ impl TemplatePath {
         }
 
         if level < 0 {
-            return err!(LoaderErrorCode::FileSystemInvalidPath {
+            return traced_err!(LoaderError::FileSystemInvalidPath {
                 path: self.raw_path.clone()
             })
         }

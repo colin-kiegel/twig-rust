@@ -7,6 +7,7 @@
 
 use engine::TwigError;
 use runtime::Runtime;
+use api::error::Traced;
 
 pub const _ANY_CALL    : &'static str = "any";
 pub const _ARRAY_CALL  : &'static str = "array";
@@ -14,7 +15,7 @@ pub const _METHOD_CALL : &'static str = "method";
 
 pub trait Template {
     /// Renders the template with the given context and returns it as string.
-    fn render(&self, runtime: &Runtime) -> Result<String, TwigError>;
+    fn render(&self, runtime: &Runtime) -> Result<String, Traced<TwigError>>;
 
     /// Displays the template with the given context.
     ///

@@ -8,7 +8,8 @@
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use std::fs;
-use loader::{LoaderError, LoaderErrorCode};
+use loader::{LoaderError};
+use api::error::Traced;
 
 /// Identifier of the default namespace.
 pub const DEFAULT : &'static str  = "__main__";
@@ -62,7 +63,7 @@ impl Namespace {
         self.dirs.insert(index, dir);
     }
 
-    pub fn find_template(&mut self, raw_path: &Path) -> Result<&Path, LoaderError> {
+    pub fn find_template(&mut self, raw_path: &Path) -> Result<&Path, Traced<LoaderError>> {
         if let Some(cached) = self.path_cache.get(raw_path) {
             // TODO: clear cache if file vanished - else return
 
@@ -77,7 +78,7 @@ impl Namespace {
         }
 
         if self.dirs.len() == 0 {
-            return err!(LoaderErrorCode::FileSystemNamespaceNotInitialized {
+            return traced_err!(LoaderError::FileSystemNamespaceNotInitialized {
                 namespace: self.id.to_string()
             })
         }
@@ -93,7 +94,7 @@ impl Namespace {
             }
         }
 
-        return err!(LoaderErrorCode::FileSystemTemplateNotFound {
+        return traced_err!(LoaderError::FileSystemTemplateNotFound {
             raw_path: raw_path.to_path_buf(),
             namespace: self.id.to_string(),
             dirs: self.dirs.clone()

@@ -6,13 +6,12 @@
 //! Represents a Token
 
 use std::fmt;
-use error::Dump;
+use api::error::Dump;
 
 pub mod error;
 pub mod stream;
 pub use self::stream::Stream;
 pub use self::error::TokenError;
-pub use self::error::TokenErrorCode;
 
 #[derive(PartialEq, Clone)]
 pub enum Token {

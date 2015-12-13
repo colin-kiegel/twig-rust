@@ -11,6 +11,7 @@ use extension::api::TokenParser;
 use std::rc::Rc;
 use template;
 use std::collections::HashMap;
+use api::error::Traced;
 
 pub mod error;
 pub mod job;
@@ -19,12 +20,10 @@ pub mod token;
 pub mod lexer;
 pub use self::lexer::Lexer;
 pub use self::lexer::LexerError;
-pub use self::lexer::LexerErrorCode;
 pub use self::token::Token;
 pub use self::error::*;
 pub use self::job::Job;
 pub use self::expression_parser::ExpressionParser;
-use error::ErrorCode;
 
 #[derive(Debug)]
 pub struct Parser {
@@ -33,11 +32,9 @@ pub struct Parser {
 } // avoid a circular reference to the engine!
 
 impl Parser {
-    pub fn new(twig: &Engine) -> Result<Parser, ParserError> {
+    pub fn new(twig: &Engine) -> Result<Parser, Traced<ParserError>> {
         let ext = match twig.extensions() {
-            Err(e) => return Err(ParserErrorCode::MissingExtensions
-                .at(loc!())
-                .caused_by(e)),
+            Err(_) => return traced_err!(ParserError::MissingExtensions),
             Ok(ext) => ext
         };
 
@@ -48,7 +45,7 @@ impl Parser {
     }
 
     #[allow(dead_code)] // TODO: testcase
-    pub fn parse<'a, 't> (&'a self, stream: &'t token::Stream<'t>) -> Result<template::Compiled, ParserError>
+    pub fn parse<'a, 't> (&'a self, stream: &'t token::Stream<'t>) -> Result<template::Compiled, Traced<ParserError>>
         where 't: 'a // the token stream must outlive the Parser
     {
         let job = Job::new(stream, &self);

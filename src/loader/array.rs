@@ -14,7 +14,8 @@
 
 use std::collections::HashMap;
 use std::borrow::Cow;
-use loader::{Loader, LoaderError, LoaderErrorCode};
+use loader::{Loader, LoaderError};
+use api::error::Traced;
 
 #[derive(Default, Debug)]
 pub struct Array {
@@ -22,11 +23,11 @@ pub struct Array {
 }
 
 impl Loader for Array {
-    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
+    fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, Traced<LoaderError>> {
 
         return match self.templates.get(name) {
             None => {
-                err!(LoaderErrorCode::ArrayTemplateNotFound {
+                traced_err!(LoaderError::ArrayTemplateNotFound {
                     name: name.to_string()
                 })
             }
@@ -36,7 +37,7 @@ impl Loader for Array {
         }
     }
 
-    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, LoaderError> {
+    fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, Traced<LoaderError>> {
         self.source(name)
     }
 

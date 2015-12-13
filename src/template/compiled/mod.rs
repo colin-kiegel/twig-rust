@@ -10,6 +10,7 @@ use engine::TwigError;
 use runtime::{Runtime, Job};
 use runtime::api::Execute;
 use engine::node;
+use api::error::Traced;
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -34,7 +35,7 @@ impl Compiled {
 }
 
 impl Template for Compiled {
-    fn render(&self, runtime: &Runtime) -> Result<String, TwigError> {
+    fn render(&self, runtime: &Runtime) -> Result<String, Traced<TwigError>> {
         Ok(runtime.run(&self.root))
     }
 

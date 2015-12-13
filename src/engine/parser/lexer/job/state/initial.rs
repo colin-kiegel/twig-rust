@@ -9,6 +9,7 @@ use super::{TokenizeState, Code};
 use engine::parser::lexer::LexerError;
 use engine::parser::lexer::job::Job;
 use super::data::Data;
+use api::error::Traced;
 
 #[allow(dead_code)] // dummy
 pub struct Initial;
@@ -18,7 +19,7 @@ impl TokenizeState for Initial {
         Code::Initial
     }
 
-    fn tokenize<'a>(job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(job: &'a mut Job) -> Result<(), Traced<LexerError>> {
         // TODO: some pre-checks, like len>0?
         return Data::tokenize(job)
     }

@@ -6,14 +6,11 @@
 //! Typisation of syntax errors.
 
 use std::fmt::{self, Display};
-use error::Error;
-use error::ErrorCode;
+use std::error::Error;
 use engine::parser::token;
 
-pub type TokenError = Error<TokenErrorCode>;
-
 #[derive(Debug)]
-pub enum TokenErrorCode {
+pub enum TokenError {
     _NoValue,
     UnexpectedTokenAtItem {
         reason: Option<&'static str>,
@@ -22,22 +19,22 @@ pub enum TokenErrorCode {
     }
 }
 
-impl ErrorCode for TokenErrorCode {
+impl Error for TokenError {
     fn description(&self) -> &str {
         match *self {
-            TokenErrorCode::_NoValue => "No value.",
-            TokenErrorCode::UnexpectedTokenAtItem{..} => "Unexpected token.",
+            TokenError::_NoValue => "No value.",
+            TokenError::UnexpectedTokenAtItem{..} => "Unexpected token.",
         }
     }
 }
 
-impl Display for TokenErrorCode {
+impl Display for TokenError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         try!(write!(f, "{}", self.description()));
 
         match *self {
-            TokenErrorCode::_NoValue => Ok(()),
-            TokenErrorCode::UnexpectedTokenAtItem {
+            TokenError::_NoValue => Ok(()),
+            TokenError::UnexpectedTokenAtItem {
                 reason, ref expected, ref found
             } => {
                 try!(write!(f, " Expected token matching {x:?} but found item {t:?} at {p:?}",

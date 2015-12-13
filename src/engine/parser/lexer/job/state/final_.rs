@@ -8,6 +8,7 @@
 use super::{TokenizeState, Code};
 use engine::parser::lexer::LexerError;
 use engine::parser::lexer::job::Job;
+use api::error::Traced;
 
 #[allow(dead_code)] // dummy
 pub struct Final;
@@ -17,7 +18,7 @@ impl TokenizeState for Final {
         Code::Final
     }
 
-    fn tokenize<'a>(_job: &'a mut Job) -> Result<(),LexerError> {
+    fn tokenize<'a>(_job: &'a mut Job) -> Result<(), Traced<LexerError>> {
         // TODO: do some final checks like
         // - job.cursor.position() == job.cursor.end() <- implicit alternative?
         Ok(()) // means we are done.

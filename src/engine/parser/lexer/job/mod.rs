@@ -12,6 +12,7 @@ use engine::parser::lexer::Patterns;
 use engine::parser::token::{self, Token, BracketType};
 use engine::parser::lexer::error::LexerError;
 use self::state::TokenizeState;
+use api::error::Traced;
 
 pub mod state;
 pub mod cursor;
@@ -51,11 +52,11 @@ impl<'c, 't> Job<'c, 't> {
     }
 
     #[allow(dead_code)] // TODO: testcase
-    pub fn tokenize(mut self: Job<'c, 't>) -> Result<token::Stream<'t>, LexerError> {
+    pub fn tokenize(mut self: Job<'c, 't>) -> Result<token::Stream<'t>, Traced<LexerError>> {
         // The TokenizeStates call each other *recursively* to avoid dynamic dispatch
         // for better performance. However, we loose debugging information about the
         // nesting of lexer states.
-        try!(state::Initial::tokenize(&mut self));
+        try_traced!(state::Initial::tokenize(&mut self));
         // TODO: check whether we returned from *final* state
 
         Ok(self.tokens)

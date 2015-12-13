@@ -7,7 +7,7 @@
 
 use std::fmt;
 use template;
-use error::Dump;
+use api::error::Dump;
 
 pub type Position = usize;
 pub type Line = usize;

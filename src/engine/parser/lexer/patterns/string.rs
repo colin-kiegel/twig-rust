@@ -9,6 +9,7 @@
 
 use regex;
 use regex::Error as regexError;
+use api::error::Traced;
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
 
@@ -30,7 +31,7 @@ impl<'a> ItemData<'a> {
 }
 
 impl Pattern {
-    pub fn new() -> Result<Pattern, regexError> {
+    pub fn new() -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(r##"(?s)\A"([^#"\\]*(?:\\.[^#"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'"##),
         })

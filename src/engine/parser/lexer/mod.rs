@@ -12,15 +12,14 @@ use template;
 use engine::{Engine, ExtensionRegistry};
 use engine::parser::lexer::job::Job;
 use engine::parser::lexer::job::state::TokenizeState;
-use error::ErrorCode;
 use engine::parser::token;
+use api::error::Traced;
 pub mod error;
 pub mod job;
 pub mod patterns;
 pub use self::patterns::Patterns;
 pub use self::patterns::options::Options;
-pub use self::error::{LexerError, LexerErrorCode, SyntaxError, SyntaxErrorCode};
-
+pub use self::error::{LexerError, SyntaxError};
 
 #[derive(PartialEq, Debug)]
 pub struct Lexer {
@@ -28,21 +27,14 @@ pub struct Lexer {
 }
 
 impl Lexer {
-    pub fn new(twig: &Engine, opt: Options) -> Result<Lexer, LexerError> {
+    pub fn new(twig: &Engine, opt: Options) -> Result<Lexer, Traced<LexerError>> {
         let ref opt = Rc::new(opt); // TODO: -> switch to &Options (!?)
         let ext = match twig.extensions() {
-            Err(e) => return Err(LexerErrorCode::MissingExtensions
-                .at(loc!())
-                .caused_by(e)),
+            Err(_) => return traced_err!(LexerError::MissingExtensions),
             Ok(ext) => ext
         };
 
-        let p = match Patterns::new(opt, ext) {
-            Err(e) => return Err(LexerErrorCode::PatternRegexError
-                .at(loc!())
-                .caused_by(e)),
-            Ok(p) => p
-        };
+        let p = try_traced!(Patterns::new(opt, ext));
 
         Ok(Lexer {
             patterns: p,
@@ -50,7 +42,7 @@ impl Lexer {
     }
 
     #[allow(dead_code)] // TODO: testcase
-    pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream<'t>, LexerError>
+    pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream<'t>, Traced<LexerError>>
         where 't: 'a // the template must outlive the Lexer
     {
         let job = Job::new(template, &self.patterns);

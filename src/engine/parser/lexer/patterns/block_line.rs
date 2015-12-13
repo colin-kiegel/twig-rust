@@ -11,10 +11,10 @@ use super::Options;
 use regex;
 use regex::Error as regexError;
 use std::rc::Rc;
-use error::ErrorCode;
+use api::error::{Traced, ErrorExt};
 
 pub type ExtractIter<'a, 'b> = super::ExtractIter<'a, 'b, Pattern>;
-pub use engine::parser::lexer::{LexerError, LexerErrorCode};
+pub use engine::parser::lexer::LexerError;
 
 
 #[derive(Debug, PartialEq)]
@@ -30,7 +30,7 @@ pub struct ItemData {
 }
 
 impl Pattern {
-    pub fn new(opt: &Rc<Options>) -> Result<Pattern, regexError> {
+    pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A\s*line\s+(\d+)\s*(?:{ws}{b1}\s*|{b1})",
                 ws = opt.whitespace_trim.quoted(),
@@ -41,14 +41,14 @@ impl Pattern {
 }
 
 impl<'t> super::Extract<'t> for Pattern {
-    type Item = Result<ItemData, LexerError>;
+    type Item = Result<ItemData, Traced<LexerError>>;
 
     fn regex(&self) -> &regex::Regex {
         &self.regex
     }
 
     #[inline]
-    fn item_from_captures(&self, captures: &regex::Captures) -> Result<ItemData, LexerError> {
+    fn item_from_captures(&self, captures: &regex::Captures) -> Result<ItemData, Traced<LexerError>> {
         Ok(ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
@@ -58,9 +58,10 @@ impl<'t> super::Extract<'t> for Pattern {
                 Some(x) => match x.parse::<usize>() {
                         Ok(line) => line,
                         Err(e) => {
-                            return Err(LexerErrorCode::InvalidValue { value: x.to_string() }
-                                .at(loc!())
-                                .caused_by(e))
+                            return traced_err!(LexerError::InvalidInteger {
+                                value: x.to_string(),
+                                parse_error: e
+                            })
                         },
                     },
                 _ => unreachable!(),
@@ -111,9 +112,10 @@ mod test {
         // u32::max_value() == 4294967295
         let err = pattern.extract(&r"   line   1844674407370955161518446744073709551615  %}").unwrap().unwrap_err();
 
-        assert_eq!(
-            *err.code(),
-            LexerErrorCode::InvalidValue { value: "1844674407370955161518446744073709551615".to_string() }
-        );
+        if let LexerError::InvalidInteger { value: ref x, parse_error: _ } = *err.error() {
+            assert_eq!(x, "1844674407370955161518446744073709551615");
+        } else {
+            panic!("expected `LexerError::InvalidInteger`");
+        }
     }
 }
