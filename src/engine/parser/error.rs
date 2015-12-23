@@ -61,8 +61,12 @@ impl From<TokenError> for ParserError {
 impl Error for ParserError {
     fn description(&self) -> &str {
         match *self {
-            ParserError::Unreachable{..} => "Unexptected parser error (please report as bug with details).",
-            ParserError::MissingExtensions => "Could not initialize parser due to missing engine extensions.",
+            ParserError::Unreachable{..} => {
+                "Unexptected parser error (please report as bug with details)."
+            }
+            ParserError::MissingExtensions => {
+                "Could not initialize parser due to missing engine extensions."
+            }
             ParserError::InvalidState{..} => "Parser ended up in unsupported state.",
             ParserError::Token(..) => "Token error.",
             ParserError::TokenParserError{..} => "Token parser error.",
@@ -82,53 +86,60 @@ impl Display for ParserError {
         match *self {
             ParserError::Unreachable {
                 ref reason, ref job
-            } => {
-                write!(f, " {reason} for {job}",
-                    reason = reason,
-                    job = job)
-            }
+            } => write!(f, " {reason} for {job}", reason = reason, job = job),
             ParserError::MissingExtensions => Ok(()),
             ParserError::InvalidState {
                 item: ref i, job: ref j
             } => {
-                write!(f, " Found token {token:?} at {pos} in {job}",
-                    token = i.token(),
-                    pos = i.position(),
-                    job = j)
-            },
-            ParserError::Token(ref e) => Display::fmt(e,f),
+                write!(f,
+                       " Found token {token:?} at {pos} in {job}",
+                       token = i.token(),
+                       pos = i.position(),
+                       job = j)
+            }
+            ParserError::Token(ref e) => Display::fmt(e, f),
             ParserError::TokenParserError {
                 tag, ref error, ref job
             } => {
-                write!(f, " {tag:?}-block: {error} for job {job}.",
-                    tag = tag, error = error, job = job)
-            },
+                write!(f,
+                       " {tag:?}-block: {error} for job {job}.",
+                       tag = tag,
+                       error = error,
+                       job = job)
+            }
             ParserError::SemanticError => Ok(()),
             ParserError::NoTagHandler {
                 tag: ref t, position: ref p, job: ref j
             } => {
-                write!(f, " Found block {tag} at {pos} for job {job}.",
-                    tag = t, pos = p, job = j)
-            },
+                write!(f,
+                       " Found block {tag} at {pos} for job {job}.",
+                       tag = t,
+                       pos = p,
+                       job = j)
+            }
             ParserError::UnexpectedBinaryOperator {
                 name: ref n, job: ref j
             } => {
-                write!(f, " The binary operator {name:?} is unknown to the engine for job {job}",
-                    name = n,
-                    job = j)
-            },
+                write!(f,
+                       " The binary operator {name:?} is unknown to the engine for job {job}",
+                       name = n,
+                       job = j)
+            }
             ParserError::UnexpectedToken {
                 reason: r, expected: ref x, found: ref i
             } => {
-                try!(write!(f, " Expected token {x:?} but found {t:?} at {p:?}.",
-                    x = x, t = i.token(), p = i.position()));
+                try!(write!(f,
+                            " Expected token {x:?} but found {t:?} at {p:?}.",
+                            x = x,
+                            t = i.token(),
+                            p = i.position()));
 
                 if let Some(reason) = r {
                     try!(write!(f, " {}", reason));
                 }
 
                 Ok(())
-            },
+            }
             ParserError::UnexpectedEof {
                 reason, ref expected, ref cursor
             } => {
@@ -150,18 +161,20 @@ impl Display for ParserError {
 #[derive(Debug)]
 pub enum NodeError {
     Unreachable {
-        reason: String
+        reason: String,
     },
     AttributeNotFound {
         key: String,
-        node_tag: String
-    }
+        node_tag: String,
+    },
 }
 
 impl Error for NodeError {
     fn description(&self) -> &str {
         match *self {
-            NodeError::Unreachable{..} => "Unexptected node error (please report as bug with details).",
+            NodeError::Unreachable{..} => {
+                "Unexptected node error (please report as bug with details)."
+            }
             NodeError::AttributeNotFound{..} => "Attribute not found.",
         }
     }
@@ -174,15 +187,15 @@ impl Display for NodeError {
         match *self {
             NodeError::Unreachable {
                 ref reason
-            } => {
-                write!(f, " {}", reason)
-            }
+            } => write!(f, " {}", reason),
             NodeError::AttributeNotFound{
                 ref key, ref node_tag
             } => {
-                write!(f, " Attribute {key:?} does not exist for Node {node:?}.",
-                    key = key, node = node_tag)
-            },
+                write!(f,
+                       " Attribute {key:?} does not exist for Node {node:?}.",
+                       key = key,
+                       node = node_tag)
+            }
         }
     }
 }

@@ -33,8 +33,8 @@ impl Pattern {
     pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A\s*line\s+(\d+)\s*(?:{ws}{b1}\s*|{b1})",
-                ws = opt.whitespace_trim.quoted(),
-                b1 = opt.tag_block_end.quoted())),
+                                          ws = opt.whitespace_trim.quoted(),
+                                          b1 = opt.tag_block_end.quoted())),
             options: (*opt).clone(),
         })
     }   // orig: '/\s*line\s+(\d+)\s*'.$tag_block[1].'/As'
@@ -48,22 +48,26 @@ impl<'t> super::Extract<'t> for Pattern {
     }
 
     #[inline]
-    fn item_from_captures(&self, captures: &regex::Captures) -> Result<ItemData, Traced<LexerError>> {
+    fn item_from_captures(&self,
+                          captures: &regex::Captures)
+                          -> Result<ItemData, Traced<LexerError>> {
         Ok(ItemData {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
             },
             line: match captures.at(1) {
-                Some(x) => match x.parse::<usize>() {
+                Some(x) => {
+                    match x.parse::<usize>() {
                         Ok(line) => line,
                         Err(e) => {
                             return traced_err!(LexerError::InvalidInteger {
                                 value: x.to_string(),
-                                parse_error: e
+                                parse_error: e,
                             })
-                        },
-                    },
+                        }
+                    }
+                }
                 _ => unreachable!(),
             },
         })
@@ -81,10 +85,7 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"\A\s*line\s+(\d+)\s*(?:-%\}\s*|%\})"
-        );
+        assert_eq!(pattern.as_str(), r"\A\s*line\s+(\d+)\s*(?:-%\}\s*|%\})");
     }
 
     #[test]
@@ -92,15 +93,13 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            // u64::max_value() == 18446744073709551615
-            // u32::max_value() == 4294967295
-            pattern.extract(&r"   line   1234567890  %}").unwrap().unwrap(),
-            ItemData {
-                position: (0,24),
-                line: 1234567890
-            }
-        );
+        assert_eq!(// u64::max_value() == 18446744073709551615
+                   // u32::max_value() == 4294967295
+                   pattern.extract(&r"   line   1234567890  %}").unwrap().unwrap(),
+                   ItemData {
+                       position: (0, 24),
+                       line: 1234567890,
+                   });
     }
 
     #[test]
@@ -110,7 +109,9 @@ mod test {
 
         // u64::max_value() == 18446744073709551615
         // u32::max_value() == 4294967295
-        let err = pattern.extract(&r"   line   1844674407370955161518446744073709551615  %}").unwrap().unwrap_err();
+        let err = pattern.extract(&r"   line   1844674407370955161518446744073709551615  %}")
+                         .unwrap()
+                         .unwrap_err();
 
         if let LexerError::InvalidInteger { value: ref x, parse_error: _ } = *err.error() {
             assert_eq!(x, "1844674407370955161518446744073709551615");

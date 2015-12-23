@@ -27,21 +27,23 @@ pub struct ExpressionParser {
 
 impl ExpressionParser {
     pub fn new(ext: &Rc<ExtensionRegistry>) -> ExpressionParser {
-        ExpressionParser {
-            ext: ext.clone(),
-        }
+        ExpressionParser { ext: ext.clone() }
     }
 
     // orig. parse_expression
-    pub fn parse(&self, job: &mut Job, precedence: Precedence) -> Result<Box<Node>, Traced<ParserError>> {
+    pub fn parse(&self,
+                 job: &mut Job,
+                 precedence: Precedence)
+                 -> Result<Box<Node>, Traced<ParserError>> {
         let expr = try_traced!(self.primary(job));
 
         let _token = try_traced!(job.mut_cursor().peek_token().ok_or_else(|| {
             ParserError::UnexpectedEof {
                 expected: None,
                 reason: Some("Found unclosed expression"),
-                cursor: job.mut_cursor().dump()
-            }.at(loc!())
+                cursor: job.mut_cursor().dump(),
+            }
+            .at(loc!())
         }));
 
         // while self.is_binary(token) {
@@ -67,8 +69,9 @@ impl ExpressionParser {
         // }
 
         return Ok(match precedence {
-        //    Precedence(0) => self.parse_conditional_expression(&expr),
-            _ => expr});
+            // Precedence(0) => self.parse_conditional_expression(&expr),
+            _ => expr,
+        });
     }
 
     pub fn primary(&self, job: &mut Job) -> Result<Box<Node>, Traced<ParserError>> {
@@ -77,16 +80,15 @@ impl ExpressionParser {
                 expected: None,
                 reason: Some("Expected to find an expression"),
                 cursor: job.mut_cursor().dump(),
-            }.at(loc!())
+            }
+            .at(loc!())
         })) {
             Token::Operator(ref _op) => unimplemented!(),
-            Token::Punctuation(Punctuation::OpeningBracket(BracketType::Round)) => {
-                unimplemented!()
-            },
+            Token::Punctuation(Punctuation::OpeningBracket(BracketType::Round)) => unimplemented!(),
             _ => {}
         }
 
-        return self.parse_primary_expression(job)
+        return self.parse_primary_expression(job);
     }
 
     pub fn is_binary(&self, _token: &Token) -> bool {
@@ -122,7 +124,9 @@ impl ExpressionParser {
         unimplemented!()
     }
 
-    pub fn parse_primary_expression(&self, job: &mut Job) -> Result<Box<Node>, Traced<ParserError>> {
+    pub fn parse_primary_expression(&self,
+                                    job: &mut Job)
+                                    -> Result<Box<Node>, Traced<ParserError>> {
         // TODO: Check if we can call next_token() immediately
         //      instead of peek() + next(), where the next() call
         //      seems to happen in every match-branch (double check!)
@@ -131,8 +135,9 @@ impl ExpressionParser {
             ParserError::UnexpectedEof {
                 expected: None,
                 reason: Some("Unclosed primary expression"),
-                cursor: job.mut_cursor().dump()
-            }.at(loc!())
+                cursor: job.mut_cursor().dump(),
+            }
+            .at(loc!())
         }));
 
         let node: Box<Node> = match *item.token() {
@@ -140,38 +145,39 @@ impl ExpressionParser {
                 job.mut_cursor().next_token();
 
                 match value.as_ref() {
-                    "true" | "TRUE" => { unimplemented!() },
-                    "false" | "FALSE" => { unimplemented!() },
-                    "none" | "NONE" | "null" | "NULL" => { unimplemented!() },
+                    "true" | "TRUE" => unimplemented!(),
+                    "false" | "FALSE" => unimplemented!(),
+                    "none" | "NONE" | "null" | "NULL" => unimplemented!(),
                     _ => if job.mut_cursor().peek_token() ==
                         Some(&Token::Punctuation(Punctuation::OpeningBracket(BracketType::Round))) {
                             unimplemented!()
                         } else {
                             node::expression::Name::boxed(value.clone(), item.position())
-                        }
+                        },
                 }
-            },
+            }
             Token::IntegerNumber(_) => unimplemented!(),
             Token::FloatingNumber(_) => unimplemented!(),
             Token::String(_) => unimplemented!(),
             Token::_InterpolationStart => unimplemented!(),
             Token::Operator(_) => unimplemented!(),
             Token::Punctuation(_) => unimplemented!(),
-            Token::_Eof
-            | Token::Text(_)
-            | Token::_InterpolationEnd
-            | Token::BlockStart
-            | Token::ExpressionStart
-            | Token::BlockEnd
-            | Token::ExpressionEnd => {
-                unimplemented!()
-            }
+            Token::_Eof |
+            Token::Text(_) |
+            Token::_InterpolationEnd |
+            Token::BlockStart |
+            Token::ExpressionStart |
+            Token::BlockEnd |
+            Token::ExpressionEnd => unimplemented!(),
         };
 
         self.parse_postfix_expression(job, node)
     }
 
-    fn parse_postfix_expression(&self, job: &mut Job, node: Box<Node>) -> Result<Box<Node>, Traced<ParserError>> {
+    fn parse_postfix_expression(&self,
+                                job: &mut Job,
+                                node: Box<Node>)
+                                -> Result<Box<Node>, Traced<ParserError>> {
         let mut node = node;
 
         'a: while let Token::Punctuation(ref punc) = *try_traced!(
@@ -183,13 +189,13 @@ impl ExpressionParser {
                 }.at(loc!())
         })) {
             match *punc {
-                Punctuation::Dot
-                | Punctuation::OpeningBracket(BracketType::Square) => {
+                Punctuation::Dot |
+                Punctuation::OpeningBracket(BracketType::Square) => {
                     node = try_traced!(self.parse_subscript_expression(job, node));
-                },
+                }
                 Punctuation::VerticalBar => {
                     node = try_traced!(self.parse_filter_expression(job, node));
-                },
+                }
                 _ => break 'a,
             }
         }
@@ -197,11 +203,17 @@ impl ExpressionParser {
         return Ok(node);
     }
 
-    fn parse_subscript_expression(&self, _job: &mut Job, _node: Box<Node>) -> Result<Box<Node>, Traced<ParserError>> {
+    fn parse_subscript_expression(&self,
+                                  _job: &mut Job,
+                                  _node: Box<Node>)
+                                  -> Result<Box<Node>, Traced<ParserError>> {
         unimplemented!()
     }
 
-    fn parse_filter_expression(&self, _job: &mut Job, _node: Box<Node>) -> Result<Box<Node>, Traced<ParserError>> {
+    fn parse_filter_expression(&self,
+                               _job: &mut Job,
+                               _node: Box<Node>)
+                               -> Result<Box<Node>, Traced<ParserError>> {
         unimplemented!()
     }
 }

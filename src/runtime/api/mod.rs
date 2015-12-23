@@ -21,8 +21,8 @@ pub trait Execute : Debug {
     //      object. Thus type erasure should *not* require Self:Sized
     //
     // TODO: report to upstream rust
-    fn run(&self, runtime: &Runtime) -> String where
-        Self: Sized
+    fn run(&self, runtime: &Runtime) -> String
+        where Self: Sized
     {
         runtime.run(self)
     }

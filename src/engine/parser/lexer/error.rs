@@ -43,14 +43,16 @@ pub enum SyntaxError {
         cursor: cursor::CursorDump,
     },
     UnclosedVariable {
-        cursor: cursor::CursorDump
+        cursor: cursor::CursorDump,
     },
 }
 
 impl Error for SyntaxError {
     fn description(&self) -> &str {
         match *self {
-            SyntaxError::Unreachable{..} => "Unexptected syntax error (please report as bug with details).",
+            SyntaxError::Unreachable{..} => {
+                "Unexptected syntax error (please report as bug with details)."
+            }
             SyntaxError::UnexpectedCharacter{..} => "Unexpected character.",
             SyntaxError::UnexpectedBracket{..} => "Unexpected bracket.",
             SyntaxError::UnexpectedEof{..} => "Unexpected end of template.",
@@ -70,59 +72,46 @@ impl Display for SyntaxError {
             SyntaxError::Unreachable {
                 reason: ref r,
                 cursor: ref c
-            } => {
-                write!(f, " {reason} at {cursor}.",
-                    reason = r,
-                    cursor = c)
-            },
+            } => write!(f, " {reason} at {cursor}.", reason = r, cursor = c),
             SyntaxError::UnexpectedCharacter {
                 character, ref cursor
             } => {
-                write!(f, " found '{c}' at {cursor}.",
-                    c = character, cursor = cursor)
-            },
+                write!(f,
+                       " found '{c}' at {cursor}.",
+                       c = character,
+                       cursor = cursor)
+            }
             SyntaxError::UnexpectedBracket {
                 ref cursor, ref bracket
             } => {
-                write!(f, " Unexpected {bracket:?} at {cursor}.",
-                    cursor = cursor, bracket = bracket)
-            },
+                write!(f,
+                       " Unexpected {bracket:?} at {cursor}.",
+                       cursor = cursor,
+                       bracket = bracket)
+            }
             SyntaxError::UnexpectedEof {
                 reason: ref r,
                 cursor: ref c
-            } => {
-                write!(f, " {reason} at {cursor}.",
-                    reason = r,
-                    cursor = c)
-            },
+            } => write!(f, " {reason} at {cursor}.", reason = r, cursor = c),
             SyntaxError::UnclosedBracket {
                 ref cursor, ref bracket, ref bracket_before, line_before
             } => {
-                write!(f, " Unclosed {b_before:?} from line\
-                                {line_before} but found {b:?} at {cursor}.",
-                    cursor = cursor,
-                    b = bracket,
-                    b_before = bracket_before,
-                    line_before = line_before)
-            },
+                write!(f,
+                       " Unclosed {b_before:?} from line{line_before} but found {b:?} at {cursor}.",
+                       cursor = cursor,
+                       b = bracket,
+                       b_before = bracket_before,
+                       line_before = line_before)
+            }
             SyntaxError::UnclosedComment {
                 ref cursor
-            } => {
-                write!(f, " At {cursor}.",
-                    cursor = cursor)
-            },
+            } => write!(f, " At {cursor}.", cursor = cursor),
             SyntaxError::UnclosedBlock {
                 ref cursor
-            } => {
-                write!(f, " At {cursor}.",
-                    cursor = cursor)
-            },
+            } => write!(f, " At {cursor}.", cursor = cursor),
             SyntaxError::UnclosedVariable {
                 ref cursor
-            } => {
-                write!(f, " At {cursor}.",
-                    cursor = cursor)
-            },
+            } => write!(f, " At {cursor}.", cursor = cursor),
         }
     }
 }
@@ -130,18 +119,18 @@ impl Display for SyntaxError {
 #[derive(Debug)]
 pub enum LexerError {
     Unreachable {
-        reason: String
+        reason: String,
     },
     MissingExtensions,
     InvalidRegexPattern(regex::Error),
     _InvalidPatternMatch,
     InvalidFloat {
         value: String,
-        parse_error: ParseFloatError
+        parse_error: ParseFloatError,
     },
     InvalidInteger {
         value: String,
-        parse_error: ParseIntError
+        parse_error: ParseIntError,
     },
     _InvalidState,
     Syntax(SyntaxError),
@@ -162,9 +151,15 @@ impl From<regex::Error> for LexerError {
 impl Error for LexerError {
     fn description(&self) -> &str {
         match *self {
-            LexerError::Unreachable{..} => "Unexptected lexer error (please report as bug with details).",
-            LexerError::MissingExtensions => "Could not initialize lexer due to missing engine extensions.",
-            LexerError::InvalidRegexPattern(..) => "Could not initialize lexer due to invalid regular expression.",
+            LexerError::Unreachable{..} => {
+                "Unexptected lexer error (please report as bug with details)."
+            }
+            LexerError::MissingExtensions => {
+                "Could not initialize lexer due to missing engine extensions."
+            }
+            LexerError::InvalidRegexPattern(..) => {
+                "Could not initialize lexer due to invalid regular expression."
+            }
             LexerError::_InvalidPatternMatch => "Invalid pattern match.",
             LexerError::InvalidFloat{..} => "Invalid float.",
             LexerError::InvalidInteger{..} => "Invalid integer.",
@@ -181,24 +176,18 @@ impl Display for LexerError {
         match *self {
             LexerError::Unreachable {
                 ref reason
-            } => {
-                write!(f, "{}.", reason)
-            },
+            } => write!(f, "{}.", reason),
             LexerError::MissingExtensions => Ok(()),
             LexerError::InvalidRegexPattern(..) => Ok(()),
             LexerError::_InvalidPatternMatch => Ok(()),
             LexerError::InvalidFloat {
                 ref value, parse_error: _
-            } => {
-                write!(f, "Found value {}.", value)
-            },
+            } => write!(f, "Found value {}.", value),
             LexerError::InvalidInteger {
                 ref value, parse_error: _
-            } => {
-                write!(f, "Found value {}.", value)
-            },
+            } => write!(f, "Found value {}.", value),
             LexerError::_InvalidState => Ok(()),
-            LexerError::Syntax(ref e) => Display::fmt(e,f),
+            LexerError::Syntax(ref e) => Display::fmt(e, f),
         }
     }
 }

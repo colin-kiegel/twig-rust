@@ -23,14 +23,13 @@ pub struct Pattern {
 
 #[derive(Debug, PartialEq)]
 pub struct ItemData {
-    pub position: (usize, usize)
+    pub position: (usize, usize),
 }
 
 impl Pattern {
     pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
-            regex: try_new_regex!(format!(r"\A\s*{i1}",
-                i1 = opt.interpolation_end.quoted())),
+            regex: try_new_regex!(format!(r"\A\s*{i1}", i1 = opt.interpolation_end.quoted())),
             options: (*opt).clone(),
         })
     }   // orig: '/\s*'.$interpolation[1].'/A'
@@ -48,16 +47,13 @@ impl<'t> super::Extract<'t> for Pattern {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
-            }
+            },
         }
     }
 
     // overwrite for better performance, as long as we only need the position
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
-            ItemData {
-                position: position
-            })
+        self.find(text).map(|position| ItemData { position: position })
     }
 }
 
@@ -72,10 +68,7 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"\A\s*\}"
-        );
+        assert_eq!(pattern.as_str(), r"\A\s*\}");
     }
 
     #[test]
@@ -83,16 +76,9 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum}"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum}"), None);
 
-        assert_eq!(
-            pattern.extract(&r"       }"),
-            Some(ItemData {
-                position: (0, 8)
-            })
-        );
+        assert_eq!(pattern.extract(&r"       }"),
+                   Some(ItemData { position: (0, 8) }));
     }
 }

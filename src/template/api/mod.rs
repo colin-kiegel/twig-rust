@@ -9,9 +9,9 @@ use engine::TwigError;
 use runtime::Runtime;
 use api::error::Traced;
 
-pub const _ANY_CALL    : &'static str = "any";
-pub const _ARRAY_CALL  : &'static str = "array";
-pub const _METHOD_CALL : &'static str = "method";
+pub const _ANY_CALL: &'static str = "any";
+pub const _ARRAY_CALL: &'static str = "array";
+pub const _METHOD_CALL: &'static str = "method";
 
 pub trait Template {
     /// Renders the template with the given context and returns it as string.
@@ -23,8 +23,8 @@ pub trait Template {
     /// blocks is an array of blocks to pass to the template
     fn display(&self, runtime: &Runtime, blocks: Option<Vec<()>>); // TODO: error handling
 
-    // /**
-    //  * Get the bound engine for this template.
-    //  */
-    // fn engine(&self) -> &Engine;
+// /**
+//  * Get the bound engine for this template.
+//  */
+// fn engine(&self) -> &Engine;
 }

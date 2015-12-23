@@ -8,8 +8,8 @@
 use super::{TokenizeState, Code};
 use engine::parser::lexer::job::Job;
 use engine::parser::token::Token;
-use engine::parser::lexer::patterns::{Extract};
-use engine::parser::lexer::{LexerError};
+use engine::parser::lexer::patterns::Extract;
+use engine::parser::lexer::LexerError;
 use super::shared_traits::LexExpression;
 use api::error::Traced;
 
@@ -29,8 +29,8 @@ impl TokenizeState for Expression {
                     job.push_token(Token::ExpressionEnd);
 
                     return Ok(());//try_traced!(job.pop_state()).tokenize(job);
-                },
-                _ => {},
+                }
+                _ => {}
             }
         };
 

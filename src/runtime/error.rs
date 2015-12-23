@@ -11,14 +11,16 @@ use std::error::Error;
 #[derive(Debug)]
 pub enum RuntimeError {
     Unreachable {
-        reason: String
-    }
+        reason: String,
+    },
 }
 
 impl Error for RuntimeError {
     fn description(&self) -> &str {
         match *self {
-            RuntimeError::Unreachable{..} => "Unexptected runtime error (please report as bug with details).",
+            RuntimeError::Unreachable{..} => {
+                "Unexptected runtime error (please report as bug with details)."
+            }
         }
     }
 }
@@ -30,9 +32,7 @@ impl Display for RuntimeError {
         match *self {
             RuntimeError::Unreachable {
                 ref reason
-            } => {
-                write!(f, " {}.", reason)
-            }
+            } => write!(f, " {}.", reason),
         }
     }
 }

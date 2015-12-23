@@ -7,12 +7,15 @@
 
 use super::api::Extension;
 
-#[allow(dead_code)] // dummy
+#[allow(dead_code)]
+// dummy
 #[derive(Default, Debug, PartialEq)]
 pub struct Staging;
 
 impl Extension for Staging {
-    fn name(&self) -> &'static str { "staging" }
+    fn name(&self) -> &'static str {
+        "staging"
+    }
 }
 
 impl Staging {

@@ -39,10 +39,10 @@ impl Pattern {
     pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"({v0}|{b0}|{c0})({ws})?",
-                ws = opt.whitespace_trim.quoted(),
-                b0 = opt.tag_block_start.quoted(),
-                c0 = opt.tag_comment_start.quoted(),
-                v0 = opt.tag_expression_start.quoted())),
+                                          ws = opt.whitespace_trim.quoted(),
+                                          b0 = opt.tag_block_start.quoted(),
+                                          c0 = opt.tag_comment_start.quoted(),
+                                          v0 = opt.tag_expression_start.quoted())),
             options: (*opt).clone(),
         })
     }   // orig: '/('.$tag_variable[0].'|'.$tag_block[0].'|'.$tag_comment[0].')('.$whitespace_trim.')?/s'
@@ -63,11 +63,11 @@ impl<'t> super::Extract<'t> for Pattern {
             },
             whitespace_trim: match captures.at(2) {
                 Some(_) => true,
-                None    => false,
+                None => false,
             },
             tag: match captures.at(1) {
-                Some(x) if x == self.options.tag_block_start.raw()    => Tag::Block,
-                Some(x) if x == self.options.tag_comment_start.raw()  => Tag::Comment,
+                Some(x) if x == self.options.tag_block_start.raw() => Tag::Block,
+                Some(x) if x == self.options.tag_comment_start.raw() => Tag::Comment,
                 Some(x) if x == self.options.tag_expression_start.raw() => Tag::Expression,
                 _ => unreachable!(),
             },
@@ -86,10 +86,7 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"(\{\{|\{%|\{\#)(-)?"
-        );
+        assert_eq!(pattern.as_str(), r"(\{\{|\{%|\{\#)(-)?");
     }
 
     #[test]
@@ -97,25 +94,20 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"{-{"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"{-{"), None);
 
-        assert_eq!(
-            pattern.extract(&r"{{-"),
-            Some(ItemData {
-                position: (0,3),
-                whitespace_trim: true,
-                tag: Tag::Expression
-            }));
+        assert_eq!(pattern.extract(&r"{{-"),
+                   Some(ItemData {
+                       position: (0, 3),
+                       whitespace_trim: true,
+                       tag: Tag::Expression,
+                   }));
 
-        assert_eq!(
-            pattern.extract(&r"{{"),
-            Some(ItemData {
-                position: (0,2),
-                whitespace_trim: false,
-                tag: Tag::Expression
-            }));
+        assert_eq!(pattern.extract(&r"{{"),
+                   Some(ItemData {
+                       position: (0, 2),
+                       whitespace_trim: false,
+                       tag: Tag::Expression,
+                   }));
     }
 }

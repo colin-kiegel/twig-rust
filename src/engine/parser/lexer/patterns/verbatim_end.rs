@@ -56,7 +56,7 @@ impl<'t> super::Extract<'t> for Pattern {
             },
             whitespace_trim: match captures.at(1) {
                 Some(_) => true,
-                None    => false,
+                None => false,
             },
             tag: match captures.at(2) {
                 Some("raw") => Tag::Raw,
@@ -78,10 +78,8 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"\{%(-)?\s*(?:end(raw|verbatim))\s*(?:-%\}\s*|%\})"
-        );
+        assert_eq!(pattern.as_str(),
+                   r"\{%(-)?\s*(?:end(raw|verbatim))\s*(?:-%\}\s*|%\})");
     }
 
     #[test]
@@ -89,27 +87,21 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum"), None);
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum {% endraw %} dolor").unwrap(),
-            ItemData {
-                position: (12,24),
-                whitespace_trim: false,
-                tag: Tag::Raw,
-            }
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum {% endraw %} dolor").unwrap(),
+                   ItemData {
+                       position: (12, 24),
+                       whitespace_trim: false,
+                       tag: Tag::Raw,
+                   });
 
-        assert_eq!(
-            pattern.extract(&r"And then there was silence {%- endverbatim -%}       .").unwrap(),
-            ItemData {
-                position: (27,53),
-                whitespace_trim: true,
-                tag: Tag::Verbatim,
-            }
-        );
+        assert_eq!(pattern.extract(&r"And then there was silence {%- endverbatim -%}       .")
+                          .unwrap(),
+                   ItemData {
+                       position: (27, 53),
+                       whitespace_trim: true,
+                       tag: Tag::Verbatim,
+                   });
     }
 }

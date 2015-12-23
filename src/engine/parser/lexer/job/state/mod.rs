@@ -27,14 +27,12 @@ pub use self::final_::Final;
 
 pub trait TokenizeState {
     /// tokenize recursively
-    fn tokenize<'a>(_job: &'a mut Job) -> Result<(), Traced<LexerError>> where
-        Self: Sized;
+    fn tokenize<'a>(_job: &'a mut Job) -> Result<(), Traced<LexerError>> where Self: Sized;
 
-    fn state() -> Code where
-        Self: Sized;
+    fn state() -> Code where Self: Sized;
 
-    fn is_state(code: Code) -> bool where
-        Self: Sized
+    fn is_state(code: Code) -> bool
+        where Self: Sized
     {
         Self::state() == code
     }
@@ -42,11 +40,11 @@ pub trait TokenizeState {
 
 #[derive(Debug, PartialEq)]
 pub enum Code {
-    Data            = 0,
-    Block           = 1,
-    Expression      = 2, // orig: var
-    String          = 3,
-    Interpolation   = 4,
-    Initial         = -1, // orig: implicit sub-state of Data
-    Final           = -2, // orig: implicit sub-state
+    Data = 0,
+    Block = 1,
+    Expression = 2, // orig: var
+    String = 3,
+    Interpolation = 4,
+    Initial = -1, // orig: implicit sub-state of Data
+    Final = -2, // orig: implicit sub-state
 }

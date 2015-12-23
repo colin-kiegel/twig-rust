@@ -21,6 +21,6 @@ impl TokenizeState for Initial {
 
     fn tokenize<'a>(job: &'a mut Job) -> Result<(), Traced<LexerError>> {
         // TODO: some pre-checks, like len>0?
-        return Data::tokenize(job)
+        return Data::tokenize(job);
     }
 }

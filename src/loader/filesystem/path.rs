@@ -7,7 +7,7 @@
 
 use std::path::{Path, PathBuf, Component};
 use super::namespace;
-use loader::{LoaderError};
+use loader::LoaderError;
 use api::error::Traced;
 
 pub struct TemplatePath {
@@ -31,12 +31,14 @@ impl TemplatePath {
 
         if normalized_path.chars().nth(1) == Some('@') {
             match normalized_path.find('/') {
-                None => return traced_err!(LoaderError::FileSystemMalformedNamespacedPath {
-                    template_name:  normalized_path
-                }),
+                None => {
+                    return traced_err!(LoaderError::FileSystemMalformedNamespacedPath {
+                        template_name: normalized_path,
+                    })
+                }
                 Some(pos) => {
                     namespace = &normalized_path[1..pos];
-                    raw_path = &normalized_path[pos+1..];
+                    raw_path = &normalized_path[pos + 1..];
                 }
             }
         } else {
@@ -65,10 +67,12 @@ impl TemplatePath {
 
         for c in template_path.chars() {
             match c {
-                '/' | '\\' => if accepting_slash {
-                    normalized_path.push('/');
-                    accepting_slash = false;
-                },
+                '/' | '\\' => {
+                    if accepting_slash {
+                        normalized_path.push('/');
+                        accepting_slash = false;
+                    }
+                }
                 _ => {
                     normalized_path.push(c);
                     accepting_slash = true;
@@ -92,9 +96,7 @@ impl TemplatePath {
         }
 
         if level < 0 {
-            return traced_err!(LoaderError::FileSystemInvalidPath {
-                path: self.raw_path.clone()
-            })
+            return traced_err!(LoaderError::FileSystemInvalidPath { path: self.raw_path.clone() });
         }
 
         Ok(())

@@ -13,8 +13,8 @@ use engine::parser::token::Punctuation;
 use engine::parser::lexer::LexerError;
 use api::error::Traced;
 
-//static TWIG_TEMPLATE_Token::Name : &'static str = "twig.template.html";
-static TWIG_TEMPLATE_CODE : &'static str = include_str!("twig.template.html");
+// static TWIG_TEMPLATE_Token::Name : &'static str = "twig.template.html";
+static TWIG_TEMPLATE_CODE: &'static str = include_str!("twig.template.html");
 
 pub fn tokenize_err<'a>(code: &'a str) -> Traced<LexerError> {
     let tpl = Rc::new(Raw::new(code, "test-example"));
@@ -34,10 +34,8 @@ pub fn assert_tokenize(code: &str, tokens: Vec<Token>) {
     println!("Template Code: {:?}", tpl.code);
     let tokenstream = lxr.tokenize(&tpl).unwrap();
 
-    assert_eq!(
-        tokenstream.into_iter().map(|i| i.into()).collect::<Vec<Token>>(),
-        tokens
-    );
+    assert_eq!(tokenstream.into_iter().map(|i| i.into()).collect::<Vec<Token>>(),
+               tokens);
 }
 
 #[test]

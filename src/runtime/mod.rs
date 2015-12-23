@@ -20,15 +20,13 @@ pub use self::error::RuntimeError;
 #[allow(dead_code)]
 #[derive(Debug, Default)]
 pub struct Runtime {
-    data: HashMap<String, String>
+    data: HashMap<String, String>,
 }
 
 #[allow(dead_code)]
 impl Runtime {
     pub fn new(data: HashMap<String, String>) -> Runtime {
-        Runtime {
-            data: data,
-        }
+        Runtime { data: data }
     }
 
     pub fn run(&self, template: &Execute) -> String {
@@ -56,9 +54,9 @@ impl Runtime {
         self.data.contains_key(key)
     }
 
-    pub fn set<K,V>(&mut self, key: K, value: V) -> Option<String> where
-        K: Into<String>,
-        V: Into<String>
+    pub fn set<K, V>(&mut self, key: K, value: V) -> Option<String>
+        where K: Into<String>,
+              V: Into<String>
     {
         self.data.insert(key.into(), value.into())
     }

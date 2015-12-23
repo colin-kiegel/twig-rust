@@ -19,12 +19,11 @@ pub struct Raw {
 #[allow(unused_variables)]
 impl Raw {
     #[allow(dead_code)] // TODO: testcase
-    pub fn new<C,N>(code: C, name: N) -> Raw where
-        C: ToString,
-        N: ToString,
-        // NOTE: Into<String> would be more efficient
-        //      but Cow<'_, str> does not implement Into<String>
-        //      -> suggest this as new std lib feature?
+    pub fn new<C, N>(code: C, name: N) -> Raw
+        where C: ToString,
+              N: ToString /* NOTE: Into<String> would be more efficient
+                           *      but Cow<'_, str> does not implement Into<String>
+                           *      -> suggest this as new std lib feature? */
     {
         let mut x = Raw {
             name: name.to_string(),
@@ -36,7 +35,7 @@ impl Raw {
     }
 
     fn fix_linebreaks(&mut self) {
-        self.code = self.code.replace("\r\n","\n").replace("\r","\n");
+        self.code = self.code.replace("\r\n", "\n").replace("\r", "\n");
     }
 
     pub fn name(&self) -> &str {
@@ -44,7 +43,9 @@ impl Raw {
     }
 
     #[allow(dead_code)]
-    pub fn tokenize<'a, 't> (&'t self, lexer: &'a Lexer) -> Result<token::Stream<'t>, Traced<LexerError>>
+    pub fn tokenize<'a, 't>(&'t self,
+                            lexer: &'a Lexer)
+                            -> Result<token::Stream<'t>, Traced<LexerError>>
         where 't: 'a // the template must outlive the Lexer
     {
         lexer.tokenize(self)
@@ -53,9 +54,10 @@ impl Raw {
 
 impl fmt::Display for Raw {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "template ({name:?}): {code:?}",
-            name = self.name(),
-            code = self.code)
+        write!(f,
+               "template ({name:?}): {code:?}",
+               name = self.name(),
+               code = self.code)
     }
 }
 
@@ -74,10 +76,7 @@ mod test {
 
     #[test]
     pub fn fix_linebreaks() {
-        let mut t = Raw {
-            code: "1\r\n2\n3\r".to_string(),
-            ..Default::default()
-        };
+        let mut t = Raw { code: "1\r\n2\n3\r".to_string(), ..Default::default() };
         t.fix_linebreaks();
         assert_eq!(t.code, "1\n2\n3\n");
     }

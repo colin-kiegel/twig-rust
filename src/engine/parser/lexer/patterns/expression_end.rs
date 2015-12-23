@@ -30,8 +30,8 @@ impl Pattern {
     pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A\s*(?:{ws}{v1}\s*|{v1})",
-                ws = opt.whitespace_trim.quoted(),
-                v1 = opt.tag_variable_end.quoted())),
+                                          ws = opt.whitespace_trim.quoted(),
+                                          v1 = opt.tag_variable_end.quoted())),
             options: opt.clone(),
         })
     }
@@ -55,10 +55,7 @@ impl<'t> super::Extract<'t> for Pattern {
 
     // overwrite for better performance, as long as we only need the position
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
-            ItemData {
-                position: position
-            })
+        self.find(text).map(|position| ItemData { position: position })
     }
 }
 
@@ -73,10 +70,7 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"\A\s*(?:-\}\}\s*|\}\})"
-        );
+        assert_eq!(pattern.as_str(), r"\A\s*(?:-\}\}\s*|\}\})");
     }
 
     #[test]
@@ -84,23 +78,12 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum }}"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum }}"), None);
 
-        assert_eq!(
-            pattern.extract(&r" }} Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 3),
-            }
-        );
+        assert_eq!(pattern.extract(&r" }} Lorem Ipsum").unwrap(),
+                   ItemData { position: (0, 3) });
 
-        assert_eq!(
-            pattern.extract(&r" -}} Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 5),
-            }
-        );
+        assert_eq!(pattern.extract(&r" -}} Lorem Ipsum").unwrap(),
+                   ItemData { position: (0, 5) });
     }
 }

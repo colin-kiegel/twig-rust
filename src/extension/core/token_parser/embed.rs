@@ -12,7 +12,7 @@ use api::error::Traced;
 #[derive(Debug, Default)]
 pub struct Embed;
 
-impl TokenParser for Embed  {
+impl TokenParser for Embed {
     fn tag(&self) -> &'static str {
         "embed"
     }

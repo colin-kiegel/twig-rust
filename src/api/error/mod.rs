@@ -48,7 +48,7 @@
 //! }
 //! ```
 
-#[macro_use] mod macros;
+#[macro_use]mod macros;
 use std::fmt::{self, Debug, Display};
 use std::error::Error; // use std Error-trait to improve cross-crate compatibility
 use std::ops::{Deref, DerefMut};
@@ -66,7 +66,8 @@ pub trait ErrorExt: Error {
     }
 }
 
-impl<T> ErrorExt for T where T: Error {}
+impl<T> ErrorExt for T where T: Error
+{}
 
 /// Record current state of complex objects
 ///
@@ -97,8 +98,7 @@ pub struct Traced<T>
     trace: Trace,
 }
 
-impl<T> Traced<T> where
-    T: Error
+impl<T> Traced<T> where T: Error
 {
     /// Create a new twig error out of some generic error code.
     ///
@@ -144,20 +144,17 @@ impl<T> Traced<T> where
 
         Traced {
             error: error.into(),
-            trace: trace
+            trace: trace,
         }
     }
 
     /// Creates an iterator to iterate along the error cause-chain.
     pub fn iter(&self) -> ErrorIter {
-        ErrorIter {
-            next: Some(&self.error),
-        }
+        ErrorIter { next: Some(&self.error) }
     }
 }
 
-impl<T> Deref for Traced<T> where
-    T: Error
+impl<T> Deref for Traced<T> where T: Error
 {
     type Target = T;
 
@@ -168,7 +165,7 @@ impl<T> Deref for Traced<T> where
 
 /// Iterator to iterate along the error cause-chain.
 pub struct ErrorIter<'a> {
-    next: Option<&'a Error>
+    next: Option<&'a Error>,
 }
 
 impl<'a> Iterator for ErrorIter<'a> {
@@ -181,28 +178,27 @@ impl<'a> Iterator for ErrorIter<'a> {
                 Some(err)
             }
             None => None,
-        }
+        };
     }
 }
 
-impl<T> Debug for Traced<T> where
-    T: Error
+impl<T> Debug for Traced<T> where T: Error
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         f.debug_struct("Traced")
-            .field("error", &self.error)
-            .field("at", &self.trace)
-            .finish()
+         .field("error", &self.error)
+         .field("at", &self.trace)
+         .finish()
     }
 }
 
-impl<T> Display for Traced<T> where
-    T: Error
+impl<T> Display for Traced<T> where T: Error
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{error} at {trace}\n",
-            error = self.error,
-            trace = &self.trace)
+        write!(f,
+               "{error} at {trace}\n",
+               error = self.error,
+               trace = &self.trace)
     }
 }
 
@@ -231,10 +227,11 @@ impl DerefMut for Trace {
 
 impl Debug for Trace {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        self.iter().enumerate().fold(
-            &mut f.debug_struct("Trace"),
-            |s, i| s.field(&format!("#{}", i.0), i.1)
-        ).finish()
+        self.iter()
+            .enumerate()
+            .fold(&mut f.debug_struct("Trace"),
+                  |s, i| s.field(&format!("#{}", i.0), i.1))
+            .finish()
     }
 }
 
@@ -242,7 +239,7 @@ impl Display for Trace {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
         match self.first() {
             Some(location) => write!(f, "{:?}", location),
-            None =>  write!(f, "unknown (no backtrace)")
+            None => write!(f, "unknown (no backtrace)"),
         }
     }
 }
@@ -252,16 +249,17 @@ impl Display for Trace {
 /// Debug::fmt() output is formatted in a compact way: `"{filename}:{line}:{column}"`.
 #[derive(PartialEq)]
 pub struct Location {
-    pub filename : &'static str,    // e.g. /src/lexer/job/state/shared_traits.rs
-    pub line : u32,
-    pub column : u32,
+    pub filename: &'static str, // e.g. /src/lexer/job/state/shared_traits.rs
+    pub line: u32,
+    pub column: u32,
 }
 
 impl Debug for Location {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{filename}:{line}:{column}",
-            filename = self.filename,
-            line     = self.line,
-            column   = self.column)
+        write!(f,
+               "{filename}:{line}:{column}",
+               filename = self.filename,
+               line = self.line,
+               column = self.column)
     }
 }

@@ -47,25 +47,26 @@ pub enum BracketType {
     Round,
     Square,
     Curly,
-    DoubleQuote, // Pseudo-Bracket - never being pushed to a real token Stream
-                 // but used as a temporary state of the lexer
+    DoubleQuote, /* Pseudo-Bracket - never being pushed to a real token Stream
+                  * but used as a temporary state of the lexer */
 }
 
 #[derive(PartialEq)]
-pub enum Type { // TODO: - remove ?
-    Eof                = -1,
-    Text               = 0,
-    BlockStart         = 1,
-    ExpressionStart    = 2,
-    BlockEnd           = 3,
-    ExpressionEnd      = 4,
-    Name               = 5,
-    Number             = 6, // Floating or Integer
-    String             = 7,
-    Operator           = 8,
-    Punctuation        = 9,
+pub enum Type {
+    // TODO: - remove ?
+    Eof = -1,
+    Text = 0,
+    BlockStart = 1,
+    ExpressionStart = 2,
+    BlockEnd = 3,
+    ExpressionEnd = 4,
+    Name = 5,
+    Number = 6, // Floating or Integer
+    String = 7,
+    Operator = 8,
+    Punctuation = 9,
     InterpolationStart = 10,
-    InterpolationEnd   = 11,
+    InterpolationEnd = 11,
 }
 
 #[allow(unused_variables)]
@@ -85,7 +86,7 @@ impl Token {
             Token::FloatingNumber(ref x) => Some(x.to_string()),
             Token::String(ref x) => Some(x.to_string()),
             Token::Operator(ref x) => Some(x.to_string()),
-            Token::Punctuation(ref x) => Some(format!("{:?}",x)),
+            Token::Punctuation(ref x) => Some(format!("{:?}", x)),
             Token::_InterpolationStart => None,
             Token::_InterpolationEnd => None,
         }
@@ -147,7 +148,7 @@ impl fmt::Debug for Token {
         let typ = self.get_type().name();
         match self.value() {
             Some(ref val) => write!(f, "{typ}({val:?})", typ = typ, val = val),
-            None          => write!(f, "{typ}", typ = typ),
+            None => write!(f, "{typ}", typ = typ),
         }
     }
 }
@@ -166,7 +167,7 @@ impl Dump for Token {
 impl Type {
     /// Returns the name of the token type (internal representation).
     pub fn name(&self) -> &'static str {
-         match *self {
+        match *self {
             Type::Eof => "EOF",
             Type::Text => "TEXT",
             Type::BlockStart => "BLOCK_START",
@@ -185,7 +186,7 @@ impl Type {
 
     /// Returns the description of the token type in plain english.
     pub fn _description(&self) -> &'static str {
-         match *self {
+        match *self {
             Type::Eof => "end of template",
             Type::Text => "text",
             Type::BlockStart => "begin of statement block",

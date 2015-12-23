@@ -9,7 +9,7 @@ use super::api::Extension;
 
 #[derive(Default, Debug, PartialEq)]
 pub struct Optimizer {
-    mode: Mode
+    mode: Mode,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -25,13 +25,13 @@ impl Default for Mode {
 }
 
 impl Extension for Optimizer {
-    fn name(&self) -> &'static str { "optimizer" }
+    fn name(&self) -> &'static str {
+        "optimizer"
+    }
 }
 
 impl Optimizer {
     pub fn new(mode: Mode) -> Box<Optimizer> {
-        Box::new(Optimizer {
-            mode: mode
-        })
+        Box::new(Optimizer { mode: mode })
     }
 }

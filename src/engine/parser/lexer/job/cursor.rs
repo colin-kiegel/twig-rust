@@ -15,9 +15,9 @@ pub type CursorDump = String;
 
 #[derive(Debug)]
 pub struct Cursor<'a> {
-    pos: Position,   // 0,..
-    end: Position,   // 0,..
-    line: Line,    // 1,..
+    pos: Position, // 0,..
+    end: Position, // 0,..
+    line: Line, // 1,..
     template: &'a template::Raw, // TODO: switch to pointer or slice
 }
 
@@ -69,7 +69,7 @@ impl<'a> Cursor<'a> {
     }
 
     #[inline]
-    pub fn slice_by(&mut self, len: usize) -> &'a str  {
+    pub fn slice_by(&mut self, len: usize) -> &'a str {
         let pos = self.pos + len;
         self.slice_to(pos)
     }
@@ -80,7 +80,7 @@ impl<'a> Cursor<'a> {
         self.slice_to(pos)
     }
 
-    pub fn slice_to(&mut self, pos: usize) -> &'a str  {
+    pub fn slice_to(&mut self, pos: usize) -> &'a str {
         let ref slice = &self.template.code[self.pos..pos];
         self.line += slice.chars().filter(|c| *c == '\n').count();
         self.pos = pos;
@@ -110,7 +110,8 @@ impl<'a> Cursor<'a> {
         // - might be better if called seldomly!
     }
 
-    pub fn column(&self) -> usize { // start counting with `1`
+    pub fn column(&self) -> usize {
+        // start counting with `1`
         self.template.code[0..self.pos].chars().rev().take_while(|c| *c != '\n').count() + 1
     }
 
@@ -121,10 +122,11 @@ impl<'a> Cursor<'a> {
 
 impl<'a> fmt::Display for Cursor<'a> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "`{template_name}` line {line} column {column}",
-            template_name = self.template.name(),
-            line = self.line(),
-            column = self.column())
+        write!(f,
+               "`{template_name}` line {line} column {column}",
+               template_name = self.template.name(),
+               line = self.line(),
+               column = self.column())
     }
 }
 
@@ -207,7 +209,8 @@ mod test {
     }
 
     #[test]
-    pub fn column() { // start counting with `1`
+    pub fn column() {
+        // start counting with `1`
         let tpl = Raw::new("\nline2\n\nline4\n\n\nline7", "");
         let mut c = Cursor::new(&tpl);
 

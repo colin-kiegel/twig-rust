@@ -48,9 +48,9 @@ pub struct GenericNode<T> {
 }
 
 #[allow(dead_code)]
-impl<T> Node for GenericNode<T> where
-    T: Debug,
-    GenericNode<T>: Execute
+impl<T> Node for GenericNode<T>
+    where T: Debug,
+          GenericNode<T>: Execute
 {
     fn position(&self) -> &Position {
         &self.position
@@ -69,10 +69,10 @@ impl<T> Node for GenericNode<T> where
             None => {
                 traced_err!(NodeError::AttributeNotFound {
                     key: key.to_string(),
-                    node_tag: self.tag.to_string()
+                    node_tag: self.tag.to_string(),
                 })
-            },
-            Some(value) => Ok(value)
+            }
+            Some(value) => Ok(value),
         }
     }
 

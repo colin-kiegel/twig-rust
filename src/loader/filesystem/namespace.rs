@@ -8,11 +8,11 @@
 use std::path::{Path, PathBuf};
 use std::collections::HashMap;
 use std::fs;
-use loader::{LoaderError};
+use loader::LoaderError;
 use api::error::Traced;
 
 /// Identifier of the default namespace.
-pub const DEFAULT : &'static str  = "__main__";
+pub const DEFAULT: &'static str = "__main__";
 
 #[derive(Debug)]
 pub struct Namespace {
@@ -39,7 +39,7 @@ impl Namespace {
 
     /// Sets the template directories.
     pub fn set_dirs<D>(&mut self, dirs: D)
-        where D: IntoIterator<Item=PathBuf>
+        where D: IntoIterator<Item = PathBuf>
     {
         self.path_cache.clear();
         self.dirs = dirs.into_iter().collect();
@@ -73,14 +73,14 @@ impl Namespace {
             //       Another workaround would be the Entry API HashMap::entry()
             //       but that requires heap allocation of the key with every lookup.
             let sneak_out: *const PathBuf = cached;
-            return Ok(unsafe{ &*sneak_out }) // equivalent to `return Ok(cached)`
+            return Ok(unsafe { &*sneak_out }); // equivalent to `return Ok(cached)`
             // <-- borrow ends here and is not extended
         }
 
         if self.dirs.len() == 0 {
             return traced_err!(LoaderError::FileSystemNamespaceNotInitialized {
-                namespace: self.id.to_string()
-            })
+                namespace: self.id.to_string(),
+            });
         }
 
         for dir in self.dirs.iter() {
@@ -88,8 +88,9 @@ impl Namespace {
 
             if let Ok(metadata) = fs::metadata(&fullpath) {
                 if metadata.is_file() {
-                    return Ok(self.path_cache.entry(PathBuf::from(raw_path))
-                        .or_insert(fullpath))
+                    return Ok(self.path_cache
+                                  .entry(PathBuf::from(raw_path))
+                                  .or_insert(fullpath));
                 }
             }
         }
@@ -97,8 +98,8 @@ impl Namespace {
         return traced_err!(LoaderError::FileSystemTemplateNotFound {
             raw_path: raw_path.to_path_buf(),
             namespace: self.id.to_string(),
-            dirs: self.dirs.clone()
-        })
+            dirs: self.dirs.clone(),
+        });
     }
 
     pub fn clear_path_cache(&mut self) {

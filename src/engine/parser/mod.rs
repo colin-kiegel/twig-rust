@@ -35,7 +35,7 @@ impl Parser {
     pub fn new(twig: &Engine) -> Result<Parser, Traced<ParserError>> {
         let ext = match twig.extensions() {
             Err(_) => return traced_err!(ParserError::MissingExtensions),
-            Ok(ext) => ext
+            Ok(ext) => ext,
         };
 
         Ok(Parser {
@@ -45,7 +45,9 @@ impl Parser {
     }
 
     #[allow(dead_code)] // TODO: testcase
-    pub fn parse<'a, 't> (&'a self, stream: &'t token::Stream<'t>) -> Result<template::Compiled, Traced<ParserError>>
+    pub fn parse<'a, 't>(&'a self,
+                         stream: &'t token::Stream<'t>)
+                         -> Result<template::Compiled, Traced<ParserError>>
         where 't: 'a // the token stream must outlive the Parser
     {
         let job = Job::new(stream, &self);

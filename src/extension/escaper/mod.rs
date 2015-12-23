@@ -28,13 +28,13 @@ impl Default for Mode {
 }
 
 impl Extension for Escaper {
-    fn name(&self) -> &'static str { "escaper" }
+    fn name(&self) -> &'static str {
+        "escaper"
+    }
 }
 
 impl Escaper {
     pub fn new(mode: Mode) -> Box<Escaper> {
-        Box::new(Escaper {
-            mode: mode
-        })
+        Box::new(Escaper { mode: mode })
     }
 }

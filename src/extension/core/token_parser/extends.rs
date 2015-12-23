@@ -12,7 +12,7 @@ use api::error::Traced;
 #[derive(Debug, Default)]
 pub struct Extends;
 
-impl TokenParser for Extends  {
+impl TokenParser for Extends {
     fn tag(&self) -> &'static str {
         "extends"
     }

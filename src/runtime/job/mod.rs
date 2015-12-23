@@ -17,9 +17,7 @@ pub struct Job {
 #[allow(dead_code)]
 impl Job {
     pub fn new() -> Job {
-        Job {
-            writer: String::new(),
-        }
+        Job { writer: String::new() }
     }
 
     pub fn reserve_writer(&mut self, additional: usize) -> &mut Job {
@@ -34,8 +32,8 @@ impl Job {
         self.writer
     }
 
-    pub fn write<T>(&mut self, text: T) where
-        T: AsRef<str>
+    pub fn write<T>(&mut self, text: T)
+        where T: AsRef<str>
     {
         self.writer.push_str(text.as_ref())
     }

@@ -11,7 +11,7 @@ use std::iter::Iterator;
 use std::rc::Rc;
 use regex;
 use regex::Error as regexError;
-use engine::{ExtensionRegistry};
+use engine::ExtensionRegistry;
 use api::error::Traced;
 
 #[macro_use]
@@ -35,7 +35,7 @@ pub mod string_dq_delim;
 pub mod string_dq_part;
 pub use self::options::Options;
 
-//#[derive(PartialEq)]
+// #[derive(PartialEq)]
 #[derive(Debug, PartialEq)]
 pub struct Patterns {
     pub expression_end: expression_end::Pattern,
@@ -58,7 +58,9 @@ pub struct Patterns {
 
 #[allow(unused_variables)]
 impl Patterns {
-    pub fn new(opt: &Rc<Options>, ext: &Rc<ExtensionRegistry>) -> Result<Patterns, Traced<regexError>> {
+    pub fn new(opt: &Rc<Options>,
+               ext: &Rc<ExtensionRegistry>)
+               -> Result<Patterns, Traced<regexError>> {
         Ok(Patterns {
             expression_end: try_traced!(expression_end::Pattern::new(opt)),
             verbatim_end: try_traced!(verbatim_end::Pattern::new(opt)),
@@ -91,11 +93,10 @@ impl<'a> Default for Patterns {
 
 pub struct ExtractIter<'p, 't, Pattern: 'p> {
     pattern: &'p Pattern,
-    captures_iter: regex::FindCaptures<'p, 't>
+    captures_iter: regex::FindCaptures<'p, 't>,
 }
 
-impl<'p, 't, Pattern> Iterator for ExtractIter<'p, 't, Pattern>
-    where Pattern: Extract<'t>
+impl<'p, 't, Pattern> Iterator for ExtractIter<'p, 't, Pattern> where Pattern: Extract<'t>
 {
     type Item = Pattern::Item;
 
@@ -128,7 +129,7 @@ pub trait Extract<'t> {
     {
         ExtractIter {
             pattern: self,
-            captures_iter: self.captures_iter(text)
+            captures_iter: self.captures_iter(text),
         }
     }
 
@@ -241,86 +242,145 @@ fn to_oct(c: &char) -> Option<u32> {
 pub fn php_stripcslashes(string: &str) -> String {
     let mut result = String::with_capacity(string.len());
     let mut it = string.chars();
-    let mut cur : Option<char>;
+    let mut cur: Option<char>;
 
-    'next: loop { // we need manual loop control for lookaheads in some match branches
+    'next: loop {
+        // we need manual loop control for lookaheads in some match branches
         cur = it.next();
-        'current: loop { match cur {
-            None => break 'next,
-            Some('\\') => match it.next() {
-                None => { result.push('\\'); continue 'next },
-                Some('a') => { result.push('\x07'); continue 'next }, // alarm (beep/bell)
-                Some('b') => { result.push('\x08'); continue 'next }, // backspace
-                Some('f') => { result.push('\x0C'); continue 'next }, // formfeed
-                Some('n') => { result.push('\n'); continue 'next }, // new line
-                Some('r') => { result.push('\r'); continue 'next }, // cariage return
-                Some('t') => { result.push('\t'); continue 'next }, // horizontal tab
-                Some('v') => { result.push('\x0B'); continue 'next }, // vertical tab
-                Some('\\') => { result.push('\\'); continue 'next }, // backslash
-                Some('x') => { // assuming *hex* UTF32 representation
-                    let mut v: char;
-                    let mut parsed = 0;
-                    let mut char_u32 = 0;
+        'current: loop {
+            match cur {
+                None => break 'next,
+                Some('\\') => {
+                    match it.next() {
+                        None => {
+                            result.push('\\');
+                            continue 'next;
+                        }
+                        Some('a') => {
+                            result.push('\x07');
+                            continue 'next;
+                        } // alarm (beep/bell)
+                        Some('b') => {
+                            result.push('\x08');
+                            continue 'next;
+                        } // backspace
+                        Some('f') => {
+                            result.push('\x0C');
+                            continue 'next;
+                        } // formfeed
+                        Some('n') => {
+                            result.push('\n');
+                            continue 'next;
+                        } // new line
+                        Some('r') => {
+                            result.push('\r');
+                            continue 'next;
+                        } // cariage return
+                        Some('t') => {
+                            result.push('\t');
+                            continue 'next;
+                        } // horizontal tab
+                        Some('v') => {
+                            result.push('\x0B');
+                            continue 'next;
+                        } // vertical tab
+                        Some('\\') => {
+                            result.push('\\');
+                            continue 'next;
+                        } // backslash
+                        Some('x') => {
+                            // assuming *hex* UTF32 representation
+                            let mut v: char;
+                            let mut parsed = 0;
+                            let mut char_u32 = 0;
 
-                    v = match {cur = it.next(); cur} {
-                        None => { result.push('x'); break 'next },
-                        Some(value) => value,
-                    };
-
-                    'hex: while parsed < 3 { match to_hex(&v) {
-                        None => break 'hex,
-                        Some(hex) => {
-                            parsed += 1;
-                            char_u32 = 16*char_u32 + hex;
-                            v = match {cur = it.next(); cur} {
-                                None => break 'hex,
+                            v = match {
+                                cur = it.next();
+                                cur
+                            } {
+                                None => {
+                                    result.push('x');
+                                    break 'next;
+                                }
                                 Some(value) => value,
+                            };
+
+                            'hex: while parsed < 3 {
+                                match to_hex(&v) {
+                                    None => break 'hex,
+                                    Some(hex) => {
+                                        parsed += 1;
+                                        char_u32 = 16 * char_u32 + hex;
+                                        v = match {
+                                            cur = it.next();
+                                            cur
+                                        } {
+                                            None => break 'hex,
+                                            Some(value) => value,
+                                        }
+                                    }
+                                }
+                            }
+
+                            // we don't parse invalid hex
+                            if parsed == 0 {
+                                result.push('x');
+                                continue 'next;
+                            }
+
+                            match ::std::char::from_u32(char_u32) {
+                                None => continue 'current, // discard invalid UTF32
+                                Some(converted) => {
+                                    result.push(converted);
+                                    continue 'current;
+                                }
                             }
                         }
-                    }}
+                        Some(escaped) => {
+                            // assuming *octal* UTF32 representation
+                            let mut v = escaped;
+                            let mut parsed = 0;
+                            let mut char_u32 = 0;
 
-                    // we don't parse invalid hex
-                    if parsed == 0 { result.push('x'); continue 'next }
+                            'octal: while parsed < 3 {
+                                match to_oct(&v) {
+                                    None => break 'octal,
+                                    Some(oct) => {
+                                        parsed += 1;
+                                        char_u32 = 8 * char_u32 + oct;
+                                        v = match {
+                                            cur = it.next();
+                                            cur
+                                        } {
+                                            None => break 'octal,
+                                            Some(value) => value,
+                                        }
+                                    }
+                                }
+                            }
 
-                    match ::std::char::from_u32(char_u32) {
-                        None => continue 'current, // discard invalid UTF32
-                        Some(converted) => {
-                            result.push(converted);
-                            continue 'current
-                        },
-                    }
-                },
-                Some(escaped) => { // assuming *octal* UTF32 representation
-                    let mut v = escaped;
-                    let mut parsed = 0;
-                    let mut char_u32 = 0;
+                            // we don't parse invalid oct
+                            if parsed == 0 {
+                                result.push(escaped);
+                                continue 'next;
+                            };
 
-                    'octal: while parsed < 3 { match to_oct(&v) {
-                        None => break 'octal,
-                        Some(oct) => {
-                            parsed += 1;
-                            char_u32 = 8*char_u32 + oct;
-                            v = match {cur = it.next(); cur} {
-                                None => break 'octal,
-                                Some(value) => value,
+                            match ::std::char::from_u32(char_u32) {
+                                None => continue 'current, // discard invalid UTF32
+                                Some(converted) => {
+                                    result.push(converted);
+                                    continue 'current;
+                                }
                             }
                         }
-                    }}
-
-                    // we don't parse invalid oct
-                    if parsed == 0 { result.push(escaped); continue 'next };
-
-                    match ::std::char::from_u32(char_u32) {
-                        None => continue 'current, // discard invalid UTF32
-                        Some(converted) => {
-                            result.push(converted);
-                            continue 'current
-                        },
                     }
                 }
-            },
-            Some(value) => { result.push(value); continue 'next },
-        }}
+                Some(value) => {
+                    result.push(value);
+                    continue 'next;
+                }
+            }
+        }
     }
 
     return result;
@@ -338,33 +398,23 @@ mod test {
 
     #[test]
     pub fn _php_stripcslashes() {
-        assert_eq!(
-            php_stripcslashes(&r#"\a\b\f\n\r\t\v\\\'\"\?\013\x00"#),
-            "\x07\x08\x0C\n\r\t\x0B\\'\"?\x0B\x00".to_string()
-        );
+        assert_eq!(php_stripcslashes(&r#"\a\b\f\n\r\t\v\\\'\"\?\013\x00"#),
+                   "\x07\x08\x0C\n\r\t\x0B\\'\"?\x0B\x00".to_string());
 
-        assert_eq!(
-            php_stripcslashes(&r#"nothing to strip \"#),
-            r#"nothing to strip \"#.to_string()
-        );
+        assert_eq!(php_stripcslashes(&r#"nothing to strip \"#),
+                   r#"nothing to strip \"#.to_string());
 
-        assert_eq!(
-            php_stripcslashes(&r#"almost nothing to strip \x"#),
-            r#"almost nothing to strip x"#.to_string()
-        );
+        assert_eq!(php_stripcslashes(&r#"almost nothing to strip \x"#),
+                   r#"almost nothing to strip x"#.to_string());
     }
 
     #[test]
     pub fn php_trim_right() {
         // Rusts built-in trim_right does not trim "\0"
-        assert_eq!(
-            _php_trim_right("trim me PHP! \0 \t \n \r \x0B \n "),
-            "trim me PHP!"
-        );
+        assert_eq!(_php_trim_right("trim me PHP! \0 \t \n \r \x0B \n "),
+                   "trim me PHP!");
 
-        assert_eq!(
-            "trim me RUST! \0 \t \n \r \x0B \n ".trim_right(),
-            "trim me RUST! \0"
-        );
+        assert_eq!("trim me RUST! \0 \t \n \r \x0B \n ".trim_right(),
+                   "trim me RUST! \0");
     }
 }

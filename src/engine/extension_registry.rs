@@ -21,7 +21,7 @@ pub struct ExtensionRegistry {
     functions: HashMap<String, Box<api::Function>>,
     tests: HashMap<String, Box<api::Test>>,
     token_parsers: HashMap<String, Box<api::TokenParser>>,
-    //_token_parser_by_tags: HashMap<String, Box<api::TokenParser>>,
+    // _token_parser_by_tags: HashMap<String, Box<api::TokenParser>>,
     node_visitors: Vec<Box<api::NodeVisitor>>,
     operators_unary: HashMap<String, api::UnaryOperator>,
     operators_binary: HashMap<String, api::BinaryOperator>,
@@ -30,15 +30,15 @@ pub struct ExtensionRegistry {
 
 impl ExtensionRegistry {
     /// Register an extension
-    pub fn push(&mut self, extension: Box<Extension>) -> Result<&mut Self, Traced<ExtensionRegistryError>> {
+    pub fn push(&mut self,
+                extension: Box<Extension>)
+                -> Result<&mut Self, Traced<ExtensionRegistryError>> {
         if self.initialized {
-            return traced_err!(ExtensionRegistryError::AlreadyInitialized)
+            return traced_err!(ExtensionRegistryError::AlreadyInitialized);
         }
 
-        if let Some(prev) = self.ext.insert(extension.name().to_string(), extension)  {
-            return traced_err!(ExtensionRegistryError::DuplicateExtension {
-                prev: prev
-            })
+        if let Some(prev) = self.ext.insert(extension.name().to_string(), extension) {
+            return traced_err!(ExtensionRegistryError::DuplicateExtension { prev: prev });
         };
 
         Ok(self)
@@ -79,7 +79,7 @@ impl ExtensionRegistry {
     /// This is where you can load some file that contains filter functions for instance.
     pub fn init(&mut self, engine: &mut Engine) -> Result<(), Traced<ExtensionRegistryError>> {
         if self.initialized {
-            return traced_err!(ExtensionRegistryError::AlreadyInitialized)
+            return traced_err!(ExtensionRegistryError::AlreadyInitialized);
         }
 
         for (_, ext) in self.ext.iter() {
@@ -89,24 +89,24 @@ impl ExtensionRegistry {
                 if let Some(prev) = self.filters.insert(k, v) {
                     return traced_err!(ExtensionRegistryError::DuplicateFilter {
                         prev: prev,
-                        ext_name: ext.name()
-                    })
+                        ext_name: ext.name(),
+                    });
                 }
             }
             for (k, v) in ext.functions() {
                 if let Some(prev) = self.functions.insert(k, v) {
                     return traced_err!(ExtensionRegistryError::DuplicateFunction {
                         prev: prev,
-                        ext_name: ext.name()
-                    })
+                        ext_name: ext.name(),
+                    });
                 }
             }
             for (k, v) in ext.tests() {
                 if let Some(prev) = self.tests.insert(k, v) {
                     return traced_err!(ExtensionRegistryError::DuplicateTest {
                         prev: prev,
-                        ext_name: ext.name()
-                    })
+                        ext_name: ext.name(),
+                    });
                 }
             }
             for (k, v) in ext.token_parsers() {
@@ -123,19 +123,21 @@ impl ExtensionRegistry {
                 if let Some(prev) = self.token_parsers.insert(k, v) {
                     return traced_err!(ExtensionRegistryError::DuplicateTokenParser {
                         prev: prev,
-                        ext_name: ext.name()
-                    })
+                        ext_name: ext.name(),
+                    });
                 }
             }
 
             // TODO: `vec.append()` is not yet stable ...
-            for v in ext.node_visitors() { self.node_visitors.push(v) }
+            for v in ext.node_visitors() {
+                self.node_visitors.push(v)
+            }
             for v in ext.operators_unary() {
                 if let Some(prev) = self.operators_unary.insert(v.repr.clone(), v) {
                     return traced_err!(ExtensionRegistryError::DuplicateOperatorUnary {
                         prev: prev,
-                        ext_name: ext.name()
-                    })
+                        ext_name: ext.name(),
+                    });
                 }
             }
 
@@ -143,8 +145,8 @@ impl ExtensionRegistry {
                 if let Some(prev) = self.operators_binary.insert(v.repr.clone(), v) {
                     return traced_err!(ExtensionRegistryError::DuplicateOperatorBinary {
                         prev: prev,
-                        ext_name: ext.name()
-                    })
+                        ext_name: ext.name(),
+                    });
                 }
             }
         }

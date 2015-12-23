@@ -15,8 +15,8 @@ pub type Position = usize;
 
 #[derive(Debug)]
 pub struct Cursor<'stream> {
-    next: Position,   // 0,..
-    end: Position,   // 0,..
+    next: Position, // 0,..
+    end: Position, // 0,..
     stream: &'stream Stream<'stream>, // inner lifetime: 'template
 }
 
@@ -60,7 +60,10 @@ impl<'stream> Cursor<'stream> {
         self.next().map(|item| item.position())
     }
 
-    pub fn next_expect<T>(&mut self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, Traced<ParserError>>
+    pub fn next_expect<T>(&mut self,
+                          pattern: T,
+                          reason: Option<&'static str>)
+                          -> Result<&'stream Item, Traced<ParserError>>
         where T: token::Pattern + 'static
     {
         let next = self.peek();
@@ -82,31 +85,42 @@ impl<'stream> Cursor<'stream> {
         self.peek().map(|item| item.position())
     }
 
-    pub fn peek_expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&'stream Item, Traced<ParserError>>         where T: token::Pattern + 'static
+    pub fn peek_expect<T>(&self,
+                          pattern: T,
+                          reason: Option<&'static str>)
+                          -> Result<&'stream Item, Traced<ParserError>>
+        where T: token::Pattern + 'static
     {
         self.expect(pattern, self.peek(), reason)
     }
 
-    fn expect<T>(&self, pattern: T, value: Option<&'stream Item>, reason: Option<&'static str>) -> Result<&'stream Item, Traced<ParserError>>
+    fn expect<T>(&self,
+                 pattern: T,
+                 value: Option<&'stream Item>,
+                 reason: Option<&'static str>)
+                 -> Result<&'stream Item, Traced<ParserError>>
         where T: token::Pattern + 'static
     {
         match value {
             Some(item) => Ok(try_traced!(item.expect(pattern, reason))),
-            None => traced_err!(ParserError::UnexpectedEof {
-                        expected: Some(<token::Pattern as Dump>::dump(&pattern)),
-                        cursor: self.dump(),
-                        reason: reason
-                    })
+            None => {
+                traced_err!(ParserError::UnexpectedEof {
+                    expected: Some(<token::Pattern as Dump>::dump(&pattern)),
+                    cursor: self.dump(),
+                    reason: reason,
+                })
+            }
         }
     }
 }
 
 impl<'stream> fmt::Display for Cursor<'stream> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "cursor (next: {next}/{end}) {tokens:?}",
-            next = self.next,
-            end = self.end,
-            tokens = self.stream)
+        write!(f,
+               "cursor (next: {next}/{end}) {tokens:?}",
+               next = self.next,
+               end = self.end,
+               tokens = self.stream)
     }
 }
 
@@ -131,9 +145,10 @@ impl<'stream> Dump for Cursor<'stream> {
 
 impl fmt::Display for CursorDump {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Cursor (next: {next}/{end}) for {stream_dump}",
-            next = self.next,
-            end = self.end,
-            stream_dump = self.stream_dump)
+        write!(f,
+               "Cursor (next: {next}/{end}) for {stream_dump}",
+               next = self.next,
+               end = self.end,
+               stream_dump = self.stream_dump)
     }
 }

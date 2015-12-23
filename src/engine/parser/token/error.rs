@@ -16,7 +16,7 @@ pub enum TokenError {
         reason: Option<&'static str>,
         expected: token::PatternDump,
         found: token::stream::Item,
-    }
+    },
 }
 
 impl Error for TokenError {
@@ -37,8 +37,11 @@ impl Display for TokenError {
             TokenError::UnexpectedTokenAtItem {
                 reason, ref expected, ref found
             } => {
-                try!(write!(f, " Expected token matching {x:?} but found item {t:?} at {p:?}",
-                    x = expected, t = found.token(), p = found.position()));
+                try!(write!(f,
+                            " Expected token matching {x:?} but found item {t:?} at {p:?}",
+                            x = expected,
+                            t = found.token(),
+                            p = found.position()));
 
                 if let Some(reason) = reason {
                     try!(write!(f, " {}", reason))

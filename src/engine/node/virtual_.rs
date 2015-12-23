@@ -17,17 +17,14 @@ pub struct Data;
 
 impl Virtual {
     pub fn boxed(position: &Position) -> Box<Virtual> {
-        Box::new(Virtual {
-            position: (*position).clone(),
-            ..GenericNode::default()
-        })
+        Box::new(Virtual { position: (*position).clone(), ..GenericNode::default() })
     }
 }
 
 impl Execute for Virtual {
     fn execute(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.execute(runtime, job)
+            node.execute(runtime, job)
         }
     }
 }
@@ -54,9 +51,6 @@ mod test {
             children.push(node_world);
         }
 
-        assert_eq!(
-            rt.run(&node_virtual),
-            "Hello world!"
-        );
+        assert_eq!(rt.run(&node_virtual), "Hello world!");
     }
 }

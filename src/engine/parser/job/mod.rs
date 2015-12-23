@@ -19,12 +19,13 @@ use engine::Node;
 pub mod cursor;
 pub use self::cursor::Cursor;
 
-type PeekableTokenStreamIterator<'a> = iter::Peekable<::std::slice::Iter<'a, token::stream::Item>>;
+type PeekableTokenStreamIterator<'a> = iter::Peekable<::std::slice::Iter<'a,
+                                                                           token::stream::Item>>;
 
 #[allow(dead_code)]
-//#[derive(Debug)]
+// #[derive(Debug)]
 pub struct Job<'p, 'stream> {
-    parser: &'p Parser,    // orig: env
+    parser: &'p Parser, // orig: env
     tokens: &'stream token::Stream<'stream>,
 
     // state:
@@ -61,17 +62,17 @@ impl<'p, 'stream> Job<'p, 'stream> {
         }
     }
 
-    pub fn parse(self: Job<'p, 'stream>) -> Result<template::Compiled, Traced<ParserError>> {
+    pub fn parse(self) -> Result<template::Compiled, Traced<ParserError>> {
         self.do_parse(None)
     }
 
-    pub fn parse_until(self: Job<'p, 'stream>, test: &Test) -> Result<template::Compiled, Traced<ParserError>> {
+    pub fn parse_until(self, test: &Test) -> Result<template::Compiled, Traced<ParserError>> {
         self.do_parse(Some(test))
     }
 
     #[allow(unused_mut)]
     #[allow(dead_code)] // TODO: testcase
-    fn do_parse(mut self: Job<'p, 'stream>, test: Option<&Test>) -> Result<template::Compiled, Traced<ParserError>> {
+    fn do_parse(mut self, test: Option<&Test>) -> Result<template::Compiled, Traced<ParserError>> {
 
         // NOTE: try to move this to other point
         //  - to avoid very first redundant push?
@@ -91,14 +92,13 @@ impl<'p, 'stream> Job<'p, 'stream> {
             }
         };
 
-        let module = node::Module::new(
-            node::Body::boxed(nodes),
-            self.state.parent,
-            self.state.blocks, // as nodes?
-            self.state.macros, // as nodes?
-            self.state.traits, // as nodes?
-            self.state.embedded_templates,
-            self.template.name());
+        let module = node::Module::new(node::Body::boxed(nodes),
+                                       self.state.parent,
+                                       self.state.blocks, // as nodes?
+                                       self.state.macros, // as nodes?
+                                       self.state.traits, // as nodes?
+                                       self.state.embedded_templates,
+                                       self.template.name());
         self.state = self.stack.pop().unwrap();
 
         // *IMPORTANT TODO*: move initialisation somewhere else(!)
@@ -120,33 +120,34 @@ impl<'p, 'stream> Job<'p, 'stream> {
 
     fn do_sub_parse(&mut self, test: Option<&Test>) -> Result<Vec<Box<Node>>, Traced<ParserError>> {
         // let line = self.current_token().line();
-        let mut nodes : Vec<Box<Node>> = Vec::new();
+        let mut nodes: Vec<Box<Node>> = Vec::new();
 
         while let Some(item) = self.cursor.next() {
             match *item.token() {
                 Token::Text(ref value) => {
                     nodes.push(node::Text::boxed(value.to_string(), item.position()));
-                },
+                }
                 Token::ExpressionStart => {
                     let node = try_traced!(self.parse_expression(Precedence(0)));
                     try_traced!(self.cursor.next_expect(Token::ExpressionEnd, None));
 
                     nodes.push(node::Print::boxed(node, item.position()));
-                },
+                }
                 Token::BlockStart => {
                     let item = {
                         let item = try_traced!(self.cursor.peek_expect(Type::Name,
-                            Some("A block must start with a tag name")));
+                                                                       Some("A block must \
+                                                                             start with a tag \
+                                                                             name")));
 
-                        if let Some(ref test) = test { // TODO: rename `test` to something more meaningful
+                        if let Some(ref test) = test {
+                            // TODO: rename `test` to something more meaningful
                             match test(item) {
-                                TestResult::KeepToken => {
-                                    return Ok(nodes)
-                                },
+                                TestResult::KeepToken => return Ok(nodes),
                                 TestResult::DropToken => {
                                     self.cursor.next();
-                                    return Ok(nodes)
-                                },
+                                    return Ok(nodes);
+                                }
                                 // TestResult::Error(e) => {
                                 //     return Err(e)
                                 // },
@@ -160,25 +161,33 @@ impl<'p, 'stream> Job<'p, 'stream> {
 
                     let subparser = {
                         // we can always destructure due to previous peek_expect(Type::Name)
-                        let tag = if let Token::Name(ref tag) = *item.token() { tag }
-                            else { unreachable!() };
+                        let tag = if let Token::Name(ref tag) = *item.token() {
+                            tag
+                        } else {
+                            unreachable!()
+                        };
 
-                        try_traced!(self.parser.tag_handler(tag)
-                            .ok_or_else(||{ ParserError::NoTagHandler {
-                                tag: tag.to_string(),
-                                position: item.position().clone(),
-                                job: self.dump()
-                            }.at(loc!())
-                        }))
+                        try_traced!(self.parser
+                                        .tag_handler(tag)
+                                        .ok_or_else(|| {
+                                            ParserError::NoTagHandler {
+                                                tag: tag.to_string(),
+                                                position: item.position().clone(),
+                                                job: self.dump(),
+                                            }
+                                            .at(loc!())
+                                        }))
                     };
 
                     let node = try_traced!(subparser.parse(self, item));
                     nodes.push(node);
-                },
-                _ => return traced_err!(ParserError::InvalidState {
-                    item: item.dump(),
-                    job: self.dump()
-                })
+                }
+                _ => {
+                    return traced_err!(ParserError::InvalidState {
+                        item: item.dump(),
+                        job: self.dump(),
+                    })
+                }
             }
         }
 
@@ -186,7 +195,7 @@ impl<'p, 'stream> Job<'p, 'stream> {
             return traced_err!(ParserError::Unreachable {
                 reason: "Parser could not extract node from token stream.".to_string(),
                 job: self.dump(),
-            })
+            });
         }
 
         return Ok(nodes);
@@ -213,11 +222,9 @@ impl<'p, 'stream> Job<'p, 'stream> {
         self.parser
     }
 
-    pub fn parse_expression (
-        &mut self,
-        precedence: Precedence
-    ) -> Result<Box<Node>, Traced<ParserError>>
-    {
+    pub fn parse_expression(&mut self,
+                            precedence: Precedence)
+                            -> Result<Box<Node>, Traced<ParserError>> {
         self.parser.expression_parser.parse(self, precedence)
     }
 
@@ -240,9 +247,10 @@ impl<'p, 'tpl> fmt::Debug for Job<'p, 'tpl> {
 
 impl<'p, 'tpl> fmt::Display for Job<'p, 'tpl> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{template} with {cursor}.",
-            template = self.template,
-            cursor = self.cursor)
+        write!(f,
+               "{template} with {cursor}.",
+               template = self.template,
+               cursor = self.cursor)
     }
 }
 

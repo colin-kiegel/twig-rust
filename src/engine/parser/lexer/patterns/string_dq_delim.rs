@@ -25,9 +25,7 @@ pub struct ItemData {
 
 impl Pattern {
     pub fn new() -> Result<Pattern, Traced<regexError>> {
-        Ok(Pattern {
-            regex: try_new_regex!(r##"\A""##),
-        })
+        Ok(Pattern { regex: try_new_regex!(r##"\A""##) })
     }   // orig: '/"/A'
 }
 
@@ -43,16 +41,13 @@ impl<'t> super::Extract<'t> for Pattern {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
-            }
+            },
         }
     }
 
     // overwrite for better performance, as long as we only need the position
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
-            ItemData {
-                position: position,
-            })
+        self.find(text).map(|position| ItemData { position: position })
     }
 }
 
@@ -65,16 +60,9 @@ mod test {
     pub fn extract() {
         let pattern = Pattern::new().unwrap();
 
-        assert_eq!(
-            pattern.extract(&r##"Lorem "Ipsum""##),
-            None
-        );
+        assert_eq!(pattern.extract(&r##"Lorem "Ipsum""##), None);
 
-        assert_eq!(
-            pattern.extract(&r##""Lorem Ipsum""##),
-            Some(ItemData {
-                position: (0, 1),
-            })
-        );
+        assert_eq!(pattern.extract(&r##""Lorem Ipsum""##),
+                   Some(ItemData { position: (0, 1) }));
     }
 }

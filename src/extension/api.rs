@@ -95,7 +95,7 @@ pub mod token_parser {
 
     #[derive(Debug)]
     pub enum TestResult {
-        Continue,  // orig: no_match
+        Continue, // orig: no_match
         KeepToken, // orig: is_match + dropNeedle == false
         DropToken, // orig: is_match + dropNeedle == true
     }
@@ -130,7 +130,7 @@ pub mod op {
     #[derive(Debug, PartialEq)]
     pub enum Operation {
         Class(Class),
-        Callable(Function)
+        Callable(Function),
     }
 
     /// Associativity
@@ -142,11 +142,11 @@ pub mod op {
 
     #[derive(Debug, PartialEq)]
     pub struct Function {
-        name: String
+        name: String,
     }
 
     #[derive(Debug, PartialEq)]
     pub struct Class {
-        name: String
+        name: String,
     }
 }

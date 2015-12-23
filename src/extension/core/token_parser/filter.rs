@@ -12,7 +12,7 @@ use api::error::Traced;
 #[derive(Debug, Default)]
 pub struct Filter;
 
-impl TokenParser for Filter  {
+impl TokenParser for Filter {
     fn tag(&self) -> &'static str {
         "filter"
     }

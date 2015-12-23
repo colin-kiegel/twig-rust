@@ -32,32 +32,33 @@ impl TokenizeState for Final {
         }
         */
 
-                //println!("matcher {:?}", self.patterns.tokens_start);
-        //println!("count {:?}", self.token_iter.unwrap().count());
-        /*for slice in self.patterns.tokens_start.find_iter(&template.code) {
-            let (start,end) = slice;
-            let token = &template.code[start..end];
-
-            println!("{:?}-{:?} = {:?}", start, end, token);
-        }
-
-        tokens.push(Token::new(
-            token::Type::Eof,
-            token::Value("".to_string()),
-            cursor.get_position()
-        ));
-
-        if !self.brackets.is_empty() {
-            //let (bracket, line) : (&str, usize) = self.brackets.pop().expect("fatal");
-
-            //let a = error::syntax::Code::UnclosedBracket::new();
-
-            //return a;
-            //return Error::new(
-              //  a,
-                //format!("Unclosed {}", bracket),
-                // ($line, $this->filename);
+        // println!("matcher {:?}", self.patterns.tokens_start);
+        // println!("count {:?}", self.token_iter.unwrap().count());
+        // for slice in self.patterns.tokens_start.find_iter(&template.code) {
+        // let (start,end) = slice;
+        // let token = &template.code[start..end];
+        //
+        // println!("{:?}-{:?} = {:?}", start, end, token);
+        // }
+        //
+        // tokens.push(Token::new(
+        // token::Type::Eof,
+        // token::Value("".to_string()),
+        // cursor.get_position()
+        // ));
+        //
+        // if !self.brackets.is_empty() {
+        // let (bracket, line) : (&str, usize) = self.brackets.pop().expect("fatal");
+        //
+        // let a = error::syntax::Code::UnclosedBracket::new();
+        //
+        // return a;
+        // return Error::new(
+        //  a,
+        // format!("Unclosed {}", bracket),
+        // ($line, $this->filename);
         //    );
-        }*/
+        // }
+
     }
 }

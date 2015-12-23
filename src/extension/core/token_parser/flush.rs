@@ -12,7 +12,7 @@ use api::error::Traced;
 #[derive(Debug, Default)]
 pub struct Flush;
 
-impl TokenParser for Flush  {
+impl TokenParser for Flush {
     fn tag(&self) -> &'static str {
         "flush"
     }

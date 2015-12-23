@@ -37,8 +37,8 @@ impl Pattern {
     pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A\s*(raw|verbatim)\s*(?:{ws}{b1}\s*|{b1})",
-                ws = opt.whitespace_trim.quoted(),
-                b1 = opt.tag_block_end.quoted())),
+                                          ws = opt.whitespace_trim.quoted(),
+                                          b1 = opt.tag_block_end.quoted())),
             options: (*opt).clone(),
         })
     }   // orig: '/\s*(raw|verbatim)\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')/As'
@@ -77,10 +77,7 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"\A\s*(raw|verbatim)\s*(?:-%\}\s*|%\})"
-        );
+        assert_eq!(pattern.as_str(), r"\A\s*(raw|verbatim)\s*(?:-%\}\s*|%\})");
     }
 
     #[test]
@@ -88,25 +85,18 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum raw %}"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum raw %}"), None);
 
-        assert_eq!(
-            pattern.extract(&r"   raw   %} Lorem").unwrap(),
-            ItemData {
-                position: (0, 11),
-                tag: Tag::Raw
-            }
-        );
+        assert_eq!(pattern.extract(&r"   raw   %} Lorem").unwrap(),
+                   ItemData {
+                       position: (0, 11),
+                       tag: Tag::Raw,
+                   });
 
-        assert_eq!(
-            pattern.extract(&r"verbatim-%}     Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 16),
-                tag: Tag::Verbatim,
-            }
-        );
+        assert_eq!(pattern.extract(&r"verbatim-%}     Lorem Ipsum").unwrap(),
+                   ItemData {
+                       position: (0, 16),
+                       tag: Tag::Verbatim,
+                   });
     }
 }

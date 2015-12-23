@@ -29,7 +29,7 @@ impl Print {
 impl Execute for Print {
     fn execute(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.execute(runtime, job)
+            node.execute(runtime, job)
         }
     }
 }

@@ -31,18 +31,18 @@ impl Lexer {
         let ref opt = Rc::new(opt); // TODO: -> switch to &Options (!?)
         let ext = match twig.extensions() {
             Err(_) => return traced_err!(LexerError::MissingExtensions),
-            Ok(ext) => ext
+            Ok(ext) => ext,
         };
 
         let p = try_traced!(Patterns::new(opt, ext));
 
-        Ok(Lexer {
-            patterns: p,
-        })
+        Ok(Lexer { patterns: p })
     }
 
     #[allow(dead_code)] // TODO: testcase
-    pub fn tokenize<'a, 't> (&'a self, template: &'t template::Raw) -> Result<token::Stream<'t>, Traced<LexerError>>
+    pub fn tokenize<'a, 't>(&'a self,
+                            template: &'t template::Raw)
+                            -> Result<token::Stream<'t>, Traced<LexerError>>
         where 't: 'a // the template must outlive the Lexer
     {
         let job = Job::new(template, &self.patterns);

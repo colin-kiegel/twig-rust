@@ -29,7 +29,7 @@ pub struct Job<'c, 't> {
     cursor: Cursor<'t>,
     _position: usize,
     token_start_iter: token_start::ExtractIter<'c, 't>, // orig: positions
-    brackets: Vec<(BracketType, usize/*TODO LineNo*/)>,
+    brackets: Vec<(BracketType, usize /* TODO LineNo */)>,
 }
 
 impl<'c, 't> Job<'c, 't> {
@@ -52,7 +52,7 @@ impl<'c, 't> Job<'c, 't> {
     }
 
     #[allow(dead_code)] // TODO: testcase
-    pub fn tokenize(mut self: Job<'c, 't>) -> Result<token::Stream<'t>, Traced<LexerError>> {
+    pub fn tokenize(mut self) -> Result<token::Stream<'t>, Traced<LexerError>> {
         // The TokenizeStates call each other *recursively* to avoid dynamic dispatch
         // for better performance. However, we loose debugging information about the
         // nesting of lexer states.
@@ -89,13 +89,10 @@ impl<'c, 't> Job<'c, 't> {
 // TODO: switch to Debug-Builder once stable
 impl<'c, 't> fmt::Debug for Job<'c, 't> {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "[\n\
-            Cursor: {cursor}\n\
-            Tokenstream: {tokens:?}\n\
-            Brackets: {brackets:?}\n\
-            ]",
-            cursor = self.cursor,
-            tokens = self.tokens,
-            brackets = self.brackets)
+        write!(f,
+               "[\nCursor: {cursor}\nTokenstream: {tokens:?}\nBrackets: {brackets:?}\n]",
+               cursor = self.cursor,
+               tokens = self.tokens,
+               brackets = self.brackets)
     }
 }

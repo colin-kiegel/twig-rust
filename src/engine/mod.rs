@@ -32,12 +32,11 @@ pub use runtime::{self, Runtime};
 pub struct Engine {
     options: Options,
     ext: Option<Rc<ExtensionRegistry>>,
-    //ext_staging: Option<Box<ext::Staging>>,
+    // ext_staging: Option<Box<ext::Staging>>,
     loader: Option<Box<Loader>>,
     lexer: Option<Lexer>,
     parser: Option<Parser>,
-    //runtime: Option<Runtime>,
-
+    // runtime: Option<Runtime>,
     _function_callbacks: Vec<()>,
     _filter_callbacks: Vec<()>,
     _template_class_prefix: String, // default: '__TwigTemplate_'
@@ -67,7 +66,7 @@ impl Engine {
     /// * When an error occurred during rendering
     pub fn render(&mut self, _path: &str, _data: ()) -> Result<String, Traced<TwigError>> {
         unimplemented!()
-        //return Ok(try_traced!(self.load_template(path, None)).render(context));
+        // return Ok(try_traced!(self.load_template(path, None)).render(context));
     }
 
     /// Displays a template.
@@ -77,8 +76,8 @@ impl Engine {
     /// * When an error occurred during compilation
     /// * When an error occurred during rendering
     pub fn display(&mut self, _path: &str, _data: ()) -> Result<(), Traced<TwigError>> {
-       unimplemented!()
-       // return Ok(try_traced!(self.load_template(path, None)).display(context, None));
+        unimplemented!()
+        // return Ok(try_traced!(self.load_template(path, None)).display(context, None));
     }
 
     /// Loads and compiles a template.
@@ -86,7 +85,10 @@ impl Engine {
     /// # Failures
     /// * When the template cannot be found
     /// * When an error occurred during compilation
-    pub fn load_template(&mut self, path: &str, _index: Option<u32>) -> Result<template::Compiled, Traced<TwigError>> {
+    pub fn load_template(&mut self,
+                         path: &str,
+                         _index: Option<u32>)
+                         -> Result<template::Compiled, Traced<TwigError>> {
         // TODO: Cache compiled templates
         //  * cache lookup
         //  * check if cache is fresh
@@ -110,7 +112,9 @@ impl Engine {
     ///
     /// # Failures
     /// * When an error occurred during lexing or parsing.
-    fn compile_template(&mut self, template: &template::Raw) -> Result<template::Compiled, Traced<TwigError>> {
+    fn compile_template(&mut self,
+                        template: &template::Raw)
+                        -> Result<template::Compiled, Traced<TwigError>> {
         let tokenstream = {
             let lexer = try_traced!(self.lexer());
             try_traced!(lexer.tokenize(template))
@@ -152,9 +156,7 @@ impl Engine {
     pub fn loader(&mut self) -> Result<&mut Loader, Traced<TwigError>> {
         match self.loader {
             Some(ref mut loader) => return Ok(&mut **loader), // dereferencing the Box<>
-            None => {
-                return traced_err!(TwigError::LoaderNotInitialized)
-            }
+            None => return traced_err!(TwigError::LoaderNotInitialized),
         }
     }
 
@@ -190,7 +192,7 @@ impl Engine {
             None => {
                 self.parser = Some(try_traced!(Parser::new(&self)));
 
-                return self.parser()
+                return self.parser();
             }
         }
     }

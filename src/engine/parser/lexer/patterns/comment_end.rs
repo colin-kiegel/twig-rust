@@ -23,15 +23,15 @@ pub struct Pattern {
 
 #[derive(Debug, PartialEq)]
 pub struct ItemData {
-    pub position: (usize, usize)
+    pub position: (usize, usize),
 }
 
 impl Pattern {
     pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"(?:{ws}{c1}\s*|{c1})\n?",
-                ws = opt.whitespace_trim.quoted(),
-                c1 = opt.tag_comment_end.quoted())),
+                                          ws = opt.whitespace_trim.quoted(),
+                                          c1 = opt.tag_comment_end.quoted())),
             options: (*opt).clone(),
         })
     }   // orig: '/(?:'.$whitespace_trim.$tag_comment[1].'\s*|'.$tag_comment[1].')\n?/s'
@@ -55,10 +55,7 @@ impl<'t> super::Extract<'t> for Pattern {
 
     // overwrite for better performance, as long as we only need the position
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
-            ItemData {
-                position: position
-            })
+        self.find(text).map(|position| ItemData { position: position })
     }
 }
 
@@ -73,10 +70,7 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"(?:-\#\}\s*|\#\})\n?"
-        );
+        assert_eq!(pattern.as_str(), r"(?:-\#\}\s*|\#\})\n?");
     }
 
     #[test]
@@ -84,25 +78,13 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum #}").unwrap(),
-            ItemData {
-                position: (12, 14)
-            }
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum #}").unwrap(),
+                   ItemData { position: (12, 14) });
 
-        assert_eq!(
-            pattern.extract(&r"#} Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 2)
-            }
-        );
+        assert_eq!(pattern.extract(&r"#} Lorem Ipsum").unwrap(),
+                   ItemData { position: (0, 2) });
 
-        assert_eq!(
-            pattern.extract(&r"Lorem -#} Ipsum").unwrap(),
-            ItemData {
-                position: (6, 10)
-            }
-        );
+        assert_eq!(pattern.extract(&r"Lorem -#} Ipsum").unwrap(),
+                   ItemData { position: (6, 10) });
     }
 }

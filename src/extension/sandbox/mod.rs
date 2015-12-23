@@ -7,12 +7,15 @@
 
 use super::api::Extension;
 
-#[allow(dead_code)] // dummy
+#[allow(dead_code)]
+// dummy
 #[derive(Default, Debug, PartialEq)]
 pub struct Sandbox;
 
 impl Extension for Sandbox {
-    fn name(&self) -> &'static str { "sandbox" }
+    fn name(&self) -> &'static str {
+        "sandbox"
+    }
 }
 
 impl Sandbox {

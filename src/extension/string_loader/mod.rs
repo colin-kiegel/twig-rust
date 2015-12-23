@@ -7,12 +7,15 @@
 
 use super::api::Extension;
 
-#[allow(dead_code)] // dummy
+#[allow(dead_code)]
+// dummy
 #[derive(Default, Debug, PartialEq)]
 pub struct StringLoader;
 
 impl Extension for StringLoader {
-    fn name(&self) -> &'static str { "string_loader" }
+    fn name(&self) -> &'static str {
+        "string_loader"
+    }
 }
 
 impl StringLoader {

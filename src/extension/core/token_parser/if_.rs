@@ -25,73 +25,83 @@ impl TokenParser for If {
         try_traced!(job.mut_cursor().next_expect(Token::BlockEnd, Some("if-Block must be closed")));
         let if_body = try_traced!(job.sub_parse_until(&is_if_fork));
         let mut conditionals = vec![(if_test, if_body)];
-        let mut _default : Option<Vec<Box<Node>>> = None;
+        let mut _default: Option<Vec<Box<Node>>> = None;
 
         'a: loop {
-            let x = try_traced!(job.mut_cursor().next().ok_or_else({||
-                ParserError::TokenParserError {
-                    tag: self.tag(),
-                    error: format!("Unexpected end of template. Twig was looking for \
-                        the following tags \"else\", \"elseif\", or \"endif\" \
-                        to close the \"if\" block started at {p}",
-                        p = item.position()),
-                    job: job.dump()
-                }.at(loc!())
+            let x = try_traced!(job.mut_cursor().next().ok_or_else({
+                || {
+                    ParserError::TokenParserError {
+                        tag: self.tag(),
+                        error: format!("Unexpected end of template. Twig was looking for the \
+                                        following tags \"else\", \"elseif\", or \"endif\" to \
+                                        close the \"if\" block started at {p}",
+                                       p = item.position()),
+                        job: job.dump(),
+                    }
+                    .at(loc!())
+                }
             }));
 
             match x.token().value_as_str() {
                 Some("else") => {
-                    try_traced!(job.mut_cursor().next_expect(Token::BlockEnd, Some("else-Block must be closed")));
+                    try_traced!(job.mut_cursor().next_expect(Token::BlockEnd,
+                                                             Some("else-Block must be closed")));
 
                     let node = try_traced!(job.sub_parse_until(&is_if_end));
                     _default = Some(node);
-                },
+                }
                 Some("elseif") => {
                     let elseif_test = try_traced!(job.parse_expression(Precedence(0)));
-                    try_traced!(job.mut_cursor().next_expect(Token::BlockEnd, Some("elseif-Block must be closed")));
+                    try_traced!(job.mut_cursor().next_expect(Token::BlockEnd,
+                                                             Some("elseif-Block must be closed")));
                     let elseif_body = try_traced!(job.sub_parse_until(&is_if_fork));
 
                     conditionals.push((elseif_test, elseif_body));
-                },
+                }
                 Some("endif") => {
-                    try_traced!(job.mut_cursor().next_expect(Token::BlockEnd, Some("endif-Block must be closed")));
+                    try_traced!(job.mut_cursor().next_expect(Token::BlockEnd,
+                                                             Some("endif-Block must be closed")));
 
                     break 'a;
-                },
-                _ => { // should be unreachable
+                }
+                _ => {
+                    // should be unreachable
                     return traced_err!(ParserError::TokenParserError {
                         tag: self.tag(),
-                        error: format!("Unexpected error (please report as bug). Twig was expecting \
-                            an if-branch beginning with the following tags \"else\", \"elseif\", \
-                            or \"endif\". Found token {token:?} at {p}",
-                            token = x.token(),
-                            p = item.position()),
-                        job: job.dump()
-                    })
+                        error: format!("Unexpected error (please report as bug). Twig was \
+                                        expecting an if-branch beginning with the following tags \
+                                        \"else\", \"elseif\", or \"endif\". Found token {token:?} \
+                                        at {p}",
+                                       token = x.token(),
+                                       p = item.position()),
+                        job: job.dump(),
+                    });
                 }
             }
         }
 
         unimplemented!()
-        //return Ok(node::If::boxed(/* conditionals ,*/ default, item.position(), self.tag()));
+        // return Ok(node::If::boxed(/* conditionals ,*/ default, item.position(), self.tag()));
     }
 }
 
 pub fn is_if_fork(item: &Item) -> TestResult {
     match item.token().value_as_str() {
-        Some(ref x) => match *x {
-            "else"
-            | "elseif"
-            | "endif" => TestResult::KeepToken,
-            _ => TestResult::Continue
-        },
-        _ => TestResult::Continue
+        Some(ref x) => {
+            match *x {
+                "else" |
+                "elseif" |
+                "endif" => TestResult::KeepToken,
+                _ => TestResult::Continue,
+            }
+        }
+        _ => TestResult::Continue,
     }
 }
 
 pub fn is_if_end(item: &Item) -> TestResult {
     match item.token().value_as_str() {
         Some("endif") => TestResult::KeepToken,
-        _ => TestResult::Continue
+        _ => TestResult::Continue,
     }
 }

@@ -45,13 +45,8 @@ mod test {
         let text = "Hello World";
         let rt = Runtime::default();
 
-        let node = Text { data: Data {
-                text: text.to_string()
-            }, ..Default::default() };
+        let node = Text { data: Data { text: text.to_string() }, ..Default::default() };
 
-        assert_eq!(
-            rt.run(&node),
-            "Hello World"
-        );
+        assert_eq!(rt.run(&node), "Hello World");
     }
 }

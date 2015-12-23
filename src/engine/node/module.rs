@@ -22,15 +22,14 @@ pub struct Data {
 }
 
 impl Module {
-    pub fn new(
-        body: Box<node::Body>,
-        parent: Option<()>,
-        blocks: Vec<()>,
-        macros: Vec<()>,
-        traits: Vec<()>,
-        embedded_templates: Vec<()>,
-        filename: &str,
-    ) -> Module {
+    pub fn new(body: Box<node::Body>,
+               parent: Option<()>,
+               blocks: Vec<()>,
+               macros: Vec<()>,
+               traits: Vec<()>,
+               embedded_templates: Vec<()>,
+               filename: &str)
+               -> Module {
         Module {
             data: Data {
                 parent: parent,
@@ -49,7 +48,7 @@ impl Module {
 impl Execute for Module {
     fn execute(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.execute(runtime, job)
+            node.execute(runtime, job)
         }
     }
 }

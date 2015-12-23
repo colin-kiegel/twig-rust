@@ -26,9 +26,7 @@ pub struct ItemData<'a> {
 
 impl Pattern {
     pub fn new() -> Result<Pattern, Traced<regexError>> {
-        Ok(Pattern {
-            regex: try_new_regex!(r"\A[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*"),
-        })
+        Ok(Pattern { regex: try_new_regex!(r"\A[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*") })
     }   // orig: '/[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/A'
 }
 
@@ -48,17 +46,18 @@ impl<'t> super::Extract<'t> for Pattern {
             name: match captures.at(0) {
                 Some(ref name) => name,
                 _ => unreachable!(),
-            }
+            },
         }
     }
 
     // overwrite for better performance, as long as we only need the position
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
+        self.find(text).map(|position| {
             ItemData {
                 position: position,
                 name: &text[position.0..position.1],
-            })
+            }
+        })
     }
 }
 
@@ -71,22 +70,14 @@ mod test {
     pub fn extract() {
         let pattern = Pattern::new().unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"{Lorem Ipsum"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"{Lorem Ipsum"), None);
 
-        assert_eq!(
-            pattern.extract(&r"123abc"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"123abc"), None);
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum"),
-            Some(ItemData {
-                position: (0,5),
-                name: "Lorem"
-            })
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum"),
+                   Some(ItemData {
+                       position: (0, 5),
+                       name: "Lorem",
+                   }));
     }
 }

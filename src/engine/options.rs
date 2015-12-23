@@ -14,7 +14,7 @@ pub type Optimizations = optimizer::Mode;
 
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Charset {
-    UTF8
+    UTF8,
 }
 
 impl Default for Charset {
@@ -69,7 +69,7 @@ impl Options {
         // TODO: why doesn't this work? -> self.cache.map(|ref buf| buf.as_ref())
         match self.cache {
             Some(ref buf) => Some(buf.as_ref()),
-            None => None
+            None => None,
         }
     }
 

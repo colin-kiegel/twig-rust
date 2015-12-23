@@ -45,7 +45,7 @@ impl Cache {
     pub fn filecache(&self) -> Option<&Path> {
         match self.filecache {
             None => None,
-            Some(ref pathbuf) => Some(pathbuf.as_path())
+            Some(ref pathbuf) => Some(pathbuf.as_path()),
         }
     }
 

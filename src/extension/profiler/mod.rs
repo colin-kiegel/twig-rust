@@ -7,12 +7,15 @@
 
 use super::api::Extension;
 
-#[allow(dead_code)] // dummy
+#[allow(dead_code)]
+// dummy
 #[derive(Default, Debug, PartialEq)]
 pub struct Profiler;
 
 impl Extension for Profiler {
-    fn name(&self) -> &'static str { "profiler" }
+    fn name(&self) -> &'static str {
+        "profiler"
+    }
 }
 
 impl Profiler {

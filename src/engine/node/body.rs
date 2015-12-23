@@ -16,17 +16,14 @@ pub struct Data;
 
 impl Body {
     pub fn boxed(nodes: Vec<Box<Node>>) -> Box<Body> {
-        Box::new(Body {
-            nodes: nodes,
-            ..GenericNode::default()
-        })
+        Box::new(Body { nodes: nodes, ..GenericNode::default() })
     }
 }
 
 impl Execute for Body {
     fn execute(&self, runtime: &Runtime, job: &mut Job) {
         for node in &self.nodes {
-             node.execute(runtime, job)
+            node.execute(runtime, job)
         }
     }
 }

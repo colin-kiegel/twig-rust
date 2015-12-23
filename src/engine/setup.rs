@@ -10,11 +10,11 @@ use std::rc::Rc;
 use extension;
 use extension::api::Extension;
 use engine::{Engine, options, Options, extension_registry, ExtensionRegistry};
-use engine::error::{TwigError};
+use engine::error::TwigError;
 use api::error::Traced;
 
 #[allow(dead_code)]
-pub const VERSION : &'static str = "1.18.1";
+pub const VERSION: &'static str = "1.18.1";
 
 #[derive(Debug)]
 pub struct Setup {
@@ -165,13 +165,13 @@ impl Setup {
 mod test {
     // use super::*;
 
-    //#[test]
+    // #[test]
     // pub fn get_unary_operators() {
     //     let mut e = Environment;
     //     e.get_unary_operators();
     // }
 
-    //#[test]
+    // #[test]
     // pub fn get_binary_operators() {
     //     let mut e = Environment;
     //     e.get_binary_operators();

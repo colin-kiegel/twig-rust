@@ -37,13 +37,13 @@ impl Loader for Filesystem {
                 // - but should avoid infinite loops (one retry only)
 
                 return traced_err!(LoaderError::FileSystemTemplateNotReadable {
-                        name: name.to_string(),
-                        path: path.to_path_buf(),
-                        io_err: e,
-                    })
-            },
-            Ok(source) => Ok(Cow::Owned(source))
-        }
+                    name: name.to_string(),
+                    path: path.to_path_buf(),
+                    io_err: e,
+                });
+            }
+            Ok(source) => Ok(Cow::Owned(source)),
+        };
     }
 
     fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, Traced<LoaderError>> {
@@ -53,7 +53,7 @@ impl Loader for Filesystem {
     fn is_fresh(&mut self, name: &str, time: i64) -> bool {
         if let Ok(path) = self.find_template(name) {
             if let Ok(metadata) = fs::metadata(path) {
-                return metadata.mtime() <= time
+                return metadata.mtime() <= time;
             }
         }
         false
@@ -91,19 +91,20 @@ impl Filesystem {
             //       Another workaround would be the Entry API HashMap::entry()
             //       but that requires heap allocation of the key with every lookup.
             let sneak_out: *mut Namespace = namespace;
-            return unsafe{ &mut *sneak_out } // equivalent to `return namespace`
+            return unsafe { &mut *sneak_out }; // equivalent to `return namespace`
             // <-- borrow ends here and is not extended
         }
 
-        return self.namespaces.entry(id.to_string())
-                    .or_insert(Namespace::new(id))
+        return self.namespaces
+                   .entry(id.to_string())
+                   .or_insert(Namespace::new(id));
     }
 
     /// Sets the template directories for a given namespace.
     // #NOTE:20 taking a Vec<String> might be more efficient,
     //       but less flexible than IntoIterator<Item=String>
     pub fn set_dirs<D>(&mut self, dirs: D, namespace_id: Option<&str>)
-        where D: IntoIterator<Item=PathBuf>
+        where D: IntoIterator<Item = PathBuf>
     {
         self.path_cache.clear();
         let namespace_id = namespace_id.unwrap_or(namespace::DEFAULT);
@@ -141,7 +142,7 @@ impl Filesystem {
             //       Another workaround would be the Entry API HashMap::entry()
             //       but that requires heap allocation of the key with every lookup.
             let sneak_out: *const PathBuf = cached;
-            return Ok(unsafe{ &*sneak_out }) // equivalent to `return Ok(cached)`
+            return Ok(unsafe { &*sneak_out }); // equivalent to `return Ok(cached)`
             // <-- borrow ends here and is not extended
         }
 
@@ -150,9 +151,11 @@ impl Filesystem {
         let raw_path = path.raw_path();
 
         match self.namespaces.get_mut(namespace_id) {
-            None => return traced_err!(LoaderError::FileSystemNamespaceNotInitialized {
-                    namespace: namespace_id.to_string()
-            }),
+            None => {
+                return traced_err!(LoaderError::FileSystemNamespaceNotInitialized {
+                    namespace: namespace_id.to_string(),
+                })
+            }
             Some(namespace) => {
                 try_traced!(path.validate()); // #Doing:0 move these checks somewhere else :-)
                                        // e.g. postpone to reading the directoy
@@ -165,12 +168,12 @@ impl Filesystem {
     }
 
     pub fn read(path: &Path) -> ::std::io::Result<String> {
-        let mut file : File = try!(File::open(path));
+        let mut file: File = try!(File::open(path));
         let mut buffer = String::new();
 
         try!(file.read_to_string(&mut buffer));
 
-        return Ok(buffer)
+        return Ok(buffer);
     }
 
     /// Checks if the template path can be found or was previously cached.

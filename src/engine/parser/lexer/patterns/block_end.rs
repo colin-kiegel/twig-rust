@@ -23,15 +23,15 @@ pub struct Pattern {
 
 #[derive(Debug, PartialEq)]
 pub struct ItemData {
-    pub position: (usize, usize)
+    pub position: (usize, usize),
 }
 
 impl Pattern {
     pub fn new(opt: &Rc<Options>) -> Result<Pattern, Traced<regexError>> {
         Ok(Pattern {
             regex: try_new_regex!(format!(r"\A\s*(?:{ws}{b1}\s*|{b1})\n?",
-                ws = opt.whitespace_trim.quoted(),
-                b1 = opt.tag_block_end.quoted())),
+                                          ws = opt.whitespace_trim.quoted(),
+                                          b1 = opt.tag_block_end.quoted())),
             options: (*opt).clone(),
         })
     }   // orig: '/\s*(?:'.$whitespace_trim.$tag_block[1].'\s*|\s*'.$tag_block[1].')\n?/A'
@@ -49,16 +49,13 @@ impl<'t> super::Extract<'t> for Pattern {
             position: match captures.pos(0) {
                 Some(position) => position,
                 _ => unreachable!(),
-            }
+            },
         }
     }
 
     // overwrite for better performance, as long as we only need the position
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
-            ItemData {
-                position: position
-            })
+        self.find(text).map(|position| ItemData { position: position })
     }
 }
 
@@ -73,10 +70,7 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.as_str(),
-            r"\A\s*(?:-%\}\s*|%\})\n?"
-        );
+        assert_eq!(pattern.as_str(), r"\A\s*(?:-%\}\s*|%\})\n?");
     }
 
     #[test]
@@ -84,23 +78,12 @@ mod test {
         let ref options = Rc::<Options>::default();
         let pattern = Pattern::new(options).unwrap();
 
-        assert_eq!(
-            pattern.extract(&r"Lorem Ipsum -%}"),
-            None
-        );
+        assert_eq!(pattern.extract(&r"Lorem Ipsum -%}"), None);
 
-        assert_eq!(
-            pattern.extract(&r"  -%} Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 6),
-            }
-        );
+        assert_eq!(pattern.extract(&r"  -%} Lorem Ipsum").unwrap(),
+                   ItemData { position: (0, 6) });
 
-        assert_eq!(
-            pattern.extract(&r"%}Lorem Ipsum").unwrap(),
-            ItemData {
-                position: (0, 2),
-            }
-        );
+        assert_eq!(pattern.extract(&r"%}Lorem Ipsum").unwrap(),
+                   ItemData { position: (0, 2) });
     }
 }

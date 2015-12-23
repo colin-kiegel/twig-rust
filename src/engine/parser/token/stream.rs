@@ -22,9 +22,7 @@ pub struct Position {
 
 impl fmt::Display for Position {
     fn fmt(&self, f: &mut fmt::Formatter) -> Result<(), fmt::Error> {
-        write!(f, "{line}:{column}",
-            line = self.line,
-            column = self.column)
+        write!(f, "{line}:{column}", line = self.line, column = self.column)
     }
 }
 
@@ -43,7 +41,10 @@ impl Item {
         &self.position
     }
 
-    pub fn expect<T>(&self, pattern: T, reason: Option<&'static str>) -> Result<&Item, Traced<TokenError>>
+    pub fn expect<T>(&self,
+                     pattern: T,
+                     reason: Option<&'static str>)
+                     -> Result<&Item, Traced<TokenError>>
         where T: token::Pattern + 'static
     {
         if pattern.matches(self.token()) {
@@ -66,20 +67,21 @@ impl Dump for Item {
     fn dump(&self) -> Self::Data {
         ItemDump {
             token: self.token.dump(),
-            position: self.position.clone()
+            position: self.position.clone(),
         }
     }
 }
 
 impl fmt::Display for Item {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "token {t} at position {p}",
-            t = self.token,
-            p = self.position)
+        write!(f,
+               "token {t} at position {p}",
+               t = self.token,
+               p = self.position)
     }
 }
 
-//#[derive(Default)]
+// #[derive(Default)]
 pub struct Stream<'a> {
     items: Vec<Item>,
     template: &'a template::Raw,
@@ -138,9 +140,9 @@ impl<'a> Stream<'a> {
     }
 
     pub fn _is_eof(&self) -> bool {
-        match self.items.last()  {
+        match self.items.last() {
             Some(x) => x.token.is_type(Type::Eof),
-            None    => true,
+            None => true,
         }
     }
 
@@ -187,16 +189,17 @@ impl<'a> Dump for Stream<'a> {
     fn dump(&self) -> Self::Data {
         StreamDump {
             template_str: self.template().to_string(),
-            items_str: self.to_string()
+            items_str: self.to_string(),
         }
     }
 }
 
 impl fmt::Display for StreamDump {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, " StreamDump{{ template: {template:?}, items: {items:?}}}",
-            template = self.template_str,
-            items = self.items_str)
+        write!(f,
+               " StreamDump{{ template: {template:?}, items: {items:?}}}",
+               template = self.template_str,
+               items = self.items_str)
     }
 }
 

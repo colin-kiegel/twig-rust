@@ -48,13 +48,8 @@ mod test {
         let mut rt = Runtime::default();
         rt.set("message".to_string(), "Hello World".to_string());
 
-        let node = Name { data: Data {
-                key: key.to_string()
-            }, ..Default::default() };
+        let node = Name { data: Data { key: key.to_string() }, ..Default::default() };
 
-        assert_eq!(
-            rt.run(&node),
-            "Hello World"
-        );
+        assert_eq!(rt.run(&node), "Hello World");
     }
 }

@@ -57,17 +57,18 @@ impl<'t> super::Extract<'t> for Pattern {
             escaped_string: match captures.at(0) {
                 Some(ref val) => val,
                 _ => unreachable!(),
-            }
+            },
         }
     }
 
     // overwrite for better performance, as long as we only need the position
     fn extract(&self, text: &'t str) -> Option<Self::Item> {
-        self.find(text).map(|position|
+        self.find(text).map(|position| {
             ItemData {
                 position: position,
                 escaped_string: &text[position.0..position.1],
-            })
+            }
+        })
     }
 }
 
@@ -80,28 +81,22 @@ mod test {
     pub fn extract() {
         let pattern = Pattern::new().unwrap();
 
-        assert_eq!(
-            pattern.extract(&r##"" "string two""##),
-            Some(ItemData {
-                position: (0, 0),
-                escaped_string: "",
-            })
-        );
+        assert_eq!(pattern.extract(&r##"" "string two""##),
+                   Some(ItemData {
+                       position: (0, 0),
+                       escaped_string: "",
+                   }));
 
-        assert_eq!(
-            pattern.extract(&r##"123\.abc"def"##),
-            Some(ItemData {
-                position: (0, 8),
-                escaped_string: r##"123\.abc"##
-            })
-        );
+        assert_eq!(pattern.extract(&r##"123\.abc"def"##),
+                   Some(ItemData {
+                       position: (0, 8),
+                       escaped_string: r##"123\.abc"##,
+                   }));
 
-        assert_eq!(
-            pattern.extract(&r"'Lorem' Ipsum"),
-            Some(ItemData {
-                position: (0,13),
-                escaped_string: "'Lorem' Ipsum"
-            })
-        );
+        assert_eq!(pattern.extract(&r"'Lorem' Ipsum"),
+                   Some(ItemData {
+                       position: (0, 13),
+                       escaped_string: "'Lorem' Ipsum",
+                   }));
     }
 }

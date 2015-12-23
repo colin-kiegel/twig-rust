@@ -19,22 +19,16 @@ use api::error::Traced;
 
 #[derive(Default, Debug)]
 pub struct Array {
-    templates: HashMap<String,String>,
+    templates: HashMap<String, String>,
 }
 
 impl Loader for Array {
     fn source<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, Traced<LoaderError>> {
 
         return match self.templates.get(name) {
-            None => {
-                traced_err!(LoaderError::ArrayTemplateNotFound {
-                    name: name.to_string()
-                })
-            }
-            Some(x) => {
-                Ok(Cow::Borrowed(x))
-            }
-        }
+            None => traced_err!(LoaderError::ArrayTemplateNotFound { name: name.to_string() }),
+            Some(x) => Ok(Cow::Borrowed(x)),
+        };
     }
 
     fn cache_key<'a>(&'a mut self, name: &str) -> Result<Cow<'a, str>, Traced<LoaderError>> {
@@ -47,15 +41,13 @@ impl Loader for Array {
 }
 
 impl Array {
-    pub fn new(templates: HashMap<String,String>) -> Array {
-        Array {
-            templates: templates,
-        }
+    pub fn new(templates: HashMap<String, String>) -> Array {
+        Array { templates: templates }
     }
 
-    pub fn set_template<N, T>(&mut self, name: N, template: T) where
-        N: ToString,
-        T: ToString
+    pub fn set_template<N, T>(&mut self, name: N, template: T)
+        where N: ToString,
+              T: ToString
     {
         self.templates.insert(name.to_string(), template.to_string());
     }

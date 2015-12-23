@@ -26,7 +26,7 @@ pub struct Pattern {
 #[derive(Debug, PartialEq)]
 pub struct ItemData<'a> {
     pub position: (usize, usize),
-    pub operator: &'a str
+    pub operator: &'a str,
 }
 
 struct Builder {
@@ -35,32 +35,39 @@ struct Builder {
 
 impl Builder {
     fn new() -> Result<Builder, Traced<regexError>> {
-        Ok(Builder {
-            whitespace: try_untraced!(regex::Regex::new(r"\s+"))
-        })
+        Ok(Builder { whitespace: try_untraced!(regex::Regex::new(r"\s+")) })
     }
 
-    fn operators_to_regex(&self, unary: &HashMap<String, UnaryOperator>, binary: &HashMap<String, BinaryOperator>) -> String {
-        let mut operators : Vec<(usize, &str)> = Vec::with_capacity(1 + unary.len() + binary.len());
+    fn operators_to_regex(&self,
+                          unary: &HashMap<String, UnaryOperator>,
+                          binary: &HashMap<String, BinaryOperator>)
+                          -> String {
+        let mut operators: Vec<(usize, &str)> = Vec::with_capacity(1 + unary.len() + binary.len());
 
         operators.push(("=".len(), "="));
 
-        for (ref op_repr, _) in unary.iter()  { operators.push((op_repr.len(), op_repr)) }
-        for (ref op_repr, _) in binary.iter() { operators.push((op_repr.len(), op_repr)) }
+        for (ref op_repr, _) in unary.iter() {
+            operators.push((op_repr.len(), op_repr))
+        }
+        for (ref op_repr, _) in binary.iter() {
+            operators.push((op_repr.len(), op_repr))
+        }
 
         // sort operators by length in reverse order (i.e. descending): 10,9,8,7,6 ..
         // -> such that a pattern `abc` is dominant over a subpattern `a`
-        operators.sort_by(|&(ref len_a,_),&(ref len_b,_)| len_b.cmp(len_a));
+        operators.sort_by(|&(ref len_a, _), &(ref len_b, _)| len_b.cmp(len_a));
 
         // collect regex "patternA|patternB|.."
-        return operators.iter().map(|&(_, op)| self.operator_to_regex(op))
-             .collect::<Vec<String>>().join("|");
+        return operators.iter()
+                        .map(|&(_, op)| self.operator_to_regex(op))
+                        .collect::<Vec<String>>()
+                        .join("|");
     }
 
     fn operator_to_regex(&self, operator: &str) -> String {
         // an operator that ends with a character must be followed by
         // a whitespace or a parenthesis
-        let mut rx : String = format!(r"\A{}", regex::quote(operator));
+        let mut rx: String = format!(r"\A{}", regex::quote(operator));
 
         // whitespaces shall match *any* whitespace
         rx = self.whitespace.replace_all(&rx, r"\s+");
@@ -89,7 +96,7 @@ impl Pattern {
                 let regex = try_traced!(Builder::new()).operators_to_regex(unary, binary);
 
                 try_untraced!(regex::Regex::new(&regex))
-            }
+            },
         })
     }
 }
@@ -110,7 +117,7 @@ impl<'t> super::Extract<'t> for Pattern {
             operator: match captures.at(0) {
                 Some(name) => name,
                 _ => unreachable!(),
-            }
+            },
         }
     }
 }
