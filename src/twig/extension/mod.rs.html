@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="Source to the Rust file `src/extension/mod.rs`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang">
+
+    <title>mod.rs.html -- source</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content source"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+</pre><pre class='rust '>
+<span class='comment'>// This file is part of rust-web/twig</span>
+<span class='comment'>//</span>
+<span class='comment'>// For the copyright and license information, please view the LICENSE</span>
+<span class='comment'>// file that was distributed with this source code.</span>
+
+<span class='doccomment'>//! Twig Extensions</span>
+<span class='doccomment'>//!</span>
+<span class='doccomment'>//! * define new behavior during the compilation process</span>
+<span class='doccomment'>//!   * **token parser**: transforms a sub-sequence from the token stream (=lexed template) to nodes in the abstract syntax tree. E.g. the `TokenParserIf` parses complex if-statements (if, elseif, else, endif) and creates the if-node with according child nodes for each test and conditional branch.</span>
+<span class='doccomment'>//!   * **node visitor**: modifies the abstract syntax tree immediately after parsing. E.g. the `optimizer` extension defines the `optimizeRawFilter` node visitor which strips all &quot;raw&quot; filters from the syntax tree.</span>
+<span class='doccomment'>//! * extensions define specific new *node types* in the abstract syntax tree - falling into the following generic classes. Note that all *examples* are defined in the `core` extension, if not stated otherwise. The core extension is not yet fully implemented (see [CHANGELOG][changelog]).</span>
+<span class='doccomment'>//!   * **test**: can be used in conditional statements. E.g. the `defined` test checks if a variable is defined in the current context.</span>
+<span class='doccomment'>//!   * **unary operator**: can be used in variable expressions to process results. E.g. the `-` (neg) operator inverts the sign of a numeric result.</span>
+<span class='doccomment'>//!   * **binary operator**: can be used in variable expressions to combine two results. E.g. the `**` (power) operator takes one number to the power of another number.</span>
+<span class='doccomment'>//!   * **function**: can be used to perform complex computations. E.g. the `round` function rounds a floating number with a given precision.</span>
+<span class='doccomment'>//!   * **filter** can modify the result of variable expressions. E.g. the `default` filter returns the result of the variable expression if it is defined, otherwise it returns the default value. The `escaper` filter escapes the result according to the output channel (html, html attribute, css, js, url, ..)</span>
+<span class='doccomment'>//!   * **global**: can be used to define global constants. Templates can test for these global constants to trigger conditional behavior, or use them as argument for functions, etc</span>
+
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>api</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>core</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>debug</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>escaper</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>optimizer</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>profiler</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>sandbox</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>staging</span>;
+<span class='kw'>pub</span> <span class='kw'>mod</span> <span class='ident'>string_loader</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>core</span>::<span class='ident'>Core</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>debug</span>::<span class='ident'>Debug</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>escaper</span>::<span class='ident'>Escaper</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>optimizer</span>::<span class='ident'>Optimizer</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>profiler</span>::<span class='ident'>Profiler</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>sandbox</span>::<span class='ident'>Sandbox</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>staging</span>::<span class='ident'>Staging</span>;
+<span class='kw'>pub</span> <span class='kw'>use</span> <span class='self'>self</span>::<span class='ident'>string_loader</span>::<span class='ident'>StringLoader</span>;
+</pre>
+</section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script async src="../../../search-index.js"></script>
+</body>
+</html>

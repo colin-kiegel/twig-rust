@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["body","Root node of the template body."],["expression","Twig library for rust"],["module","Root node of the template."],["print","Represents a node that executes an expression."],["text","Text Node."],["virtual_","Text Node."]],"struct":[["GenericNode",""]],"trait":[["Node",""]]});

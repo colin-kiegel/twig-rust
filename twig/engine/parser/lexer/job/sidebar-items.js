@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["cursor","Position within a raw template."],["state","FSM model of the lexer."]],"struct":[["Job",""]]});

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Item` struct in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Item">
+
+    <title>twig::engine::parser::token::stream::Item - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../../../index.html'>twig</a>::<wbr><a href='../../../index.html'>engine</a>::<wbr><a href='../../index.html'>parser</a>::<wbr><a href='../index.html'>token</a>::<wbr><a href='index.html'>stream</a></p><script>window.sidebarCurrent = {name: 'Item', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../../../index.html'>twig</a>::<wbr><a href='../../../index.html'>engine</a>::<wbr><a href='../../index.html'>parser</a>::<wbr><a href='../index.html'>token</a>::<wbr><a href='index.html'>stream</a>::<wbr><a class='struct' href=''>Item</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-1198' class='srclink' href='../../../../../src/twig/engine/parser/token/stream.rs.html#30-33' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Item {
+    // some fields omitted
+}</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a></code></h3><div class='impl-items'><h4 id='method.token' class='method'><code>fn <a href='#method.token' class='fnname'>token</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../../../../twig/engine/parser/token/enum.Token.html' title='twig::engine::parser::token::Token'>Token</a></code></h4>
+<h4 id='method.position' class='method'><code>fn <a href='#method.position' class='fnname'>position</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Position.html' title='twig::engine::parser::token::stream::Position'>Position</a></code></h4>
+<h4 id='method.expect' class='method'><code>fn <a href='#method.expect' class='fnname'>expect</a>&lt;T&gt;(&amp;self, pattern: T, reason: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'static <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;<a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a>, <a class='struct' href='../../../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../../../twig/engine/parser/token/error/enum.TokenError.html' title='twig::engine::parser::token::error::TokenError'>TokenError</a>&gt;&gt; <span class='where'>where T: <a class='trait' href='../../../../../twig/engine/parser/token/trait.Pattern.html' title='twig::engine::parser::token::Pattern'>Pattern</a> + 'static</span></code></h4>
+</div><h2 id='deref-methods'>Methods from <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a>&lt;Target=<a class='enum' href='../../../../../twig/engine/parser/token/enum.Token.html' title='twig::engine::parser::token::Token'>Token</a>&gt;</h2><div class='impl-items'><h4 id='method.value' class='method'><code>fn <a href='#method.value' class='fnname'>value</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>&gt;</code></h4>
+<h4 id='method.value_as_str' class='method'><code>fn <a href='#method.value_as_str' class='fnname'>value_as_str</a>&lt;'a&gt;(&amp;'a self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;</code></h4>
+<h4 id='method.get_type' class='method'><code>fn <a href='#method.get_type' class='fnname'>get_type</a>(&amp;self) -&gt; <a class='enum' href='../../../../../twig/engine/parser/token/enum.Type.html' title='twig::engine::parser::token::Type'>Type</a></code></h4>
+<h4 id='method.is_type' class='method'><code>fn <a href='#method.is_type' class='fnname'>is_type</a>(&amp;self, typ: <a class='enum' href='../../../../../twig/engine/parser/token/enum.Type.html' title='twig::engine::parser::token::Type'>Type</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='../../../../../twig/api/error/trait.Dump.html' title='twig::api::error::Dump'>Dump</a> for <a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a></code></h3><div class='impl-items'><h4 id='assoc_type.Data' class='type'><code>type Data = <a class='type' href='../../../../../twig/engine/parser/token/stream/type.ItemDump.html' title='twig::engine::parser::token::stream::ItemDump'>ItemDump</a></code></h4>
+<h4 id='method.dump' class='method'><code>fn <a href='../../../../../twig/api/error/trait.Dump.html#method.dump' class='fnname'>dump</a>(&amp;self) -&gt; Self::<a class='trait' href='../../../../../twig/api/error/trait.Dump.html' title='twig::api::error::Dump'>Data</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a> for <a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html' title='core::convert::Into'>Into</a>&lt;<a class='enum' href='../../../../../twig/engine/parser/token/enum.Token.html' title='twig::engine::parser::token::Token'>Token</a>&gt; for <a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a></code></h3><div class='impl-items'><h4 id='method.into' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.Into.html#method.into' class='fnname'>into</a>(self) -&gt; <a class='enum' href='../../../../../twig/engine/parser/token/enum.Token.html' title='twig::engine::parser::token::Token'>Token</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html' title='core::ops::Deref'>Deref</a> for <a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a></code></h3><div class='impl-items'><h4 id='assoc_type.Target' class='type'><code>type Target = <a class='enum' href='../../../../../twig/engine/parser/token/enum.Token.html' title='twig::engine::parser::token::Token'>Token</a></code></h4>
+<h4 id='method.deref' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/ops/trait.Deref.html#method.deref' class='fnname'>deref</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../../../../twig/engine/parser/token/enum.Token.html' title='twig::engine::parser::token::Token'>Token</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../../../jquery.js"></script>
+    <script src="../../../../../main.js"></script>
+    
+    <script async src="../../../../../search-index.js"></script>
+</body>
+</html>

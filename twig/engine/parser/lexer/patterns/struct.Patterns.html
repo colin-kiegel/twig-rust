@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Patterns` struct in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Patterns">
+
+    <title>twig::engine::parser::lexer::patterns::Patterns - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../../../index.html'>twig</a>::<wbr><a href='../../../index.html'>engine</a>::<wbr><a href='../../index.html'>parser</a>::<wbr><a href='../index.html'>lexer</a>::<wbr><a href='index.html'>patterns</a></p><script>window.sidebarCurrent = {name: 'Patterns', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../../../index.html'>twig</a>::<wbr><a href='../../../index.html'>engine</a>::<wbr><a href='../../index.html'>parser</a>::<wbr><a href='../index.html'>lexer</a>::<wbr><a href='index.html'>patterns</a>::<wbr><a class='struct' href=''>Patterns</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-3545' class='srclink' href='../../../../../src/twig/engine/parser/lexer/patterns/mod.rs.html#40-57' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Patterns {
+    pub expression_end: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/expression_end/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::expression_end::Pattern'>Pattern</a>,
+    pub block_end: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/block_end/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::block_end::Pattern'>Pattern</a>,
+    pub verbatim_end: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/verbatim_end/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::verbatim_end::Pattern'>Pattern</a>,
+    pub operator: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/operator/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::operator::Pattern'>Pattern</a>,
+    pub comment_end: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/comment_end/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::comment_end::Pattern'>Pattern</a>,
+    pub verbatim_start: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/verbatim_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::verbatim_start::Pattern'>Pattern</a>,
+    pub block_line: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/block_line/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::block_line::Pattern'>Pattern</a>,
+    pub token_start: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a>,
+    pub interpolation_start: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/interpolation_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::interpolation_start::Pattern'>Pattern</a>,
+    pub interpolation_end: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/interpolation_end/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::interpolation_end::Pattern'>Pattern</a>,
+    pub name: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/name/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::name::Pattern'>Pattern</a>,
+    pub number: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/number/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::number::Pattern'>Pattern</a>,
+    pub punctuation: &amp;'static <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/punctuation/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::punctuation::Pattern'>Pattern</a>,
+    pub string: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/string/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::string::Pattern'>Pattern</a>,
+    pub string_dq_delim: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/string_dq_delim/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::string_dq_delim::Pattern'>Pattern</a>,
+    pub string_dq_part: <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/string_dq_part/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::string_dq_part::Pattern'>Pattern</a>,
+}</pre><h2 class='fields'>Fields</h2>
+<table><tr class='stab '>
+                                  <td id='structfield.expression_end'><code>expression_end</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.block_end'><code>block_end</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.verbatim_end'><code>verbatim_end</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.operator'><code>operator</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.comment_end'><code>comment_end</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.verbatim_start'><code>verbatim_start</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.block_line'><code>block_line</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.token_start'><code>token_start</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.interpolation_start'><code>interpolation_start</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.interpolation_end'><code>interpolation_end</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.name'><code>name</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.number'><code>number</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.punctuation'><code>punctuation</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.string'><code>string</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.string_dq_delim'><code>string_dq_delim</code></td><td></td></tr><tr class='stab '>
+                                  <td id='structfield.string_dq_part'><code>string_dq_part</code></td><td></td></tr></table><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(opt: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/rc/struct.Rc.html' title='alloc::rc::Rc'>Rc</a>&lt;<a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/options/struct.Options.html' title='twig::engine::parser::lexer::patterns::options::Options'>Options</a>&gt;, ext: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/rc/struct.Rc.html' title='alloc::rc::Rc'>Rc</a>&lt;<a class='struct' href='../../../../../twig/engine/extension_registry/struct.ExtensionRegistry.html' title='twig::engine::extension_registry::ExtensionRegistry'>ExtensionRegistry</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a>, <a class='struct' href='../../../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../../../regex/re/enum.Error.html' title='regex::re::Error'>regexError</a>&gt;&gt;</code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'a&gt; <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a></code></h3><div class='impl-items'><h4 id='method.eq' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../../../jquery.js"></script>
+    <script src="../../../../../main.js"></script>
+    
+    <script async src="../../../../../search-index.js"></script>
+</body>
+</html>

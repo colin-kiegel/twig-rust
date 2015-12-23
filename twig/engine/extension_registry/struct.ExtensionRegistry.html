@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ExtensionRegistry` struct in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ExtensionRegistry">
+
+    <title>twig::engine::extension_registry::ExtensionRegistry - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../index.html'>twig</a>::<wbr><a href='../index.html'>engine</a>::<wbr><a href='index.html'>extension_registry</a></p><script>window.sidebarCurrent = {name: 'ExtensionRegistry', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>twig</a>::<wbr><a href='../index.html'>engine</a>::<wbr><a href='index.html'>extension_registry</a>::<wbr><a class='struct' href=''>ExtensionRegistry</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-481' class='srclink' href='../../../src/twig/engine/extension_registry.rs.html#17-29' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct ExtensionRegistry {
+    // some fields omitted
+}</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../twig/engine/extension_registry/struct.ExtensionRegistry.html' title='twig::engine::extension_registry::ExtensionRegistry'>ExtensionRegistry</a></code></h3><div class='impl-items'><h4 id='method.push' class='method'><code>fn <a href='#method.push' class='fnname'>push</a>(&amp;mut self, extension: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.Extension.html' title='twig::extension::api::Extension'>Extension</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;mut Self, <a class='struct' href='../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../twig/engine/error/enum.ExtensionRegistryError.html' title='twig::engine::error::ExtensionRegistryError'>ExtensionRegistryError</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Register an extension</p>
+</div><h4 id='method.has' class='method'><code>fn <a href='#method.has' class='fnname'>has</a>(&amp;self, name: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p>Returns true if the given extension is registered</p>
+</div><h4 id='method.get' class='method'><code>fn <a href='#method.get' class='fnname'>get</a>(&amp;self, name: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='trait' href='../../../twig/extension/api/trait.Extension.html' title='twig::extension::api::Extension'>Extension</a>&gt;</code></h4>
+<div class='docblock'><p>Get extension by name</p>
+</div><h4 id='method.iter' class='method'><code>fn <a href='#method.iter' class='fnname'>iter</a>(&amp;self) -&gt; <a class='type' href='../../../twig/engine/extension_registry/type.Iter.html' title='twig::engine::extension_registry::Iter'>Iter</a></code></h4>
+<div class='docblock'><p>Get all registered extensions</p>
+</div><h4 id='method.initialized' class='method'><code>fn <a href='#method.initialized' class='fnname'>initialized</a>(&amp;self) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<div class='docblock'><p>Returns true if the extensions have been initialized with the engine</p>
+</div><h4 id='method.check_initialized' class='method'><code>fn <a href='#method.check_initialized' class='fnname'>check_initialized</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;&amp;Self, <a class='struct' href='../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../twig/engine/error/enum.ExtensionRegistryError.html' title='twig::engine::error::ExtensionRegistryError'>ExtensionRegistryError</a>&gt;&gt;</code></h4>
+<div class='docblock'>
+<h1 id='failures' class='section-header'><a href='#failures'>Failures</a></h1>
+<p>If the extensions have not been initialized with the engine</p>
+</div><h4 id='method.init' class='method'><code>fn <a href='#method.init' class='fnname'>init</a>(&amp;mut self, engine: &amp;mut <a class='struct' href='../../../twig/engine/struct.Engine.html' title='twig::engine::Engine'>Engine</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>()</a>, <a class='struct' href='../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../twig/engine/error/enum.ExtensionRegistryError.html' title='twig::engine::error::ExtensionRegistryError'>ExtensionRegistryError</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Initialize extensions with the engine
+This is where you can load some file that contains filter functions for instance.</p>
+</div><h4 id='method.token_parsers' class='method'><code>fn <a href='#method.token_parsers' class='fnname'>token_parsers</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html' title='std::collections::hash::map::HashMap'>HashMap</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.TokenParser.html' title='twig::extension::api::TokenParser'>TokenParser</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Get the token parser instances defined by engine extensions.</p>
+</div><h4 id='method.node_visitors' class='method'><code>fn <a href='#method.node_visitors' class='fnname'>node_visitors</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.NodeVisitor.html' title='twig::extension::api::NodeVisitor'>NodeVisitor</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Get the node visitor instances defined by engine extensions.</p>
+</div><h4 id='method.filters' class='method'><code>fn <a href='#method.filters' class='fnname'>filters</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html' title='std::collections::hash::map::HashMap'>HashMap</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.Filter.html' title='twig::extension::api::Filter'>Filter</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Get the filters defined by engine extensions.</p>
+</div><h4 id='method.tests' class='method'><code>fn <a href='#method.tests' class='fnname'>tests</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html' title='std::collections::hash::map::HashMap'>HashMap</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.Test.html' title='twig::extension::api::Test'>Test</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Get the tests defined by engine extensions.</p>
+</div><h4 id='method.functions' class='method'><code>fn <a href='#method.functions' class='fnname'>functions</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html' title='std::collections::hash::map::HashMap'>HashMap</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.Function.html' title='twig::extension::api::Function'>Function</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Get the functions defined by engine extensions.</p>
+</div><h4 id='method.operators_unary' class='method'><code>fn <a href='#method.operators_unary' class='fnname'>operators_unary</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html' title='std::collections::hash::map::HashMap'>HashMap</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='../../../twig/extension/api/struct.UnaryOperator.html' title='twig::extension::api::UnaryOperator'>UnaryOperator</a>&gt;</code></h4>
+<div class='docblock'><p>Get the unary operators defined by engine extensions.</p>
+</div><h4 id='method.operators_binary' class='method'><code>fn <a href='#method.operators_binary' class='fnname'>operators_binary</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html' title='std::collections::hash::map::HashMap'>HashMap</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>, <a class='struct' href='../../../twig/extension/api/struct.BinaryOperator.html' title='twig::extension::api::BinaryOperator'>BinaryOperator</a>&gt;</code></h4>
+<div class='docblock'><p>Get the binary operators defined by engine extensions.</p>
+</div><h4 id='method._globals' class='method'><code>fn <a href='#method._globals' class='fnname'>_globals</a>(&amp;self) -&gt; &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/collections/vec/struct.Vec.html' title='collections::vec::Vec'>Vec</a>&lt;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.Global.html' title='twig::extension::api::Global'>Global</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Get the global variables defined by engine extensions.</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../twig/engine/extension_registry/struct.ExtensionRegistry.html' title='twig::engine::extension_registry::ExtensionRegistry'>ExtensionRegistry</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../twig/engine/extension_registry/struct.ExtensionRegistry.html' title='twig::engine::extension_registry::ExtensionRegistry'>ExtensionRegistry</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../twig/engine/extension_registry/struct.ExtensionRegistry.html' title='twig::engine::extension_registry::ExtensionRegistry'>ExtensionRegistry</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script async src="../../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `extension` mod in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, extension">
+
+    <title>twig::extension - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../index.html'>twig</a></p><script>window.sidebarCurrent = {name: 'extension', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../index.html'>twig</a>::<wbr><a class='mod' href=''>extension</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-4823' class='srclink' href='../../src/twig/extension/mod.rs.html#6-35' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Twig Extensions</p>
+
+<ul>
+<li>define new behavior during the compilation process
+
+<ul>
+<li><strong>token parser</strong>: transforms a sub-sequence from the token stream (=lexed template) to nodes in the abstract syntax tree. E.g. the <code>TokenParserIf</code> parses complex if-statements (if, elseif, else, endif) and creates the if-node with according child nodes for each test and conditional branch.</li>
+<li><strong>node visitor</strong>: modifies the abstract syntax tree immediately after parsing. E.g. the <code>optimizer</code> extension defines the <code>optimizeRawFilter</code> node visitor which strips all &quot;raw&quot; filters from the syntax tree.</li>
+</ul></li>
+<li>extensions define specific new <em>node types</em> in the abstract syntax tree - falling into the following generic classes. Note that all <em>examples</em> are defined in the <code>core</code> extension, if not stated otherwise. The core extension is not yet fully implemented (see [CHANGELOG][changelog]).
+
+<ul>
+<li><strong>test</strong>: can be used in conditional statements. E.g. the <code>defined</code> test checks if a variable is defined in the current context.</li>
+<li><strong>unary operator</strong>: can be used in variable expressions to process results. E.g. the <code>-</code> (neg) operator inverts the sign of a numeric result.</li>
+<li><strong>binary operator</strong>: can be used in variable expressions to combine two results. E.g. the <code>**</code> (power) operator takes one number to the power of another number.</li>
+<li><strong>function</strong>: can be used to perform complex computations. E.g. the <code>round</code> function rounds a floating number with a given precision.</li>
+<li><strong>filter</strong> can modify the result of variable expressions. E.g. the <code>default</code> filter returns the result of the variable expression if it is defined, otherwise it returns the default value. The <code>escaper</code> filter escapes the result according to the output channel (html, html attribute, css, js, url, ..)</li>
+<li><strong>global</strong>: can be used to define global constants. Templates can test for these global constants to trigger conditional behavior, or use them as argument for functions, etc</li>
+</ul></li>
+</ul>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
+<table><tr><td><code>pub use self::<a class='mod'
+                                            href='./core/index.html'>core</a>::<a class='struct' href='../../twig/extension/core/struct.Core.html' title='twig::extension::core::Core'>Core</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./debug/index.html'>debug</a>::<a class='struct' href='../../twig/extension/debug/struct.Debug.html' title='twig::extension::debug::Debug'>Debug</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./escaper/index.html'>escaper</a>::<a class='struct' href='../../twig/extension/escaper/struct.Escaper.html' title='twig::extension::escaper::Escaper'>Escaper</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./optimizer/index.html'>optimizer</a>::<a class='struct' href='../../twig/extension/optimizer/struct.Optimizer.html' title='twig::extension::optimizer::Optimizer'>Optimizer</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./profiler/index.html'>profiler</a>::<a class='struct' href='../../twig/extension/profiler/struct.Profiler.html' title='twig::extension::profiler::Profiler'>Profiler</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./sandbox/index.html'>sandbox</a>::<a class='struct' href='../../twig/extension/sandbox/struct.Sandbox.html' title='twig::extension::sandbox::Sandbox'>Sandbox</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./staging/index.html'>staging</a>::<a class='struct' href='../../twig/extension/staging/struct.Staging.html' title='twig::extension::staging::Staging'>Staging</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./string_loader/index.html'>string_loader</a>::<a class='struct' href='../../twig/extension/string_loader/struct.StringLoader.html' title='twig::extension::string_loader::StringLoader'>StringLoader</a>;</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='api/index.html'
+                               title='twig::extension::api'>api</a></td>
+                        <td class='docblock short'>
+                             <p>Twig Extension API</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='core/index.html'
+                               title='twig::extension::core'>core</a></td>
+                        <td class='docblock short'>
+                             <p>Core Extension</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='debug/index.html'
+                               title='twig::extension::debug'>debug</a></td>
+                        <td class='docblock short'>
+                             <p>Debug Extension.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='escaper/index.html'
+                               title='twig::extension::escaper'>escaper</a></td>
+                        <td class='docblock short'>
+                             <p>Escaper Extension</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='optimizer/index.html'
+                               title='twig::extension::optimizer'>optimizer</a></td>
+                        <td class='docblock short'>
+                             <p>Optimizer Extension</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='profiler/index.html'
+                               title='twig::extension::profiler'>profiler</a></td>
+                        <td class='docblock short'>
+                             <p>Profiler Extension</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='sandbox/index.html'
+                               title='twig::extension::sandbox'>sandbox</a></td>
+                        <td class='docblock short'>
+                             <p>Sandbox Extension</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='staging/index.html'
+                               title='twig::extension::staging'>staging</a></td>
+                        <td class='docblock short'>
+                             <p>Staging Extension</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='string_loader/index.html'
+                               title='twig::extension::string_loader'>string_loader</a></td>
+                        <td class='docblock short'>
+                             <p>String Loader Extension</p>
+
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../jquery.js"></script>
+    <script src="../../main.js"></script>
+    
+    <script async src="../../search-index.js"></script>
+</body>
+</html>

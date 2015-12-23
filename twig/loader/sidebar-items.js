@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["array","Loads a template from an array."],["error","Typisation of loader errors."],["filesystem","Loads a template from the filesystem."]],"trait":[["Loader",""]]});

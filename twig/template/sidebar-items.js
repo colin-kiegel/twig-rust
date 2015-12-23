@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["api","Twig Template API."],["compiled","Default base class for compiled templates."],["raw","Twig raw template."]]});

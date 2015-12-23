@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["BracketType",""],["Punctuation",""],["Token",""],["Type",""]],"mod":[["error","Typisation of syntax errors."],["stream","Represents a token stream."]],"trait":[["Pattern",""]],"type":[["PatternDump",""],["TokenDump",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["error","Typisation of lexer and syntax errors."],["job","A lexer job - modeled as a FSM (Finite State Machine)."],["patterns","The patterns used by the lexer to tokenize the templates."]],"struct":[["Lexer",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ItemData",""],["Pattern",""]],"type":[["ExtractIter",""]]});

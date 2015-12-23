@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["namespace","Namespaces for the filesystem template loader."],["path","Paths for the filesystem template loader."]],"struct":[["Filesystem",""]]});

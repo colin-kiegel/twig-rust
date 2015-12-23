@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `lexer` mod in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, lexer">
+
+    <title>twig::engine::parser::lexer - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../../index.html'>twig</a>::<wbr><a href='../../index.html'>engine</a>::<wbr><a href='../index.html'>parser</a></p><script>window.sidebarCurrent = {name: 'lexer', ty: 'mod', relpath: '../'};</script><script defer src="../sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content mod">
+<h1 class='fqn'><span class='in-band'>Module <a href='../../../index.html'>twig</a>::<wbr><a href='../../index.html'>engine</a>::<wbr><a href='../index.html'>parser</a>::<wbr><a class='mod' href=''>lexer</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-1577' class='srclink' href='../../../../src/twig/engine/parser/lexer/mod.rs.html#6-62' title='goto source code'>[src]</a></span></h1>
+<div class='docblock'><p>Lexes a template string.</p>
+</div><h2 id='reexports' class='section-header'><a href="#reexports">Reexports</a></h2>
+<table><tr><td><code>pub use self::<a class='mod'
+                                            href='./patterns/index.html'>patterns</a>::<a class='struct' href='../../../../twig/engine/parser/lexer/patterns/struct.Patterns.html' title='twig::engine::parser::lexer::patterns::Patterns'>Patterns</a>;</code></td></tr><tr><td><code>pub use self::<a class='mod'
+                                            href='./patterns/index.html'>patterns</a>::<a class='mod'
+                                            href='./patterns/options/index.html'>options</a>::<a class='struct' href='../../../../twig/engine/parser/lexer/patterns/options/struct.Options.html' title='twig::engine::parser::lexer::patterns::options::Options'>Options</a>;</code></td></tr><tr><td><code>pub use self::error::{<a class='enum' href='../../../../twig/engine/parser/lexer/error/enum.LexerError.html' title='twig::engine::parser::lexer::error::LexerError'>LexerError</a>, <a class='enum' href='../../../../twig/engine/parser/lexer/error/enum.SyntaxError.html' title='twig::engine::parser::lexer::error::SyntaxError'>SyntaxError</a>};</code></td></tr></table><h2 id='modules' class='section-header'><a href="#modules">Modules</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='error/index.html'
+                               title='twig::engine::parser::lexer::error'>error</a></td>
+                        <td class='docblock short'>
+                             <p>Typisation of lexer and syntax errors.</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='job/index.html'
+                               title='twig::engine::parser::lexer::job'>job</a></td>
+                        <td class='docblock short'>
+                             <p>A lexer job - modeled as a FSM (Finite State Machine).</p>
+
+                        </td>
+                    </tr>
+                
+                    <tr class=' module-item'>
+                        <td><a class='mod' href='patterns/index.html'
+                               title='twig::engine::parser::lexer::patterns'>patterns</a></td>
+                        <td class='docblock short'>
+                             <p>The patterns used by the lexer to tokenize the templates.</p>
+
+                        </td>
+                    </tr>
+                </table><h2 id='structs' class='section-header'><a href="#structs">Structs</a></h2>
+<table>
+                    <tr class=' module-item'>
+                        <td><a class='struct' href='struct.Lexer.html'
+                               title='twig::engine::parser::lexer::Lexer'>Lexer</a></td>
+                        <td class='docblock short'>
+                             
+                        </td>
+                    </tr>
+                </table></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../../jquery.js"></script>
+    <script src="../../../../main.js"></script>
+    
+    <script async src="../../../../search-index.js"></script>
+</body>
+</html>

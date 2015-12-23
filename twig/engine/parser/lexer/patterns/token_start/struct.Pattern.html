@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Pattern` struct in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Pattern">
+
+    <title>twig::engine::parser::lexer::patterns::token_start::Pattern - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../../../../index.html'>twig</a>::<wbr><a href='../../../../index.html'>engine</a>::<wbr><a href='../../../index.html'>parser</a>::<wbr><a href='../../index.html'>lexer</a>::<wbr><a href='../index.html'>patterns</a>::<wbr><a href='index.html'>token_start</a></p><script>window.sidebarCurrent = {name: 'Pattern', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../../../../index.html'>twig</a>::<wbr><a href='../../../../index.html'>engine</a>::<wbr><a href='../../../index.html'>parser</a>::<wbr><a href='../../index.html'>lexer</a>::<wbr><a href='../index.html'>patterns</a>::<wbr><a href='index.html'>token_start</a>::<wbr><a class='struct' href=''>Pattern</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-2262' class='srclink' href='../../../../../../src/twig/engine/parser/lexer/patterns/token_start.rs.html#19-22' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Pattern {
+    // some fields omitted
+}</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a></code></h3><div class='impl-items'><h4 id='method.new' class='method'><code>fn <a href='#method.new' class='fnname'>new</a>(opt: &amp;<a class='struct' href='https://doc.rust-lang.org/nightly/alloc/rc/struct.Rc.html' title='alloc::rc::Rc'>Rc</a>&lt;<a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/options/struct.Options.html' title='twig::engine::parser::lexer::patterns::options::Options'>Options</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a>, <a class='struct' href='../../../../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../../../../regex/re/enum.Error.html' title='regex::re::Error'>regexError</a>&gt;&gt;</code></h4>
+</div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl&lt;'t&gt; <a class='trait' href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html' title='twig::engine::parser::lexer::patterns::Extract'>Extract</a>&lt;'t&gt; for <a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a></code></h3><div class='impl-items'><h4 id='assoc_type.Item' class='type'><code>type Item = <a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.ItemData.html' title='twig::engine::parser::lexer::patterns::token_start::ItemData'>ItemData</a></code></h4>
+<h4 id='method.regex' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.regex' class='fnname'>regex</a>(&amp;self) -&gt; &amp;<a class='enum' href='../../../../../../regex/re/enum.Regex.html' title='regex::re::Regex'>Regex</a></code></h4>
+<h4 id='method.item_from_captures' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.item_from_captures' class='fnname'>item_from_captures</a>(&amp;self, captures: &amp;<a class='struct' href='../../../../../../regex/re/struct.Captures.html' title='regex::re::Captures'>Captures</a>) -&gt; <a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.ItemData.html' title='twig::engine::parser::lexer::patterns::token_start::ItemData'>ItemData</a></code></h4>
+<h4 id='method.extract' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.extract' class='fnname'>extract</a>(&amp;self, text: &amp;'t <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;Self::<a class='trait' href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html' title='twig::engine::parser::lexer::patterns::Extract'>Item</a>&gt;</code></h4>
+<h4 id='method.extract_iter' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.extract_iter' class='fnname'>extract_iter</a>&lt;'p&gt;(&amp;'p self, text: &amp;'t <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/struct.ExtractIter.html' title='twig::engine::parser::lexer::patterns::ExtractIter'>ExtractIter</a>&lt;'p, 't, Self&gt; <span class='where'>where Self: <a class='trait' href='https://doc.rust-lang.org/nightly/core/marker/trait.Sized.html' title='core::marker::Sized'>Sized</a></span></code></h4>
+<h4 id='method.is_match' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.is_match' class='fnname'>is_match</a>(&amp;self, text: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.find' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.find' class='fnname'>find</a>(&amp;self, text: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.tuple.html'>(<a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>)</a>&gt;</code></h4>
+<h4 id='method.find_iter' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.find_iter' class='fnname'>find_iter</a>&lt;'r&gt;(&amp;'r self, text: &amp;'t <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../../../../../../regex/re/struct.FindMatches.html' title='regex::re::FindMatches'>FindMatches</a>&lt;'r, 't&gt;</code></h4>
+<h4 id='method.captures' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.captures' class='fnname'>captures</a>(&amp;self, text: &amp;'t <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='struct' href='../../../../../../regex/re/struct.Captures.html' title='regex::re::Captures'>Captures</a>&lt;'t&gt;&gt;</code></h4>
+<h4 id='method.captures_iter' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.captures_iter' class='fnname'>captures_iter</a>&lt;'r&gt;(&amp;'r self, text: &amp;'t <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../../../../../../regex/re/struct.FindCaptures.html' title='regex::re::FindCaptures'>FindCaptures</a>&lt;'r, 't&gt;</code></h4>
+<h4 id='method.split' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.split' class='fnname'>split</a>&lt;'r&gt;(&amp;'r self, text: &amp;'t <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>) -&gt; <a class='struct' href='../../../../../../regex/re/struct.RegexSplits.html' title='regex::re::RegexSplits'>RegexSplits</a>&lt;'r, 't&gt;</code></h4>
+<h4 id='method.splitn' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.splitn' class='fnname'>splitn</a>&lt;'r&gt;(&amp;'r self, text: &amp;'t <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, limit: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>) -&gt; <a class='struct' href='../../../../../../regex/re/struct.RegexSplitsN.html' title='regex::re::RegexSplitsN'>RegexSplitsN</a>&lt;'r, 't&gt;</code></h4>
+<h4 id='method.replace' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.replace' class='fnname'>replace</a>&lt;R: <a class='trait' href='../../../../../../regex/re/trait.Replacer.html' title='regex::re::Replacer'>Replacer</a>&gt;(&amp;self, text: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, rep: R) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<h4 id='method.replace_all' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.replace_all' class='fnname'>replace_all</a>&lt;R: <a class='trait' href='../../../../../../regex/re/trait.Replacer.html' title='regex::re::Replacer'>Replacer</a>&gt;(&amp;self, text: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, rep: R) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<h4 id='method.replacen' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.replacen' class='fnname'>replacen</a>&lt;R: <a class='trait' href='../../../../../../regex/re/trait.Replacer.html' title='regex::re::Replacer'>Replacer</a>&gt;(&amp;self, text: &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>, limit: <a href='https://doc.rust-lang.org/nightly/std/primitive.usize.html'>usize</a>, rep: R) -&gt; <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a></code></h4>
+<h4 id='method.as_str' class='method'><code>fn <a href='../../../../../../twig/engine/parser/lexer/patterns/trait.Extract.html#method.as_str' class='fnname'>as_str</a>&lt;'a&gt;(&amp;'a self) -&gt; &amp;'a <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html' title='core::cmp::PartialEq'>PartialEq</a> for <a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a></code></h3><div class='impl-items'><h4 id='method.eq' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.eq' class='fnname'>eq</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+<h4 id='method.ne' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/cmp/trait.PartialEq.html#method.ne' class='fnname'>ne</a>(&amp;self, __arg_0: &amp;<a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a>) -&gt; <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../../../../twig/engine/parser/lexer/patterns/token_start/struct.Pattern.html' title='twig::engine::parser::lexer::patterns::token_start::Pattern'>Pattern</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../../../../jquery.js"></script>
+    <script src="../../../../../../main.js"></script>
+    
+    <script async src="../../../../../../search-index.js"></script>
+</body>
+</html>

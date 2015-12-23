@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["api","Twig Extension API"],["core","Core Extension"],["debug","Debug Extension."],["escaper","Escaper Extension"],["optimizer","Optimizer Extension"],["profiler","Profiler Extension"],["sandbox","Sandbox Extension"],["staging","Staging Extension"],["string_loader","String Loader Extension"]]});

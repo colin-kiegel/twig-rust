@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `ParserError` enum in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, ParserError">
+
+    <title>twig::engine::parser::error::ParserError - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../../index.html'>twig</a>::<wbr><a href='../../index.html'>engine</a>::<wbr><a href='../index.html'>parser</a>::<wbr><a href='index.html'>error</a></p><script>window.sidebarCurrent = {name: 'ParserError', ty: 'enum', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content enum">
+<h1 class='fqn'><span class='in-band'>Enum <a href='../../../index.html'>twig</a>::<wbr><a href='../../index.html'>engine</a>::<wbr><a href='../index.html'>parser</a>::<wbr><a href='index.html'>error</a>::<wbr><a class='enum' href=''>ParserError</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-597' class='srclink' href='../../../../src/twig/engine/parser/error.rs.html#17-53' title='goto source code'>[src]</a></span></h1>
+<pre class='rust enum'>pub enum ParserError {
+    Unreachable {
+        reason: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+        job: <a class='type' href='../../../../twig/engine/parser/job/type.JobDump.html' title='twig::engine::parser::job::JobDump'>JobDump</a>,
+    },
+    MissingExtensions,
+    InvalidState {
+        item: <a class='struct' href='../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a>,
+        job: <a class='type' href='../../../../twig/engine/parser/job/type.JobDump.html' title='twig::engine::parser::job::JobDump'>JobDump</a>,
+    },
+    Token(<a class='enum' href='../../../../twig/engine/parser/token/error/enum.TokenError.html' title='twig::engine::parser::token::error::TokenError'>TokenError</a>),
+    TokenParserError {
+        tag: &amp;'static <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>,
+        error: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+        job: <a class='type' href='../../../../twig/engine/parser/job/type.JobDump.html' title='twig::engine::parser::job::JobDump'>JobDump</a>,
+    },
+    SemanticError,
+    NoTagHandler {
+        tag: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+        position: <a class='struct' href='../../../../twig/engine/parser/token/stream/struct.Position.html' title='twig::engine::parser::token::stream::Position'>Position</a>,
+        job: <a class='type' href='../../../../twig/engine/parser/job/type.JobDump.html' title='twig::engine::parser::job::JobDump'>JobDump</a>,
+    },
+    UnexpectedBinaryOperator {
+        name: <a class='struct' href='https://doc.rust-lang.org/nightly/collections/string/struct.String.html' title='collections::string::String'>String</a>,
+        job: <a class='type' href='../../../../twig/engine/parser/job/type.JobDump.html' title='twig::engine::parser::job::JobDump'>JobDump</a>,
+    },
+    UnexpectedToken {
+        reason: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'static <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;,
+        expected: <a class='type' href='../../../../twig/engine/parser/token/type.PatternDump.html' title='twig::engine::parser::token::PatternDump'>PatternDump</a>,
+        found: <a class='struct' href='../../../../twig/engine/parser/token/stream/struct.Item.html' title='twig::engine::parser::token::stream::Item'>Item</a>,
+    },
+    UnexpectedEof {
+        reason: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;'static <a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a>&gt;,
+        expected: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a class='type' href='../../../../twig/engine/parser/token/type.PatternDump.html' title='twig::engine::parser::token::PatternDump'>PatternDump</a>&gt;,
+        cursor: <a class='struct' href='../../../../twig/engine/parser/job/cursor/struct.CursorDump.html' title='twig::engine::parser::job::cursor::CursorDump'>CursorDump</a>,
+    },
+}</pre><h2 class='variants'>Variants</h2>
+<table><tr><td id='variant.Unreachable'><code>Unreachable</code></td><td><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.Unreachable.field.reason'><code>reason</code></td><td></td></tr><tr><td id='variant.Unreachable.field.job'><code>job</code></td><td></td></tr></table></td></tr><tr><td id='variant.MissingExtensions'><code>MissingExtensions</code></td><td></td></tr><tr><td id='variant.InvalidState'><code>InvalidState</code></td><td><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.InvalidState.field.item'><code>item</code></td><td></td></tr><tr><td id='variant.InvalidState.field.job'><code>job</code></td><td></td></tr></table></td></tr><tr><td id='variant.Token'><code>Token</code></td><td></td></tr><tr><td id='variant.TokenParserError'><code>TokenParserError</code></td><td><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.TokenParserError.field.tag'><code>tag</code></td><td></td></tr><tr><td id='variant.TokenParserError.field.error'><code>error</code></td><td></td></tr><tr><td id='variant.TokenParserError.field.job'><code>job</code></td><td></td></tr></table></td></tr><tr><td id='variant.SemanticError'><code>SemanticError</code></td><td></td></tr><tr><td id='variant.NoTagHandler'><code>NoTagHandler</code></td><td><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.NoTagHandler.field.tag'><code>tag</code></td><td></td></tr><tr><td id='variant.NoTagHandler.field.position'><code>position</code></td><td></td></tr><tr><td id='variant.NoTagHandler.field.job'><code>job</code></td><td></td></tr></table></td></tr><tr><td id='variant.UnexpectedBinaryOperator'><code>UnexpectedBinaryOperator</code></td><td><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.UnexpectedBinaryOperator.field.name'><code>name</code></td><td></td></tr><tr><td id='variant.UnexpectedBinaryOperator.field.job'><code>job</code></td><td></td></tr></table></td></tr><tr><td id='variant.UnexpectedToken'><code>UnexpectedToken</code></td><td><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.UnexpectedToken.field.reason'><code>reason</code></td><td></td></tr><tr><td id='variant.UnexpectedToken.field.expected'><code>expected</code></td><td></td></tr><tr><td id='variant.UnexpectedToken.field.found'><code>found</code></td><td></td></tr></table></td></tr><tr><td id='variant.UnexpectedEof'><code>UnexpectedEof</code></td><td><h3 class='fields'>Fields</h3>
+
+                                              <table><tr><td id='variant.UnexpectedEof.field.reason'><code>reason</code></td><td></td></tr><tr><td id='variant.UnexpectedEof.field.expected'><code>expected</code></td><td></td></tr><tr><td id='variant.UnexpectedEof.field.cursor'><code>cursor</code></td><td></td></tr></table></td></tr></table><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html' title='core::convert::From'>From</a>&lt;<a class='enum' href='../../../../twig/engine/parser/token/error/enum.TokenError.html' title='twig::engine::parser::token::error::TokenError'>TokenError</a>&gt; for <a class='enum' href='../../../../twig/engine/parser/error/enum.ParserError.html' title='twig::engine::parser::error::ParserError'>ParserError</a></code></h3><div class='impl-items'><h4 id='method.from' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/convert/trait.From.html#method.from' class='fnname'>from</a>(err: <a class='enum' href='../../../../twig/engine/parser/token/error/enum.TokenError.html' title='twig::engine::parser::token::error::TokenError'>TokenError</a>) -&gt; <a class='enum' href='../../../../twig/engine/parser/error/enum.ParserError.html' title='twig::engine::parser::error::ParserError'>ParserError</a></code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/std/error/trait.Error.html' title='std::error::Error'>Error</a> for <a class='enum' href='../../../../twig/engine/parser/error/enum.ParserError.html' title='twig::engine::parser::error::ParserError'>ParserError</a></code></h3><div class='impl-items'><h4 id='method.description' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/error/trait.Error.html#method.description' class='fnname'>description</a>(&amp;self) -&gt; &amp;<a href='https://doc.rust-lang.org/nightly/std/primitive.str.html'>str</a></code></h4>
+<h4 id='method.cause' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/std/error/trait.Error.html#method.cause' class='fnname'>cause</a>(&amp;self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='trait' href='https://doc.rust-lang.org/nightly/std/error/trait.Error.html' title='std::error::Error'>Error</a>&gt;</code></h4>
+</div><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html' title='core::fmt::Display'>Display</a> for <a class='enum' href='../../../../twig/engine/parser/error/enum.ParserError.html' title='twig::engine::parser::error::ParserError'>ParserError</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Display.html#method.fmt' class='fnname'>fmt</a>(&amp;self, f: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='enum' href='../../../../twig/engine/parser/error/enum.ParserError.html' title='twig::engine::parser::error::ParserError'>ParserError</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../../jquery.js"></script>
+    <script src="../../../../main.js"></script>
+    
+    <script async src="../../../../search-index.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="rustdoc">
+    <meta name="description" content="API documentation for the Rust `Setup` struct in crate `twig`.">
+    <meta name="keywords" content="rust, rustlang, rust-lang, Setup">
+
+    <title>twig::engine::setup::Setup - Rust</title>
+
+    <link rel="stylesheet" type="text/css" href="../../../main.css">
+
+    
+    
+</head>
+<body class="rustdoc">
+    <!--[if lte IE 8]>
+    <div class="warning">
+        This old browser is unsupported and will most likely display funky
+        things.
+    </div>
+    <![endif]-->
+
+    
+
+    <nav class="sidebar">
+        
+        <p class='location'><a href='../../index.html'>twig</a>::<wbr><a href='../index.html'>engine</a>::<wbr><a href='index.html'>setup</a></p><script>window.sidebarCurrent = {name: 'Setup', ty: 'struct', relpath: ''};</script><script defer src="sidebar-items.js"></script>
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <div class="search-container">
+                <input class="search-input" name="search"
+                       autocomplete="off"
+                       placeholder="Click or press ‘S’ to search, ‘?’ for more options…"
+                       type="search">
+            </div>
+        </form>
+    </nav>
+
+    <section id='main' class="content struct">
+<h1 class='fqn'><span class='in-band'>Struct <a href='../../index.html'>twig</a>::<wbr><a href='../index.html'>engine</a>::<wbr><a href='index.html'>setup</a>::<wbr><a class='struct' href=''>Setup</a></span><span class='out-of-band'><span id='render-detail'>
+            <a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">
+                [<span class='inner'>&#x2212;</span>]
+            </a>
+        </span><a id='src-413' class='srclink' href='../../../src/twig/engine/setup.rs.html#20-23' title='goto source code'>[src]</a></span></h1>
+<pre class='rust struct'>pub struct Setup {
+    // some fields omitted
+}</pre><h2 id='methods'>Methods</h2><h3 class='impl'><code>impl <a class='struct' href='../../../twig/engine/setup/struct.Setup.html' title='twig::engine::setup::Setup'>Setup</a></code></h3><div class='docblock'><p>Builds an instance of the Twig Engine, according to supplied options and engine extensions.</p>
+
+<p>The following extensions will be registered by default:
+* core
+* escaper
+* optimizer</p>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>twig</span>::{<span class='ident'>Setup</span>, <span class='ident'>Engine</span>};
+<span class='kw'>use</span> <span class='ident'>twig</span>::<span class='ident'>extension</span>::<span class='ident'>Debug</span>;
+
+<span class='kw'>let</span> <span class='kw-2'>mut</span> <span class='ident'>setup</span> <span class='op'>=</span> <span class='ident'>Setup</span>::<span class='ident'>default</span>()
+    .<span class='ident'>set_strict_variables</span>(<span class='boolval'>true</span>)
+    .<span class='ident'>add_extension</span>(<span class='ident'>Debug</span>::<span class='ident'>new</span>()).<span class='ident'>unwrap</span>();
+<span class='kw'>let</span> <span class='ident'>engine</span> <span class='op'>=</span> <span class='ident'>Engine</span>::<span class='ident'>new</span>(<span class='ident'>setup</span>).<span class='ident'>unwrap</span>();</pre>
+</div><div class='impl-items'><h4 id='method.engine' class='method'><code>fn <a href='#method.engine' class='fnname'>engine</a>(self) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;<a class='struct' href='../../../twig/engine/struct.Engine.html' title='twig::engine::Engine'>Engine</a>, <a class='struct' href='../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../twig/engine/error/enum.TwigError.html' title='twig::engine::error::TwigError'>TwigError</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Create engine from setup.</p>
+
+<h1 id='examples' class='section-header'><a href='#examples'>Examples</a></h1><pre class='rust rust-example-rendered'>
+<span class='kw'>use</span> <span class='ident'>twig</span>::<span class='ident'>Setup</span>;
+
+<span class='kw'>let</span> <span class='ident'>twig</span> <span class='op'>=</span> <span class='ident'>Setup</span>::<span class='ident'>default</span>().<span class='ident'>engine</span>().<span class='ident'>unwrap</span>();</pre>
+</div><h4 id='method.add_extension' class='method'><code>fn <a href='#method.add_extension' class='fnname'>add_extension</a>(self, extension: <a class='struct' href='https://doc.rust-lang.org/nightly/alloc/boxed/struct.Box.html' title='alloc::boxed::Box'>Box</a>&lt;<a class='trait' href='../../../twig/extension/api/trait.Extension.html' title='twig::extension::api::Extension'>Extension</a>&gt;) -&gt; <a class='enum' href='https://doc.rust-lang.org/nightly/core/result/enum.Result.html' title='core::result::Result'>Result</a>&lt;Self, <a class='struct' href='../../../twig/api/error/struct.Traced.html' title='twig::api::error::Traced'>Traced</a>&lt;<a class='enum' href='../../../twig/engine/error/enum.TwigError.html' title='twig::engine::error::TwigError'>TwigError</a>&gt;&gt;</code></h4>
+<div class='docblock'><p>Registers an extension</p>
+</div><h4 id='method.set_debug' class='method'><code>fn <a href='#method.set_debug' class='fnname'>set_debug</a>(self, debug: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; Self</code></h4>
+<div class='docblock'><p>When set to true, it automatically set &quot;auto_reload&quot; to true as well
+(default to false)</p>
+</div><h4 id='method.set_charset' class='method'><code>fn <a href='#method.set_charset' class='fnname'>set_charset</a>(self, set_charset: <a class='enum' href='../../../twig/engine/options/enum.Charset.html' title='twig::engine::options::Charset'>Charset</a>) -&gt; Self</code></h4>
+<div class='docblock'><p>The charset used by the templates (default to UTF-8)</p>
+</div><h4 id='method.set_strict_variables' class='method'><code>fn <a href='#method.set_strict_variables' class='fnname'>set_strict_variables</a>(self, strict_variables: <a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>) -&gt; Self</code></h4>
+<div class='docblock'><p>Whether to ignore invalid variables in templates
+(default to false).</p>
+</div><h4 id='method.set_autoescape' class='method'><code>fn <a href='#method.set_autoescape' class='fnname'>set_autoescape</a>(self, autoescape: <a class='type' href='../../../twig/engine/options/type.Autoescape.html' title='twig::engine::options::Autoescape'>Autoescape</a>) -&gt; Self</code></h4>
+<div class='docblock'><p>Whether to enable auto-escaping (default to html):
+* false: disable auto-escaping
+* true: equivalent to html
+* html, js: set the autoescaping to one of the supported strategies
+* filename: set the autoescaping strategy based on the template filename extension
+* PHP callback: a PHP callback that returns an escaping strategy based on the template &quot;filename&quot;</p>
+</div><h4 id='method.set_cache' class='method'><code>fn <a href='#method.set_cache' class='fnname'>set_cache</a>(self, cache: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;&amp;<a class='struct' href='https://doc.rust-lang.org/nightly/std/path/struct.Path.html' title='std::path::Path'>Path</a>&gt;) -&gt; Self</code></h4>
+<div class='docblock'><p>An absolute path where to store the compiled templates (optional)</p>
+</div><h4 id='method.set_auto_reload' class='method'><code>fn <a href='#method.set_auto_reload' class='fnname'>set_auto_reload</a>(self, auto_reload: <a class='enum' href='https://doc.rust-lang.org/nightly/core/option/enum.Option.html' title='core::option::Option'>Option</a>&lt;<a href='https://doc.rust-lang.org/nightly/std/primitive.bool.html'>bool</a>&gt;) -&gt; Self</code></h4>
+<div class='docblock'><p>Whether to reload the template if the original source changed (optional).
+If you don&#39;t provide the auto_reload option, it will be
+determined automatically based on the debug value.</p>
+</div><h4 id='method.set_optimizations' class='method'><code>fn <a href='#method.set_optimizations' class='fnname'>set_optimizations</a>(self, optimizations: <a class='type' href='../../../twig/engine/options/type.Optimizations.html' title='twig::engine::options::Optimizations'>Optimizations</a>) -&gt; Self</code></h4>
+<div class='docblock'><p>A flag that indicates whether optimizations are applied</p>
+</div><h4 id='method.options' class='method'><code>fn <a href='#method.options' class='fnname'>options</a>(&amp;self) -&gt; &amp;<a class='struct' href='../../../twig/engine/options/struct.Options.html' title='twig::engine::options::Options'>Options</a></code></h4>
+<div class='docblock'><p>Get all options</p>
+</div><h4 id='method.extensions' class='method'><code>fn <a href='#method.extensions' class='fnname'>extensions</a>(&amp;self) -&gt; <a class='type' href='../../../twig/engine/extension_registry/type.Iter.html' title='twig::engine::extension_registry::Iter'>Iter</a></code></h4>
+<div class='docblock'><p>Get all registered extensions</p>
+</div></div><h2 id='implementations'>Trait Implementations</h2><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html' title='core::default::Default'>Default</a> for <a class='struct' href='../../../twig/engine/setup/struct.Setup.html' title='twig::engine::setup::Setup'>Setup</a></code></h3><div class='impl-items'><h4 id='method.default' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/default/trait.Default.html#method.default' class='fnname'>default</a>() -&gt; <a class='struct' href='../../../twig/engine/setup/struct.Setup.html' title='twig::engine::setup::Setup'>Setup</a></code></h4>
+</div><h3 id='derived_implementations'>Derived Implementations </h3><h3 class='impl'><code>impl <a class='trait' href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html' title='core::fmt::Debug'>Debug</a> for <a class='struct' href='../../../twig/engine/setup/struct.Setup.html' title='twig::engine::setup::Setup'>Setup</a></code></h3><div class='impl-items'><h4 id='method.fmt' class='method'><code>fn <a href='https://doc.rust-lang.org/nightly/core/fmt/trait.Debug.html#method.fmt' class='fnname'>fmt</a>(&amp;self, __arg_0: &amp;mut <a class='struct' href='https://doc.rust-lang.org/nightly/core/fmt/struct.Formatter.html' title='core::fmt::Formatter'>Formatter</a>) -&gt; <a class='type' href='https://doc.rust-lang.org/nightly/core/fmt/type.Result.html' title='core::fmt::Result'>Result</a></code></h4>
+</div></section>
+    <section id='search' class="content hidden"></section>
+
+    <section class="footer"></section>
+
+    <aside id="help" class="hidden">
+        <div>
+            <h1 class="hidden">Help</h1>
+
+            <div class="shortcuts">
+                <h2>Keyboard Shortcuts</h2>
+
+                <dl>
+                    <dt>?</dt>
+                    <dd>Show this help dialog</dd>
+                    <dt>S</dt>
+                    <dd>Focus the search field</dd>
+                    <dt>&larrb;</dt>
+                    <dd>Move up in search results</dd>
+                    <dt>&rarrb;</dt>
+                    <dd>Move down in search results</dd>
+                    <dt>&#9166;</dt>
+                    <dd>Go to active search result</dd>
+                </dl>
+            </div>
+
+            <div class="infos">
+                <h2>Search Tricks</h2>
+
+                <p>
+                    Prefix searches with a type followed by a colon (e.g.
+                    <code>fn:</code>) to restrict the search to a given type.
+                </p>
+
+                <p>
+                    Accepted types are: <code>fn</code>, <code>mod</code>,
+                    <code>struct</code>, <code>enum</code>,
+                    <code>trait</code>, <code>type</code>, <code>macro</code>,
+                    and <code>const</code>.
+                </p>
+
+                <p>
+                    Search functions by type signature (e.g.
+                    <code>vec -> usize</code>)
+                </p>
+            </div>
+        </div>
+    </aside>
+
+    
+
+    <script>
+        window.rootPath = "../../../";
+        window.currentCrate = "twig";
+        window.playgroundUrl = "";
+    </script>
+    <script src="../../../jquery.js"></script>
+    <script src="../../../main.js"></script>
+    
+    <script async src="../../../search-index.js"></script>
+</body>
+</html>
